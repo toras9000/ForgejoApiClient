@@ -1,0 +1,10 @@
+services:
+  app:
+    volumes:
+      - type: volume
+        source: forgejo-data
+        target: /data
+
+volumes:
+  forgejo-data:
+

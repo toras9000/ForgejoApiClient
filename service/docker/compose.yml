@@ -1,0 +1,31 @@
+services:
+  app:
+    image: codeberg.org/forgejo/forgejo:7.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: curl -f -s http://localhost:3000 || exit 1
+      start_period: 60s
+      start_interval: 3s
+      timeout: 5s
+      interval: 300s
+      retries: 3
+    ports:
+      - "9970:3000"
+      - "9972:22"
+    environment:
+      - TZ=JST-9
+      - USER_UID=1000
+      - USER_GID=1000
+      - FORGEJO__log__LEVEL=Info
+      - FORGEJO__database__DB_TYPE=sqlite3
+      - FORGEJO__cron_0x2E_update_checker__ENABLED=false
+      - FORGEJO__server__SSH_PORT=9972
+      - FORGEJO__server__ROOT_URL=http://localhost:9970
+      - FORGEJO__security__DISABLE_GIT_HOOKS=false
+      - FORGEJO__webhook__ALLOWED_HOST_LIST=*
+      - FORGEJO__migrations__ALLOW_LOCALNETWORKS=true
+      - FORGEJO__repository__ENABLE_FLAGS=true
+      - FORGEJO__repository__SETTABLE_FLAGS=flag1,flag2,flag3
+      - FORGEJO__federation__ENABLED=true
+    extra_hosts:
+      - testhost-gateway:host-gateway

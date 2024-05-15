@@ -1,0 +1,8 @@
+services:
+  app:
+    volumes:
+      - type: bind
+        source: ./volumes/forgejo/app
+        target: /data
+        bind:
+          create_host_path: true

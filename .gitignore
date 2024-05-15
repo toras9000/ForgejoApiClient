@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+## 追加の無視項目
+volumes
+test/test-forgejo-instance.json
+.vscode
+omnisharp.json
