@@ -100,3 +100,29 @@ public sealed record DownloadResult(Stream Stream, string? FileName) : IDisposab
     /// <summary>リソース破棄</summary>
     public void Dispose() => this.Stream.Dispose();
 }
+
+/// <summary>チーム検索結果型</summary>
+/// <param name="ok">検索成否</param>
+/// <param name="data">検索結果</param>
+public record TeamSearchResults(bool ok, Team[] data);
+
+/// <summary>ユーザ検索結果型</summary>
+/// <param name="ok">検索成否</param>
+/// <param name="data">検索結果</param>
+public record UserSearchResults(bool ok, User[] data);
+
+/// <summary>アクションランナー登録トークン型</summary>
+/// <param name="token">トークン</param>
+public record RegistrationTokenResult(string token);
+
+/// <summary>PGP検証パラメータ型</summary>
+/// <param name="key_id">GPGキーID</param>
+/// <param name="armored_signature">Armor形式のGPG署名</param>
+public record VerifyGPGKeyOption(
+    string key_id,
+    string? armored_signature = default
+);
+
+/// <summary>トピック検索結果型</summary>
+/// <param name="topics">検索結果</param>
+public record TopicSearchResults(TopicResponse[] topics);
