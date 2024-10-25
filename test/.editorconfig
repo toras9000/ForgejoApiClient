@@ -1,0 +1,12 @@
+root = false
+
+# All files
+[*]
+indent_style = space
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none
+
+# Xml files
+[*.xml]
+indent_size = 2
