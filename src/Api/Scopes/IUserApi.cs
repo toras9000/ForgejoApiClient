@@ -50,7 +50,6 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserSettings</returns>
     [ForgejoEndpoint("GET", "/user/settings", "Get user settings")]
-    [ManualEdit("結果値のSwagger定義が誤っていたため修正")]
     public Task<UserSettings> GetSettingsAsync(CancellationToken cancelToken = default)
         => GetRequest("user/settings", cancelToken).JsonResponseAsync<UserSettings>(cancelToken);
 
@@ -59,7 +58,6 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserSettings</returns>
     [ForgejoEndpoint("PATCH", "/user/settings", "Update user settings")]
-    [ManualEdit("結果値のSwagger定義が誤っていたため修正")]
     public Task<UserSettings> UpdateSettingsAsync(UserSettingsOptions options, CancellationToken cancelToken = default)
         => PatchRequest("user/settings", options, cancelToken).JsonResponseAsync<UserSettings>(cancelToken);
 

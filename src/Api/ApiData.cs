@@ -1173,7 +1173,7 @@ public record EditReleaseOption(
 /// <param name="default_delete_branch_after_merge">set to `true` to delete pr branch after merge by default</param>
 /// <param name="default_merge_style">set to a merge style to be used by this repository: "merge", "rebase", "rebase-merge", "squash", or "fast-forward-only".</param>
 /// <param name="description">a short description of the repository.</param>
-/// <param name="enable_prune">enable prune - remove obsolete remote-tracking references</param>
+/// <param name="enable_prune">enable prune - remove obsolete remote-tracking references when mirroring</param>
 /// <param name="external_tracker"></param>
 /// <param name="external_wiki"></param>
 /// <param name="has_actions">either `true` to enable actions unit, or `false` to disable them.</param>
