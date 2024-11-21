@@ -46,7 +46,6 @@ public interface IApiScope
         => new RequestContext(this.Http.PostAsync(new Uri(this.BaseUrl, endpoint), default, cancelToken));
 
     /// <summary>APIにJSON-BODYのPOSTメソッドアクセスを行う要求コンテキストを作成する</summary>
-    /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="content">要求データ</param>
     /// <param name="cancelToken">キャンセルトークン</param>

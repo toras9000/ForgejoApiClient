@@ -1,5 +1,6 @@
 ﻿namespace ForgejoApiClient.Api;
 
+/// <summary>API戻り値型の拡張メソッド</summary>
 public static class ApiClientDataExtensions
 {
     /// <summary>ステータスコード結果値を評価する。</summary>

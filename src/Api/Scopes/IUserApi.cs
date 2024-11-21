@@ -514,6 +514,7 @@ public interface IUserApi : IApiScope
 
     #region Token
     /// <summary>List the authenticated user&apos;s access tokens</summary>
+    /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -524,6 +525,7 @@ public interface IUserApi : IApiScope
         => GetRequest(auth, $"users/{username}/tokens".WithQuery(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
     /// <summary>Create an access token</summary>
+    /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -534,6 +536,7 @@ public interface IUserApi : IApiScope
         => PostRequest(auth, $"users/{username}/tokens", options, cancelToken).JsonResponseAsync<AccessToken>(cancelToken);
 
     /// <summary>delete an access token</summary>
+    /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="token">token to be deleted, identified by ID and if not available by name</param>
     /// <param name="cancelToken">キャンセルトークン</param>

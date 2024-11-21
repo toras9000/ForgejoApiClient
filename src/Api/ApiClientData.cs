@@ -25,7 +25,6 @@ public record StatusCodeResult(HttpStatusCode Code, string? Message);
 /// 必要以上にリソースのライフタイムが延命されることを防ぐため、呼び出し元は不要になった時点でこの結果値を破棄するべきとなる。
 /// </remarks>
 /// <typeparam name="TResult">結果データ型</typeparam>
-/// <param name="Result">結果データ</param>
 public class ResponseResult<TResult> : IDisposable where TResult : notnull, IDisposable
 {
     // 公開プロパティ

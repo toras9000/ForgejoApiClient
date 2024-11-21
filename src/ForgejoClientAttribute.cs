@@ -32,6 +32,7 @@ public class ForgejoEndpointAttribute(string method, string endpoint, string des
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
 public class ManualEditAttribute(string description = "") : Attribute
 {
+    /// <summary>手動編集のメモ</summary>
     public string Description => description;
 }
 

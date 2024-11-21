@@ -45,6 +45,7 @@ public static class RepositoryApiExtensions
     }
 
     /// <summary>リリースにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="id">リリースID</param>
@@ -64,12 +65,12 @@ public static class RepositoryApiExtensions
     }
 
     /// <summary>リリースにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="id">リリースID</param>
     /// <param name="content">添付するファイル内容</param>
     /// <param name="name">ファイル名</param>
-    /// <param name="updated_at">更新日時</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>添付情報</returns>
     public static async Task<Attachment> CreateReleaseAttachmentAsync(this IRepositoryApi self, string owner, string repo, long id, byte[] content, string? name = default, CancellationToken cancelToken = default)

@@ -47,7 +47,7 @@ internal struct FormData
     // 演算子オーバロード
     #region 演算子
     /// <summary>HTTPコンテンツへの暗黙変換オペレータ</summary>
-    /// <param name="query">フォームデータビルダインスタンス</param>
+    /// <param name="data">フォームデータビルダインスタンス</param>
     public static implicit operator HttpContent(FormData data) => data.AsContent();
     #endregion
 

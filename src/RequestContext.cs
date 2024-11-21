@@ -87,7 +87,6 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
     // 非公開メソッド
     #region 応答処理
     /// <summary>API要求を行いJSON応答を解釈する</summary>
-    /// <typeparam name="TResult">応答データ型</typeparam>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>応答を得るタスク</returns>
     private async readonly Task<StatusCodeResult> interpretResponseStatusAsync(CancellationToken cancelToken)

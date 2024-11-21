@@ -6,6 +6,7 @@ namespace ForgejoApiClient.Api.Extensions;
 public static class IssueApiExtensions
 {
     /// <summary>イシューにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="index">イシュー番号</param>
@@ -25,6 +26,7 @@ public static class IssueApiExtensions
     }
 
     /// <summary>イシューにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="index">イシュー番号</param>
@@ -40,6 +42,7 @@ public static class IssueApiExtensions
     }
 
     /// <summary>イシューコメントにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="id">コメントID</param>
@@ -59,6 +62,7 @@ public static class IssueApiExtensions
     }
 
     /// <summary>イシューコメントにファイルを添付する</summary>
+    /// <param name="self">APIインタフェース</param>
     /// <param name="owner">リポジトリのオーナ</param>
     /// <param name="repo">リポジトリ名</param>
     /// <param name="id">コメントID</param>
