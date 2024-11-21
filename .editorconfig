@@ -408,3 +408,6 @@ dotnet_diagnostic.CA1822.severity = silent
 
 # CA1068: CancellationToken パラメーターは最後に指定する必要があります
 dotnet_diagnostic.CA1068.severity = silent
+
+# IDE0028: コレクションの初期化を簡略化します
+dotnet_diagnostic.IDE0028.severity = silent
