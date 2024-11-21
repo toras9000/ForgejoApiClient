@@ -29,6 +29,56 @@ public record AccessToken(
     string? token_last_eight = default
 );
 
+/// <summary>ActionTask represents a ActionTask</summary>
+/// <param name="created_at"></param>
+/// <param name="display_title"></param>
+/// <param name="event"></param>
+/// <param name="head_branch"></param>
+/// <param name="head_sha"></param>
+/// <param name="id"></param>
+/// <param name="name"></param>
+/// <param name="run_number"></param>
+/// <param name="run_started_at"></param>
+/// <param name="status"></param>
+/// <param name="updated_at"></param>
+/// <param name="url"></param>
+/// <param name="workflow_id"></param>
+public record ActionTask(
+    DateTimeOffset? created_at = default,
+    string? display_title = default,
+    string? @event = default,
+    string? head_branch = default,
+    string? head_sha = default,
+    long? id = default,
+    string? name = default,
+    long? run_number = default,
+    DateTimeOffset? run_started_at = default,
+    string? status = default,
+    DateTimeOffset? updated_at = default,
+    string? url = default,
+    string? workflow_id = default
+);
+
+/// <summary>ActionTaskResponse returns a ActionTask</summary>
+/// <param name="total_count"></param>
+/// <param name="workflow_runs"></param>
+public record ActionTaskResponse(
+    long? total_count = default,
+    ICollection<ActionTask>? workflow_runs = default
+);
+
+/// <summary>ActionVariable return value of the query API</summary>
+/// <param name="data">the value of the variable</param>
+/// <param name="name">the name of the variable</param>
+/// <param name="owner_id">the owner to which the variable belongs</param>
+/// <param name="repo_id">the repository to which the variable belongs</param>
+public record ActionVariable(
+    string? data = default,
+    string? name = default,
+    long? owner_id = default,
+    long? repo_id = default
+);
+
 /// <summary></summary>
 /// <param name="act_user"></param>
 /// <param name="act_user_id"></param>
@@ -38,7 +88,7 @@ public record AccessToken(
 /// <param name="created"></param>
 /// <param name="id"></param>
 /// <param name="is_private"></param>
-/// <param name="op_type"></param>
+/// <param name="op_type">the type of action</param>
 /// <param name="ref_name"></param>
 /// <param name="repo"></param>
 /// <param name="repo_id"></param>
@@ -52,7 +102,7 @@ public record Activity(
     DateTimeOffset? created = default,
     long? id = default,
     bool? is_private = default,
-    string? op_type = default,
+    ActivityOp_type? op_type = default,
     string? ref_name = default,
     Repository? repo = default,
     long? repo_id = default,
@@ -82,6 +132,7 @@ public record AddTimeOption(
 );
 
 /// <summary>AnnotatedTag represents an annotated tag</summary>
+/// <param name="archive_download_count"></param>
 /// <param name="message"></param>
 /// <param name="object"></param>
 /// <param name="sha"></param>
@@ -90,6 +141,7 @@ public record AddTimeOption(
 /// <param name="url"></param>
 /// <param name="verification"></param>
 public record AnnotatedTag(
+    TagArchiveDownloadCount? archive_download_count = default,
     string? message = default,
     AnnotatedTagObject? @object = default,
     string? sha = default,
@@ -408,6 +460,14 @@ public record CommitUser(
     string? date = default,
     string? email = default,
     string? name = default
+);
+
+/// <summary></summary>
+/// <param name="commits"></param>
+/// <param name="total_commits"></param>
+public record Compare(
+    ICollection<Commit>? commits = default,
+    long? total_commits = default
 );
 
 /// <summary>ContentsResponse contains information about a repo's entry's (dir, file, symlink, submodule) metadata and content</summary>
@@ -753,6 +813,7 @@ public record CreatePushMirrorOption(
 /// <param name="tag_name"></param>
 /// <param name="body"></param>
 /// <param name="draft"></param>
+/// <param name="hide_archive_links"></param>
 /// <param name="name"></param>
 /// <param name="prerelease"></param>
 /// <param name="target_commitish"></param>
@@ -760,6 +821,7 @@ public record CreateReleaseOption(
     string tag_name,
     string? body = default,
     bool? draft = default,
+    bool? hide_archive_links = default,
     string? name = default,
     bool? prerelease = default,
     string? target_commitish = default
@@ -815,6 +877,16 @@ public record CreateTagOption(
     string? target = default
 );
 
+/// <summary>CreateTagProtectionOption options for creating a tag protection</summary>
+/// <param name="name_pattern"></param>
+/// <param name="whitelist_teams"></param>
+/// <param name="whitelist_usernames"></param>
+public record CreateTagProtectionOption(
+    string? name_pattern = default,
+    ICollection<string>? whitelist_teams = default,
+    ICollection<string>? whitelist_usernames = default
+);
+
 /// <summary>CreateTeamOption options for creating a team</summary>
 /// <param name="name"></param>
 /// <param name="can_create_org_repo"></param>
@@ -861,6 +933,12 @@ public record CreateUserOption(
     bool? send_notify = default,
     long? source_id = default,
     string? visibility = default
+);
+
+/// <summary>CreateVariableOption the option when creating variable</summary>
+/// <param name="value">Value of the variable to create</param>
+public record CreateVariableOption(
+    string value
 );
 
 /// <summary>CreateWikiPageOptions form for creating wiki</summary>
@@ -950,6 +1028,14 @@ public record DeployKey(
 public record DismissPullReviewOptions(
     string? message = default,
     bool? priors = default
+);
+
+/// <summary>DispatchWorkflowOption options when dispatching a workflow</summary>
+/// <param name="ref">Git reference for the workflow</param>
+/// <param name="inputs">Input keys and values configured in the workflow file.</param>
+public record DispatchWorkflowOption(
+    string @ref,
+    IDictionary<string, string>? inputs = default
 );
 
 /// <summary>EditAttachmentOptions options for editing attachments</summary>
@@ -1145,6 +1231,7 @@ public record EditReactionOption(
 /// <summary>EditReleaseOption options when editing a release</summary>
 /// <param name="body"></param>
 /// <param name="draft"></param>
+/// <param name="hide_archive_links"></param>
 /// <param name="name"></param>
 /// <param name="prerelease"></param>
 /// <param name="tag_name"></param>
@@ -1152,6 +1239,7 @@ public record EditReactionOption(
 public record EditReleaseOption(
     string? body = default,
     bool? draft = default,
+    bool? hide_archive_links = default,
     string? name = default,
     bool? prerelease = default,
     string? tag_name = default,
@@ -1176,6 +1264,7 @@ public record EditReleaseOption(
 /// <param name="enable_prune">enable prune - remove obsolete remote-tracking references when mirroring</param>
 /// <param name="external_tracker"></param>
 /// <param name="external_wiki"></param>
+/// <param name="globally_editable_wiki">set the globally editable state of the wiki</param>
 /// <param name="has_actions">either `true` to enable actions unit, or `false` to disable them.</param>
 /// <param name="has_issues">either `true` to enable issues for this repository or `false` to disable them.</param>
 /// <param name="has_packages">either `true` to enable packages unit, or `false` to disable them.</param>
@@ -1213,6 +1302,7 @@ public record EditRepoOption(
     bool? enable_prune = default,
     ExternalTracker? external_tracker = default,
     ExternalWiki? external_wiki = default,
+    bool? globally_editable_wiki = default,
     bool? has_actions = default,
     bool? has_issues = default,
     bool? has_packages = default,
@@ -1228,6 +1318,16 @@ public record EditRepoOption(
     bool? template = default,
     string? website = default,
     string? wiki_branch = default
+);
+
+/// <summary>EditTagProtectionOption options for editing a tag protection</summary>
+/// <param name="name_pattern"></param>
+/// <param name="whitelist_teams"></param>
+/// <param name="whitelist_usernames"></param>
+public record EditTagProtectionOption(
+    string? name_pattern = default,
+    ICollection<string>? whitelist_teams = default,
+    ICollection<string>? whitelist_usernames = default
 );
 
 /// <summary>EditTeamOption options for editing a team</summary>
@@ -1249,8 +1349,6 @@ public record EditTeamOption(
 );
 
 /// <summary>EditUserOption edit user options</summary>
-/// <param name="login_name"></param>
-/// <param name="source_id"></param>
 /// <param name="active"></param>
 /// <param name="admin"></param>
 /// <param name="allow_create_organization"></param>
@@ -1260,17 +1358,17 @@ public record EditTeamOption(
 /// <param name="email"></param>
 /// <param name="full_name"></param>
 /// <param name="location"></param>
+/// <param name="login_name"></param>
 /// <param name="max_repo_creation"></param>
 /// <param name="must_change_password"></param>
 /// <param name="password"></param>
 /// <param name="prohibit_login"></param>
 /// <param name="pronouns"></param>
 /// <param name="restricted"></param>
+/// <param name="source_id"></param>
 /// <param name="visibility"></param>
 /// <param name="website"></param>
 public record EditUserOption(
-    string login_name,
-    long source_id,
     bool? active = default,
     bool? admin = default,
     bool? allow_create_organization = default,
@@ -1280,12 +1378,14 @@ public record EditUserOption(
     string? email = default,
     string? full_name = default,
     string? location = default,
+    string? login_name = default,
     long? max_repo_creation = default,
     bool? must_change_password = default,
     string? password = default,
     bool? prohibit_login = default,
     string? pronouns = default,
     bool? restricted = default,
+    long? source_id = default,
     string? visibility = default,
     string? website = default
 );
@@ -1383,6 +1483,9 @@ public record FilesResponse(
     ICollection<ContentsResponse>? files = default,
     PayloadCommitVerification? verification = default
 );
+
+/// <summary>ForgeLike activity data type</summary>
+public record ForgeLike();
 
 /// <summary>GPGKey a user GPG key to sign commit and tag in repository</summary>
 /// <param name="can_certify"></param>
@@ -1723,10 +1826,13 @@ public record IssueFormField(
 );
 
 /// <summary>IssueLabelsOption a collection of labels</summary>
-/// <param name="labels">list of label IDs</param>
+/// <param name="labels">
+/// Labels can be a list of integers representing label IDs
+/// or a list of strings representing label names
+/// </param>
 /// <param name="updated_at"></param>
 public record IssueLabelsOption(
-    ICollection<long>? labels = default,
+    ICollection<object>? labels = default,
     DateTimeOffset? updated_at = default
 );
 
@@ -2279,15 +2385,19 @@ public record PublicKey(
 );
 
 /// <summary>PullRequest represents a pull request</summary>
+/// <param name="additions"></param>
 /// <param name="allow_maintainer_edit"></param>
 /// <param name="assignee"></param>
 /// <param name="assignees"></param>
 /// <param name="base"></param>
 /// <param name="body"></param>
+/// <param name="changed_files"></param>
 /// <param name="closed_at"></param>
 /// <param name="comments"></param>
 /// <param name="created_at"></param>
+/// <param name="deletions"></param>
 /// <param name="diff_url"></param>
+/// <param name="draft"></param>
 /// <param name="due_date"></param>
 /// <param name="head"></param>
 /// <param name="html_url"></param>
@@ -2305,21 +2415,26 @@ public record PublicKey(
 /// <param name="patch_url"></param>
 /// <param name="pin_order"></param>
 /// <param name="requested_reviewers"></param>
+/// <param name="review_comments">number of review comments made on the diff of a PR review (not including comments on commits or issues in a PR)</param>
 /// <param name="state"></param>
 /// <param name="title"></param>
 /// <param name="updated_at"></param>
 /// <param name="url"></param>
 /// <param name="user"></param>
 public record PullRequest(
+    long? additions = default,
     bool? allow_maintainer_edit = default,
     User? assignee = default,
     ICollection<User>? assignees = default,
     PRBranchInfo? @base = default,
     string? body = default,
+    long? changed_files = default,
     DateTimeOffset? closed_at = default,
     long? comments = default,
     DateTimeOffset? created_at = default,
+    long? deletions = default,
     string? diff_url = default,
+    bool? draft = default,
     DateTimeOffset? due_date = default,
     PRBranchInfo? head = default,
     string? html_url = default,
@@ -2337,6 +2452,7 @@ public record PullRequest(
     string? patch_url = default,
     long? pin_order = default,
     ICollection<User>? requested_reviewers = default,
+    long? review_comments = default,
     string? state = default,
     string? title = default,
     DateTimeOffset? updated_at = default,
@@ -2346,10 +2462,12 @@ public record PullRequest(
 
 /// <summary>PullRequestMeta PR info if an issue is a PR</summary>
 /// <param name="draft"></param>
+/// <param name="html_url"></param>
 /// <param name="merged"></param>
 /// <param name="merged_at"></param>
 public record PullRequestMeta(
     bool? draft = default,
+    string? html_url = default,
     bool? merged = default,
     DateTimeOffset? merged_at = default
 );
@@ -2469,11 +2587,13 @@ public record Reference(
 );
 
 /// <summary>Release represents a repository release</summary>
+/// <param name="archive_download_count"></param>
 /// <param name="assets"></param>
 /// <param name="author"></param>
 /// <param name="body"></param>
 /// <param name="created_at"></param>
 /// <param name="draft"></param>
+/// <param name="hide_archive_links"></param>
 /// <param name="html_url"></param>
 /// <param name="id"></param>
 /// <param name="name"></param>
@@ -2486,11 +2606,13 @@ public record Reference(
 /// <param name="url"></param>
 /// <param name="zipball_url"></param>
 public record Release(
+    TagArchiveDownloadCount? archive_download_count = default,
     ICollection<Attachment>? assets = default,
     User? author = default,
     string? body = default,
     DateTimeOffset? created_at = default,
     bool? draft = default,
+    bool? hide_archive_links = default,
     string? html_url = default,
     long? id = default,
     string? name = default,
@@ -2581,6 +2703,7 @@ public record RepoTransfer(
 /// <param name="fork"></param>
 /// <param name="forks_count"></param>
 /// <param name="full_name"></param>
+/// <param name="globally_editable_wiki"></param>
 /// <param name="has_actions"></param>
 /// <param name="has_issues"></param>
 /// <param name="has_packages"></param>
@@ -2614,6 +2737,7 @@ public record RepoTransfer(
 /// <param name="ssh_url"></param>
 /// <param name="stars_count"></param>
 /// <param name="template"></param>
+/// <param name="topics"></param>
 /// <param name="updated_at"></param>
 /// <param name="url"></param>
 /// <param name="watchers_count"></param>
@@ -2642,6 +2766,7 @@ public record Repository(
     bool? fork = default,
     long? forks_count = default,
     string? full_name = default,
+    bool? globally_editable_wiki = default,
     bool? has_actions = default,
     bool? has_issues = default,
     bool? has_packages = default,
@@ -2675,6 +2800,7 @@ public record Repository(
     string? ssh_url = default,
     long? stars_count = default,
     bool? template = default,
+    ICollection<string>? topics = default,
     DateTimeOffset? updated_at = default,
     string? url = default,
     long? watchers_count = default,
@@ -2743,6 +2869,7 @@ public record SubmitPullReviewOptions(
 );
 
 /// <summary>Tag represents a repository tag</summary>
+/// <param name="archive_download_count"></param>
 /// <param name="commit"></param>
 /// <param name="id"></param>
 /// <param name="message"></param>
@@ -2750,12 +2877,37 @@ public record SubmitPullReviewOptions(
 /// <param name="tarball_url"></param>
 /// <param name="zipball_url"></param>
 public record Tag(
+    TagArchiveDownloadCount? archive_download_count = default,
     CommitMeta? commit = default,
     string? id = default,
     string? message = default,
     string? name = default,
     string? tarball_url = default,
     string? zipball_url = default
+);
+
+/// <summary>TagArchiveDownloadCount counts how many times a archive was downloaded</summary>
+/// <param name="tar_gz"></param>
+/// <param name="zip"></param>
+public record TagArchiveDownloadCount(
+    long? tar_gz = default,
+    long? zip = default
+);
+
+/// <summary>TagProtection represents a tag protection</summary>
+/// <param name="created_at"></param>
+/// <param name="id"></param>
+/// <param name="name_pattern"></param>
+/// <param name="updated_at"></param>
+/// <param name="whitelist_teams"></param>
+/// <param name="whitelist_usernames"></param>
+public record TagProtection(
+    DateTimeOffset? created_at = default,
+    long? id = default,
+    string? name_pattern = default,
+    DateTimeOffset? updated_at = default,
+    ICollection<string>? whitelist_teams = default,
+    ICollection<string>? whitelist_usernames = default
 );
 
 /// <summary>Team represents a team in an organization</summary>
@@ -2927,6 +3079,14 @@ public record UpdateUserAvatarOption(
     string? image = default
 );
 
+/// <summary>UpdateVariableOption the option when updating variable</summary>
+/// <param name="value">Value of the variable to update</param>
+/// <param name="name">New name for the variable. If the field is empty, the variable name won't be updated.</param>
+public record UpdateVariableOption(
+    string value,
+    string? name = default
+);
+
 /// <summary>User represents a user</summary>
 /// <param name="active">Is user active</param>
 /// <param name="avatar_url">URL to the user's avatar</param>
@@ -2936,6 +3096,7 @@ public record UpdateUserAvatarOption(
 /// <param name="followers_count">user counts</param>
 /// <param name="following_count"></param>
 /// <param name="full_name">the user's full name</param>
+/// <param name="html_url">URL to the user's gitea page</param>
 /// <param name="id">the user's id</param>
 /// <param name="is_admin">Is the user an administrator</param>
 /// <param name="language">User locale</param>
@@ -2946,6 +3107,7 @@ public record UpdateUserAvatarOption(
 /// <param name="prohibit_login">Is user login prohibited</param>
 /// <param name="pronouns">the user's pronouns</param>
 /// <param name="restricted">Is user restricted</param>
+/// <param name="source_id">The ID of the user's Authentication Source</param>
 /// <param name="starred_repos_count"></param>
 /// <param name="visibility">User visibility level option: public, limited, private</param>
 /// <param name="website">the user's website</param>
@@ -2958,6 +3120,7 @@ public record User(
     long? followers_count = default,
     long? following_count = default,
     string? full_name = default,
+    string? html_url = default,
     long? id = default,
     bool? is_admin = default,
     string? language = default,
@@ -2968,6 +3131,7 @@ public record User(
     bool? prohibit_login = default,
     string? pronouns = default,
     bool? restricted = default,
+    long? source_id = default,
     long? starred_repos_count = default,
     string? visibility = default,
     string? website = default
@@ -3100,6 +3264,92 @@ public record WikiPageMetaData(
     string? sub_url = default,
     string? title = default
 );
+
+/// <summary>the type of action</summary>
+public enum ActivityOp_type
+{
+    /// <summary>create_repo</summary>
+    [MapEnum("create_repo")]
+    Create_repo = 0,
+    /// <summary>rename_repo</summary>
+    [MapEnum("rename_repo")]
+    Rename_repo = 1,
+    /// <summary>star_repo</summary>
+    [MapEnum("star_repo")]
+    Star_repo = 2,
+    /// <summary>watch_repo</summary>
+    [MapEnum("watch_repo")]
+    Watch_repo = 3,
+    /// <summary>commit_repo</summary>
+    [MapEnum("commit_repo")]
+    Commit_repo = 4,
+    /// <summary>create_issue</summary>
+    [MapEnum("create_issue")]
+    Create_issue = 5,
+    /// <summary>create_pull_request</summary>
+    [MapEnum("create_pull_request")]
+    Create_pull_request = 6,
+    /// <summary>transfer_repo</summary>
+    [MapEnum("transfer_repo")]
+    Transfer_repo = 7,
+    /// <summary>push_tag</summary>
+    [MapEnum("push_tag")]
+    Push_tag = 8,
+    /// <summary>comment_issue</summary>
+    [MapEnum("comment_issue")]
+    Comment_issue = 9,
+    /// <summary>merge_pull_request</summary>
+    [MapEnum("merge_pull_request")]
+    Merge_pull_request = 10,
+    /// <summary>close_issue</summary>
+    [MapEnum("close_issue")]
+    Close_issue = 11,
+    /// <summary>reopen_issue</summary>
+    [MapEnum("reopen_issue")]
+    Reopen_issue = 12,
+    /// <summary>close_pull_request</summary>
+    [MapEnum("close_pull_request")]
+    Close_pull_request = 13,
+    /// <summary>reopen_pull_request</summary>
+    [MapEnum("reopen_pull_request")]
+    Reopen_pull_request = 14,
+    /// <summary>delete_tag</summary>
+    [MapEnum("delete_tag")]
+    Delete_tag = 15,
+    /// <summary>delete_branch</summary>
+    [MapEnum("delete_branch")]
+    Delete_branch = 16,
+    /// <summary>mirror_sync_push</summary>
+    [MapEnum("mirror_sync_push")]
+    Mirror_sync_push = 17,
+    /// <summary>mirror_sync_create</summary>
+    [MapEnum("mirror_sync_create")]
+    Mirror_sync_create = 18,
+    /// <summary>mirror_sync_delete</summary>
+    [MapEnum("mirror_sync_delete")]
+    Mirror_sync_delete = 19,
+    /// <summary>approve_pull_request</summary>
+    [MapEnum("approve_pull_request")]
+    Approve_pull_request = 20,
+    /// <summary>reject_pull_request</summary>
+    [MapEnum("reject_pull_request")]
+    Reject_pull_request = 21,
+    /// <summary>comment_pull</summary>
+    [MapEnum("comment_pull")]
+    Comment_pull = 22,
+    /// <summary>publish_release</summary>
+    [MapEnum("publish_release")]
+    Publish_release = 23,
+    /// <summary>pull_review_dismissed</summary>
+    [MapEnum("pull_review_dismissed")]
+    Pull_review_dismissed = 24,
+    /// <summary>pull_request_ready_for_review</summary>
+    [MapEnum("pull_request_ready_for_review")]
+    Pull_request_ready_for_review = 25,
+    /// <summary>auto_merge_pull_request</summary>
+    [MapEnum("auto_merge_pull_request")]
+    Auto_merge_pull_request = 26,
+};
 
 /// <summary>indicates what to do with the file</summary>
 public enum ChangeFileOperationOperation

@@ -121,7 +121,7 @@ public interface IIssueApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/issues/{index}/assets", "Create an issue attachment")]
     public Task<Attachment> CreateAttachmentAsync(string owner, string repo, long index, Stream attachment, string? name = default, DateTimeOffset? updated_at = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/issues/{index}/assets".WithQuery(name).Param(updated_at), new FormData(attachment), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/issues/{index}/assets".WithQuery(name).Param(updated_at), new FormData(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit an issue attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -280,7 +280,7 @@ public interface IIssueApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/issues/comments/{id}/assets", "Create a comment attachment")]
     public Task<Attachment> CreateCommentAttachmentAsync(string owner, string repo, long id, Stream attachment, string? name = default, DateTimeOffset? updated_at = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/issues/comments/{id}/assets".WithQuery(name).Param(updated_at), new FormData(attachment), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/issues/comments/{id}/assets".WithQuery(name).Param(updated_at), new FormData(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit a comment attachment</summary>
     /// <param name="owner">owner of the repo</param>

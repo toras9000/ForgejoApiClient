@@ -177,7 +177,7 @@ public interface IOrganizationApi : IApiScope
         => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Secret
+    #region Action Secret
     /// <summary>List an organization&apos;s actions secrets</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
@@ -203,6 +203,54 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/secrets/{secretname}", "Delete a secret in an organization")]
     public Task DeleteActionSecretAsync(string org, string secretname, CancellationToken cancelToken = default)
         => DeleteRequest($"orgs/{org}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Action Variable
+    /// <summary>Get an org-level variables list</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>VariableList</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables", "Get an org-level variables list")]
+    public Task<ActionVariable[]> ListActionVariablesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/variables".WithQuery(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+
+    /// <summary>Get an org-level variable</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionVariable</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables/{variablename}", "Get an org-level variable")]
+    public Task<ActionVariable> GetActionVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+
+    /// <summary>Create an org-level variable</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/orgs/{org}/actions/variables/{variablename}", "Create an org-level variable")]
+    public Task CreateActionVariableAsync(string org, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
+        => PostRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Update an org-level variable</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PUT", "/orgs/{org}/actions/variables/{variablename}", "Update an org-level variable")]
+    public Task UpdateActionVariableAsync(string org, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
+        => PutRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Delete an org-level variable</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionVariable</returns>
+    [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/variables/{variablename}", "Delete an org-level variable")]
+    [ManualEdit("Swaggerの戻り値定義誤りを訂正")]
+    public Task DeleteActionVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
+        => DeleteRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region Social

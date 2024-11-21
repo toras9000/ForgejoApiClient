@@ -191,6 +191,101 @@ public interface IRepositoryApi : IApiScope
         => DeleteRequest($"repos/{owner}/{repo}/branch_protections/{name}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
+    #region Tag
+    /// <summary>List a repository&apos;s tags</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TagList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags", "List a repository's tags")]
+    public Task<Tag[]> ListTagsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/tags".WithQuery(paging), cancelToken).JsonResponseAsync<Tag[]>(cancelToken);
+
+    /// <summary>Get the tag of a repository by tag name</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="tag">name of tag</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Tag</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags/{tag}", "Get the tag of a repository by tag name")]
+    public Task<Tag> GetTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<Tag>(cancelToken);
+
+    /// <summary>Create a new git tag in a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Tag</returns>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/tags", "Create a new git tag in a repository")]
+    public Task<Tag> CreateTagAsync(string owner, string repo, CreateTagOption options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/tags", options, cancelToken).JsonResponseAsync<Tag>(cancelToken);
+
+    /// <summary>Delete a repository&apos;s tag by name</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="tag">name of tag to delete</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/tags/{tag}", "Delete a repository's tag by name")]
+    public Task DeleteTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region TagProtection
+    /// <summary>List tag protections for a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TagProtectionList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tag_protections", "List tag protections for a repository")]
+    public Task<TagProtection[]> ListTagProtectionsAsync(string owner, string repo, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/tag_protections", cancelToken).JsonResponseAsync<TagProtection[]>(cancelToken);
+
+    /// <summary>Get a specific tag protection for the repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="id">id of the tag protect to get</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TagProtection</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tag_protections/{id}", "Get a specific tag protection for the repository")]
+    [ManualEdit("id パラメータの型を変更")]
+    public Task<TagProtection> GetTagProtectionAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+
+    /// <summary>Create a tag protections for a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TagProtection</returns>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/tag_protections", "Create a tag protections for a repository")]
+    public Task<TagProtection> CreateTagProtectionAsync(string owner, string repo, CreateTagProtectionOption options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/tag_protections", options, cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+
+    /// <summary>Edit a tag protections for a repository. Only fields that are set will be changed</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="id">id of protected tag</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TagProtection</returns>
+    [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/tag_protections/{id}", "Edit a tag protections for a repository. Only fields that are set will be changed")]
+    [ManualEdit("id パラメータの型を変更")]
+    public Task<TagProtection> UpdateTagProtectionAsync(string owner, string repo, long id, EditTagProtectionOption options, CancellationToken cancelToken = default)
+        => PatchRequest($"repos/{owner}/{repo}/tag_protections/{id}", options, cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+
+    /// <summary>Delete a specific tag protection for the repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="id">id of protected tag</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/tag_protections/{id}", "Delete a specific tag protection for the repository")]
+    [ManualEdit("id パラメータの型を変更")]
+    public Task DeleteTagProtectionAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
     #region Commit
     /// <summary>Get a list of all commits from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -231,6 +326,16 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/commits/{sha}.{diffType}", "Get a commit's diff or patch")]
     public Task<string> GetCommitDiffAsync(string owner, string repo, string sha, string diffType, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/git/commits/{sha}.{diffType}", cancelToken).TextResponseAsync(cancelToken);
+
+    /// <summary>Get commit comparison information</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="basehead">compare two branches or commits</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns></returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/compare/{basehead}", "Get commit comparison information")]
+    public Task<Compare> GetCommitCompareAsync(string owner, string repo, string basehead, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/compare/{basehead}", cancelToken).JsonResponseAsync<Compare>(cancelToken);
 
     /// <summary>Get the pull request of the commit</summary>
     /// <param name="owner">owner of the repo</param>
@@ -303,47 +408,6 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/statuses/{sha}", "Create a commit status")]
     public Task<CommitStatus> CreateCommitStatusAsync(string owner, string repo, string sha, CreateStatusOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/statuses/{sha}", options, cancelToken).JsonResponseAsync<CommitStatus>(cancelToken);
-    #endregion
-
-    #region Tag
-    /// <summary>List a repository&apos;s tags</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="paging">ページングオプション</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>TagList</returns>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags", "List a repository's tags")]
-    public Task<Tag[]> ListTagsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tags".WithQuery(paging), cancelToken).JsonResponseAsync<Tag[]>(cancelToken);
-
-    /// <summary>Get the tag of a repository by tag name</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="tag">name of tag</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>Tag</returns>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags/{tag}", "Get the tag of a repository by tag name")]
-    public Task<Tag> GetTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<Tag>(cancelToken);
-
-    /// <summary>Create a new git tag in a repository</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="options"></param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>Tag</returns>
-    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/tags", "Create a new git tag in a repository")]
-    public Task<Tag> CreateTagAsync(string owner, string repo, CreateTagOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/tags", options, cancelToken).JsonResponseAsync<Tag>(cancelToken);
-
-    /// <summary>Delete a repository&apos;s tag by name</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="tag">name of tag to delete</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/tags/{tag}", "Delete a repository's tag by name")]
-    public Task DeleteTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region Git
@@ -559,7 +623,39 @@ public interface IRepositoryApi : IApiScope
         => PostRequest($"repos/{owner}/{repo}/forks", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
     #endregion
 
-    #region Secret
+    #region Action
+    /// <summary>List a repository&apos;s action tasks</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>TasksList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/tasks", "List a repository's action tasks")]
+    public Task<ActionTaskResponse> GetActionTasks(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
+
+    /// <summary>Dispatches a workflow</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="workflowname">name of the workflow</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", "Dispatches a workflow")]
+    public Task DispatchActionWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Action Secret
+    /// <summary>List an repo&apos;s actions secrets</summary>
+    /// <param name="owner">owner of the repository</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>SecretList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/secrets", "List an repo's actions secrets")]
+    public Task<Secret[]> ListActionSecretsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/secrets".WithQuery(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
+
     /// <summary>Create or Update a secret value in a repository</summary>
     /// <param name="owner">owner of the repository</param>
     /// <param name="repo">name of the repository</param>
@@ -567,7 +663,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Create or Update a secret value in a repository")]
-    public Task SetSecretAsync(string owner, string repo, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
+    public Task SetActionSecretAsync(string owner, string repo, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Delete a secret in a repository</summary>
@@ -576,8 +672,61 @@ public interface IRepositoryApi : IApiScope
     /// <param name="secretname">name of the secret</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Delete a secret in a repository")]
-    public Task DeleteSecretAsync(string owner, string repo, string secretname, CancellationToken cancelToken = default)
+    public Task DeleteActionSecretAsync(string owner, string repo, string secretname, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Action Variable
+    /// <summary>Get repo-level variables list</summary>
+    /// <param name="owner">name of the owner</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>VariableList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables", "Get repo-level variables list")]
+    public Task<ActionVariable[]> ListActionVariablesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/variables".WithQuery(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+
+    /// <summary>Get a repo-level variable</summary>
+    /// <param name="owner">name of the owner</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionVariable</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Get a repo-level variable")]
+    public Task<ActionVariable> GetActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+
+    /// <summary>Create a repo-level variable</summary>
+    /// <param name="owner">name of the owner</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Create a repo-level variable")]
+    public Task CreateActionVariableAsync(string owner, string repo, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Update a repo-level variable</summary>
+    /// <param name="owner">name of the owner</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Update a repo-level variable")]
+    public Task UpdateActionVariableAsync(string owner, string repo, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
+        => PutRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Delete a repo-level variable</summary>
+    /// <param name="owner">name of the owner</param>
+    /// <param name="repo">name of the repository</param>
+    /// <param name="variablename">name of the variable</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionVariable</returns>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Delete a repo-level variable")]
+    public Task<ActionVariable> DeleteActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+
     #endregion
 
     #region Flag
@@ -1157,7 +1306,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases/{id}/assets", "Create a release attachment")]
     public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream attachment, string? name = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData(attachment), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
