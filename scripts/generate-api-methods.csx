@@ -290,7 +290,7 @@ IEnumerable<string> makeApiMethodComments(ApiEndpoint ep)
     // Path パラメータ
     foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Path))
     {
-        yield return $$"""/// <param name="{{escape(param.Variable)}}">{{escape(param.Description)}}</param>""";
+        yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
     }
 
     // Body/FormData パラメータチェック
@@ -301,13 +301,13 @@ IEnumerable<string> makeApiMethodComments(ApiEndpoint ep)
     // Body パラメータ
     foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Body))
     {
-        yield return $$"""/// <param name="{{escape(GenerationConstants.BodyParamVariable)}}">{{escape(param.Description)}}</param>""";
+        yield return $$"""/// <param name="{{escape(GenerationConstants.BodyParamVariable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
     }
 
     // FormData パラメータ
     foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData))
     {
-        yield return $$"""/// <param name="{{escape(param.Variable)}}">{{escape(param.Description)}}</param>""";
+        yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
     }
 
     // Query パラメータ
@@ -316,13 +316,13 @@ IEnumerable<string> makeApiMethodComments(ApiEndpoint ep)
     if (hasPaging) queryParams.RemoveAll(p => p.Name is "limit" or "page");
     foreach (var param in queryParams)
     {
-        yield return $"""/// <param name="{escape(param.Variable)}">{escape(param.Description)}</param>""";
+        yield return $"""/// <param name="{escape(param.Variable.TrimStart('@'))}">{escape(param.Description)}</param>""";
     }
 
     // ページングパラメータ
     if (hasPaging)
     {
-        yield return $"""/// <param name="{escape(GenerationConstants.PagingParamVariable)}">ページングオプション</param>""";
+        yield return $"""/// <param name="{escape(GenerationConstants.PagingParamVariable.TrimStart('@'))}">ページングオプション</param>""";
     }
 
     // キャンセルパラメータ

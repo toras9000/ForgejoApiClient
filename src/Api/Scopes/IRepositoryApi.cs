@@ -30,13 +30,13 @@ public interface IRepositoryApi : IApiScope
     /// <param name="priority_owner_id">repo owner to prioritize in the results</param>
     /// <param name="team_id">search only for repos that belong to the given team id</param>
     /// <param name="starredBy">search only for repos that the user with the given id has starred</param>
-    /// <param name="@private">include private repositories this user has access to (defaults to true)</param>
+    /// <param name="private">include private repositories this user has access to (defaults to true)</param>
     /// <param name="is_private">show only pubic, private or all repositories (defaults to all)</param>
     /// <param name="template">include template repositories this user has access to (defaults to true)</param>
     /// <param name="archived">show only archived, non-archived or all repositories (defaults to all)</param>
     /// <param name="mode">type of repository to search for. Supported values are &quot;fork&quot;, &quot;source&quot;, &quot;mirror&quot; and &quot;collaborative&quot;</param>
     /// <param name="exclusive">if `uid` is given, search only for repos that the user owns</param>
-    /// <param name="sort">sort repos by attribute. Supported values are &quot;alpha&quot;, &quot;created&quot;, &quot;updated&quot;, &quot;size&quot;, and &quot;id&quot;. Default is &quot;alpha&quot;</param>
+    /// <param name="sort">sort repos by attribute. Supported values are &quot;alpha&quot;, &quot;created&quot;, &quot;updated&quot;, &quot;size&quot;, &quot;git_size&quot;, &quot;lfs_size&quot;, &quot;stars&quot;, &quot;forks&quot; and &quot;id&quot;. Default is &quot;alpha&quot;</param>
     /// <param name="order">sort order, either &quot;asc&quot; (ascending) or &quot;desc&quot; (descending). Default is &quot;asc&quot;, ignored if &quot;sort&quot; is not specified.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -259,7 +259,7 @@ public interface IRepositoryApi : IApiScope
     /// <summary>Get a commit&apos;s statuses, by branch/tag/commit reference</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
-    /// <param name="@ref">name of branch/tag/commit</param>
+    /// <param name="ref">name of branch/tag/commit</param>
     /// <param name="sort">type of sort</param>
     /// <param name="state">type of state</param>
     /// <param name="paging">ページングオプション</param>
@@ -272,7 +272,7 @@ public interface IRepositoryApi : IApiScope
     /// <summary>Get a commit&apos;s combined status, by branch/tag/commit reference</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
-    /// <param name="@ref">name of branch/tag/commit</param>
+    /// <param name="ref">name of branch/tag/commit</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>CombinedStatus</returns>
@@ -363,7 +363,7 @@ public interface IRepositoryApi : IApiScope
     /// <summary>Get specified ref or filtered repository&apos;s refs</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
-    /// <param name="@ref">part or full name of the ref</param>
+    /// <param name="ref">part or full name of the ref</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ReferenceList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/refs/{ref}", "Get specified ref or filtered repository's refs")]
@@ -373,7 +373,7 @@ public interface IRepositoryApi : IApiScope
     /// <summary>Gets the metadata of all the entries of the root dir</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
-    /// <param name="@ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
+    /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ContentsListResponse</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/contents", "Gets the metadata of all the entries of the root dir")]
@@ -384,7 +384,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="filepath">path of the dir, file, symlink or submodule in the repo</param>
-    /// <param name="@ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
+    /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ContentsResponse</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/contents/{filepath}", "Gets the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir")]
@@ -405,7 +405,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="filepath">filepath of the file to get</param>
-    /// <param name="@ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
+    /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/media/{filepath}", "Get a file or it's LFS object from a repository")]
     [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
@@ -416,7 +416,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="filepath">filepath of the file to get</param>
-    /// <param name="@ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
+    /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/raw/{filepath}", "Get a file from a repository")]
     [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
@@ -690,7 +690,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="id">id of the hook to test</param>
-    /// <param name="@ref">The name of the commit/branch/tag, indicates which commit will be loaded to the webhook payload.</param>
+    /// <param name="ref">The name of the commit/branch/tag, indicates which commit will be loaded to the webhook payload.</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/hooks/{id}/tests", "Test a push webhook")]
     public Task TestWebhookAsync(string owner, string repo, long id, string? @ref = default, CancellationToken cancelToken = default)
@@ -775,7 +775,7 @@ public interface IRepositoryApi : IApiScope
     /// <summary>Get a pull request by base and head</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
-    /// <param name="@base">base of the pull request to get</param>
+    /// <param name="base">base of the pull request to get</param>
     /// <param name="head">head of the pull request to get</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>PullRequest</returns>
@@ -1647,7 +1647,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="filepath">filepath of file to get</param>
-    /// <param name="@ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
+    /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/editorconfig/{filepath}", "Get the EditorConfig definitions of a file in a repository")]
     [ManualEdit("得られる結果値に合わせた戻り値型を使用")]

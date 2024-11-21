@@ -60,7 +60,7 @@ public record Activity(
 );
 
 /// <summary>ActivityPub type</summary>
-/// <param name="@context"></param>
+/// <param name="context"></param>
 public record ActivityPub(
     string? @context = default
 );
@@ -83,7 +83,7 @@ public record AddTimeOption(
 
 /// <summary>AnnotatedTag represents an annotated tag</summary>
 /// <param name="message"></param>
-/// <param name="@object"></param>
+/// <param name="object"></param>
 /// <param name="sha"></param>
 /// <param name="tag"></param>
 /// <param name="tagger"></param>
@@ -140,7 +140,7 @@ public record BlockedUser(
 /// <param name="effective_branch_protection_name"></param>
 /// <param name="enable_status_check"></param>
 /// <param name="name"></param>
-/// <param name="@protected"></param>
+/// <param name="protected"></param>
 /// <param name="required_approvals"></param>
 /// <param name="status_check_contexts"></param>
 /// <param name="user_can_merge"></param>
@@ -604,7 +604,7 @@ public record CreateIssueCommentOption(
 /// <param name="due_date"></param>
 /// <param name="labels">list of label ids</param>
 /// <param name="milestone">milestone id</param>
-/// <param name="@ref"></param>
+/// <param name="ref"></param>
 public record CreateIssueOption(
     string title,
     string? assignee = default,
@@ -692,7 +692,7 @@ public record CreateOrgOption(
 /// <summary>CreatePullRequestOption options when creating a pull request</summary>
 /// <param name="assignee"></param>
 /// <param name="assignees"></param>
-/// <param name="@base"></param>
+/// <param name="base"></param>
 /// <param name="body"></param>
 /// <param name="due_date"></param>
 /// <param name="head"></param>
@@ -727,7 +727,7 @@ public record CreatePullReviewComment(
 /// <param name="body"></param>
 /// <param name="comments"></param>
 /// <param name="commit_id"></param>
-/// <param name="@event"></param>
+/// <param name="event"></param>
 public record CreatePullReviewOptions(
     string? body = default,
     ICollection<CreatePullReviewComment>? comments = default,
@@ -774,7 +774,7 @@ public record CreateReleaseOption(
 /// <param name="issue_labels">Label-Set to use</param>
 /// <param name="license">License to use</param>
 /// <param name="object_format_name">ObjectFormatName of the underlying git repository</param>
-/// <param name="@private">Whether the repository is private</param>
+/// <param name="private">Whether the repository is private</param>
 /// <param name="readme">Readme of the repository to create</param>
 /// <param name="template">Whether the repository is template</param>
 /// <param name="trust_model">TrustModel of the repository</param>
@@ -1048,7 +1048,7 @@ public record EditIssueCommentOption(
 /// <param name="body"></param>
 /// <param name="due_date"></param>
 /// <param name="milestone"></param>
-/// <param name="@ref"></param>
+/// <param name="ref"></param>
 /// <param name="state"></param>
 /// <param name="title"></param>
 /// <param name="unset_due_date"></param>
@@ -1114,7 +1114,7 @@ public record EditOrgOption(
 /// <param name="allow_maintainer_edit"></param>
 /// <param name="assignee"></param>
 /// <param name="assignees"></param>
-/// <param name="@base"></param>
+/// <param name="base"></param>
 /// <param name="body"></param>
 /// <param name="due_date"></param>
 /// <param name="labels"></param>
@@ -1187,7 +1187,7 @@ public record EditReleaseOption(
 /// <param name="internal_tracker"></param>
 /// <param name="mirror_interval">set to a string like `8h30m0s` to set the mirror interval time</param>
 /// <param name="name">name of the repository</param>
-/// <param name="@private">
+/// <param name="private">
 /// either `true` to make the repository private or `false` to make it public.
 /// Note: you will get a 422 error if the organization restricts changing repository visibility to organization
 /// owners and a non-owner tries to change the value of private.
@@ -1483,7 +1483,7 @@ public record GeneralUISettings(
 /// <param name="git_content">include git content of default branch in template repo</param>
 /// <param name="git_hooks">include git hooks in template repo</param>
 /// <param name="labels">include labels in template repo</param>
-/// <param name="@private">Whether the repository is private</param>
+/// <param name="private">Whether the repository is private</param>
 /// <param name="protected_branch">include protected branches in template repo</param>
 /// <param name="topics">include topics in template repo</param>
 /// <param name="webhooks">include webhooks in template repo</param>
@@ -1641,7 +1641,7 @@ public record InternalTracker(
 /// <param name="original_author_id"></param>
 /// <param name="pin_order"></param>
 /// <param name="pull_request"></param>
-/// <param name="@ref"></param>
+/// <param name="ref"></param>
 /// <param name="repository"></param>
 /// <param name="state"></param>
 /// <param name="title"></param>
@@ -1747,7 +1747,7 @@ public record IssueMeta(
 /// <param name="file_name"></param>
 /// <param name="labels"></param>
 /// <param name="name"></param>
-/// <param name="@ref"></param>
+/// <param name="ref"></param>
 /// <param name="title"></param>
 public record IssueTemplate(
     string? about = default,
@@ -1916,7 +1916,7 @@ public record MergePullRequestOption(
 /// <param name="milestones"></param>
 /// <param name="mirror"></param>
 /// <param name="mirror_interval"></param>
-/// <param name="@private"></param>
+/// <param name="private"></param>
 /// <param name="pull_requests"></param>
 /// <param name="releases"></param>
 /// <param name="repo_owner">Name of User or Organisation who will own Repo after migration</param>
@@ -2045,7 +2045,7 @@ public record Note(
 );
 
 /// <summary>NotificationCount number of unread notifications</summary>
-/// <param name="@new"></param>
+/// <param name="new"></param>
 public record NotificationCount(
     long? @new = default
 );
@@ -2146,7 +2146,7 @@ public record OrganizationPermissions(
 
 /// <summary>PRBranchInfo information about a branch</summary>
 /// <param name="label"></param>
-/// <param name="@ref"></param>
+/// <param name="ref"></param>
 /// <param name="repo"></param>
 /// <param name="repo_id"></param>
 /// <param name="sha"></param>
@@ -2282,7 +2282,7 @@ public record PublicKey(
 /// <param name="allow_maintainer_edit"></param>
 /// <param name="assignee"></param>
 /// <param name="assignees"></param>
-/// <param name="@base"></param>
+/// <param name="base"></param>
 /// <param name="body"></param>
 /// <param name="closed_at"></param>
 /// <param name="comments"></param>
@@ -2459,8 +2459,8 @@ public record Reaction(
 );
 
 /// <summary></summary>
-/// <param name="@object"></param>
-/// <param name="@ref"></param>
+/// <param name="object"></param>
+/// <param name="ref"></param>
 /// <param name="url"></param>
 public record Reference(
     GitObject? @object = default,
@@ -2591,7 +2591,7 @@ public record RepoTransfer(
 /// <param name="html_url"></param>
 /// <param name="id"></param>
 /// <param name="ignore_whitespace_conflicts"></param>
-/// <param name="@internal"></param>
+/// <param name="internal"></param>
 /// <param name="internal_tracker"></param>
 /// <param name="language"></param>
 /// <param name="languages_url"></param>
@@ -2607,7 +2607,7 @@ public record RepoTransfer(
 /// <param name="owner"></param>
 /// <param name="parent"></param>
 /// <param name="permissions"></param>
-/// <param name="@private"></param>
+/// <param name="private"></param>
 /// <param name="release_counter"></param>
 /// <param name="repo_transfer"></param>
 /// <param name="size"></param>
@@ -2736,7 +2736,7 @@ public record StopWatch(
 
 /// <summary>SubmitPullReviewOptions are options to submit a pending pull review</summary>
 /// <param name="body"></param>
-/// <param name="@event"></param>
+/// <param name="event"></param>
 public record SubmitPullReviewOptions(
     string? body = default,
     string? @event = default
@@ -3104,10 +3104,13 @@ public record WikiPageMetaData(
 /// <summary>indicates what to do with the file</summary>
 public enum ChangeFileOperationOperation
 {
+    /// <summary>create</summary>
     [MapEnum("create")]
     Create = 0,
+    /// <summary>update</summary>
     [MapEnum("update")]
     Update = 1,
+    /// <summary>delete</summary>
     [MapEnum("delete")]
     Delete = 2,
 };
@@ -3115,26 +3118,37 @@ public enum ChangeFileOperationOperation
 /// <summary></summary>
 public enum CreateHookOptionType
 {
+    /// <summary>forgejo</summary>
     [MapEnum("forgejo")]
     Forgejo = 0,
+    /// <summary>dingtalk</summary>
     [MapEnum("dingtalk")]
     Dingtalk = 1,
+    /// <summary>discord</summary>
     [MapEnum("discord")]
     Discord = 2,
+    /// <summary>gitea</summary>
     [MapEnum("gitea")]
     Gitea = 3,
+    /// <summary>gogs</summary>
     [MapEnum("gogs")]
     Gogs = 4,
+    /// <summary>msteams</summary>
     [MapEnum("msteams")]
     Msteams = 5,
+    /// <summary>slack</summary>
     [MapEnum("slack")]
     Slack = 6,
+    /// <summary>telegram</summary>
     [MapEnum("telegram")]
     Telegram = 7,
+    /// <summary>feishu</summary>
     [MapEnum("feishu")]
     Feishu = 8,
+    /// <summary>wechatwork</summary>
     [MapEnum("wechatwork")]
     Wechatwork = 9,
+    /// <summary>packagist</summary>
     [MapEnum("packagist")]
     Packagist = 10,
 };
@@ -3142,8 +3156,10 @@ public enum CreateHookOptionType
 /// <summary></summary>
 public enum CreateMilestoneOptionState
 {
+    /// <summary>open</summary>
     [MapEnum("open")]
     Open = 0,
+    /// <summary>closed</summary>
     [MapEnum("closed")]
     Closed = 1,
 };
@@ -3151,10 +3167,13 @@ public enum CreateMilestoneOptionState
 /// <summary>possible values are `public` (default), `limited` or `private`</summary>
 public enum CreateOrgOptionVisibility
 {
+    /// <summary>public</summary>
     [MapEnum("public")]
     Public = 0,
+    /// <summary>limited</summary>
     [MapEnum("limited")]
     Limited = 1,
+    /// <summary>private</summary>
     [MapEnum("private")]
     Private = 2,
 };
@@ -3162,8 +3181,10 @@ public enum CreateOrgOptionVisibility
 /// <summary>ObjectFormatName of the underlying git repository</summary>
 public enum CreateRepoOptionObject_format_name
 {
+    /// <summary>sha1</summary>
     [MapEnum("sha1")]
     Sha1 = 0,
+    /// <summary>sha256</summary>
     [MapEnum("sha256")]
     Sha256 = 1,
 };
@@ -3171,12 +3192,16 @@ public enum CreateRepoOptionObject_format_name
 /// <summary>TrustModel of the repository</summary>
 public enum CreateRepoOptionTrust_model
 {
+    /// <summary>default</summary>
     [MapEnum("default")]
     Default = 0,
+    /// <summary>collaborator</summary>
     [MapEnum("collaborator")]
     Collaborator = 1,
+    /// <summary>committer</summary>
     [MapEnum("committer")]
     Committer = 2,
+    /// <summary>collaboratorcommitter</summary>
     [MapEnum("collaboratorcommitter")]
     Collaboratorcommitter = 3,
 };
@@ -3184,10 +3209,13 @@ public enum CreateRepoOptionTrust_model
 /// <summary></summary>
 public enum CreateTeamOptionPermission
 {
+    /// <summary>read</summary>
     [MapEnum("read")]
     Read = 0,
+    /// <summary>write</summary>
     [MapEnum("write")]
     Write = 1,
+    /// <summary>admin</summary>
     [MapEnum("admin")]
     Admin = 2,
 };
@@ -3195,10 +3223,13 @@ public enum CreateTeamOptionPermission
 /// <summary>possible values are `public`, `limited` or `private`</summary>
 public enum EditOrgOptionVisibility
 {
+    /// <summary>public</summary>
     [MapEnum("public")]
     Public = 0,
+    /// <summary>limited</summary>
     [MapEnum("limited")]
     Limited = 1,
+    /// <summary>private</summary>
     [MapEnum("private")]
     Private = 2,
 };
@@ -3206,10 +3237,13 @@ public enum EditOrgOptionVisibility
 /// <summary></summary>
 public enum EditTeamOptionPermission
 {
+    /// <summary>read</summary>
     [MapEnum("read")]
     Read = 0,
+    /// <summary>write</summary>
     [MapEnum("write")]
     Write = 1,
+    /// <summary>admin</summary>
     [MapEnum("admin")]
     Admin = 2,
 };
@@ -3217,16 +3251,22 @@ public enum EditTeamOptionPermission
 /// <summary></summary>
 public enum MergePullRequestOptionDo
 {
+    /// <summary>merge</summary>
     [MapEnum("merge")]
     Merge = 0,
+    /// <summary>rebase</summary>
     [MapEnum("rebase")]
     Rebase = 1,
+    /// <summary>rebase-merge</summary>
     [MapEnum("rebase-merge")]
     RebaseMerge = 2,
+    /// <summary>squash</summary>
     [MapEnum("squash")]
     Squash = 3,
+    /// <summary>fast-forward-only</summary>
     [MapEnum("fast-forward-only")]
     FastForwardOnly = 4,
+    /// <summary>manually-merged</summary>
     [MapEnum("manually-merged")]
     ManuallyMerged = 5,
 };
@@ -3234,20 +3274,28 @@ public enum MergePullRequestOptionDo
 /// <summary></summary>
 public enum MigrateRepoOptionsService
 {
+    /// <summary>git</summary>
     [MapEnum("git")]
     Git = 0,
+    /// <summary>github</summary>
     [MapEnum("github")]
     Github = 1,
+    /// <summary>gitea</summary>
     [MapEnum("gitea")]
     Gitea = 2,
+    /// <summary>gitlab</summary>
     [MapEnum("gitlab")]
     Gitlab = 3,
+    /// <summary>gogs</summary>
     [MapEnum("gogs")]
     Gogs = 4,
+    /// <summary>onedev</summary>
     [MapEnum("onedev")]
     Onedev = 5,
+    /// <summary>gitbucket</summary>
     [MapEnum("gitbucket")]
     Gitbucket = 6,
+    /// <summary>codebase</summary>
     [MapEnum("codebase")]
     Codebase = 7,
 };
@@ -3255,8 +3303,10 @@ public enum MigrateRepoOptionsService
 /// <summary>ObjectFormatName of the underlying git repository</summary>
 public enum RepositoryObject_format_name
 {
+    /// <summary>sha1</summary>
     [MapEnum("sha1")]
     Sha1 = 0,
+    /// <summary>sha256</summary>
     [MapEnum("sha256")]
     Sha256 = 1,
 };
@@ -3264,14 +3314,19 @@ public enum RepositoryObject_format_name
 /// <summary></summary>
 public enum TeamPermission
 {
+    /// <summary>none</summary>
     [MapEnum("none")]
     None = 0,
+    /// <summary>read</summary>
     [MapEnum("read")]
     Read = 1,
+    /// <summary>write</summary>
     [MapEnum("write")]
     Write = 2,
+    /// <summary>admin</summary>
     [MapEnum("admin")]
     Admin = 3,
+    /// <summary>owner</summary>
     [MapEnum("owner")]
     Owner = 4,
 };

@@ -141,6 +141,7 @@ IEnumerable<string> generateTypeDefines(CSharpTypeResolver resolver, IEnumerable
             foreach (var entryModel in enumModel.Enums)
             {
                 var entryName = config.ReserveWords.Contains(entryModel.Name) ? $"@{entryModel.Name}" : entryModel.Name;
+                yield return $"    /// <summary>{entryModel.Value}</summary>";
                 yield return $"    [MapEnum(\"{entryModel.Value}\")]";
                 yield return $"    {entryName} = {entryModel.InternalValue},";
             }
@@ -166,7 +167,7 @@ IEnumerable<string> generateTypeDefines(CSharpTypeResolver resolver, IEnumerable
                 .ToArray();
             foreach (var prop in properties)
             {
-                foreach (var desc in generateDescription(prop.Model.Description, $"<param name=\"{prop.PropName}\">", "</param>"))
+                foreach (var desc in generateDescription(prop.Model.Description, $"<param name=\"{prop.PropName.TrimStart('@')}\">", "</param>"))
                 {
                     yield return desc;
                 }
