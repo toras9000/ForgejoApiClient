@@ -5,7 +5,7 @@
 [NugetPackage]: https://www.nuget.org/packages/ForgejoApiClient
 [NugetShield]: https://img.shields.io/nuget/v/ForgejoApiClient
 
-This is [ForgejoApiClient](https://forgejo.org/) API client library for .NET. (unofficial)  
+This is [Forgejo](https://forgejo.org/) API client library for .NET. (unofficial)  
 
 This library is a relatively simple wrapping of the Forgejo API.  
 The client class `ForgejoClient` has properties grouped by API category as indicated in the [Swagger documentation](https://codeberg.org/api/swagger).  
@@ -53,22 +53,18 @@ await client.Repository.AddTopicAsync(me.login, "repo-name", topic: "test");
 ### Create organizations and teams, add members
 
 ```csharp
-var apiBase = new Uri(@"http://<your-hosting-server>/api/v1");
-var apiToken = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 using var client = new ForgejoClient(apiBase, apiToken);
 
-var org = await client.Organization.CreateAsync(new("org-name"));
+var org = await client.Organization.CreateAsync(new(username: "org-name"));
 var team_units = new Dictionary<string, string> { ["repo.code"] = "write", };
-var team = await client.Organization.CreateTeamAsync(("org-name", new("team-name", units_map: team_units));
+var team = await client.Organization.CreateTeamAsync(("org-name", new(name: "team-name", units_map: team_units));
 await client.Organization.AddTeamMemberAsync(team.id!.Value, "user-name");
 ```
 
 ### Running the API in a different user context by sudo
 
 ```csharp
-var apiBase = new Uri(@"http://<your-hosting-server>/api/v1");
-var apiToken = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-using var client = new ForgejoClient(apiBase, apiToken);
+using var adminClient = new ForgejoClient(apiBase, apiToken);
 
 var userClient = adminClient.Sudo("user-name");
 await userClient.Repository.WatchAsync("owner-name", "repo-name");
