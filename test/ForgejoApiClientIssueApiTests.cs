@@ -21,7 +21,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
 
         // Issue作成
-        var issue_created = await client.Issue.CreateAsync(repoOwner, repoName, new(issueTitle));
+        var issue_created = await client.Issue.CreateAsync(repoOwner, repoName, new(title: issueTitle));
 
         // Issue取得
         var issue_get = await client.Issue.GetAsync(repoOwner, repoName, issue_created.number!.Value);
@@ -116,16 +116,16 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
 
         // Reaction作成
-        var reaction_1 = await client.Issue.AddReactionAsync(repoOwner, repoName, issue.number!.Value, new("+1"));
+        var reaction_1 = await client.Issue.AddReactionAsync(repoOwner, repoName, issue.number!.Value, new(content: "+1"));
 
         // Reaction作成
-        var reaction_2 = await client.Issue.AddReactionAsync(repoOwner, repoName, issue.number!.Value, new("heart"));
+        var reaction_2 = await client.Issue.AddReactionAsync(repoOwner, repoName, issue.number!.Value, new(content: "heart"));
 
         // Reactionリスト取得
         var reaction_list = await client.Issue.ListReactionsAsync(repoOwner, repoName, issue.number!.Value);
 
         // Reaction削除
-        await client.Issue.RemoveReactionAsync(repoOwner, repoName, issue.number!.Value, new("heart"));
+        await client.Issue.RemoveReactionAsync(repoOwner, repoName, issue.number!.Value, new(content: "heart"));
 
         // Reactionリスト取得
         var reaction_deleted_list = await client.Issue.ListReactionsAsync(repoOwner, repoName, issue.number!.Value);
@@ -153,7 +153,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
 
         // コメント作成
-        var comment_created = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new("comment"));
+        var comment_created = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new(body: "comment"));
 
         // コメント取得
         var comment_created_get = await client.Issue.GetCommentAsync(repoOwner, repoName, comment_created.id!.Value);
@@ -165,7 +165,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var comment_created_list_repo = await client.Issue.ListRepositoryCommentsAsync(repoOwner, repoName);
 
         // コメント更新
-        var comment_updated = await client.Issue.UpdateCommentAsync(repoOwner, repoName, comment_created.id!.Value, new("comment-updated"));
+        var comment_updated = await client.Issue.UpdateCommentAsync(repoOwner, repoName, comment_created.id!.Value, new(body: "comment-updated"));
 
         // コメントリスト取得 
         var comment_updated_list = await client.Issue.ListIssueCommentsAsync(repoOwner, repoName, issue.number!.Value);
@@ -204,7 +204,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
 
         // コメント作成
-        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new("comment"));
+        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new(body: "comment"));
 
         // Attachment作成
         using var content = new MemoryStream(Encoding.UTF8.GetBytes("file-content"), writable: false);
@@ -253,19 +253,19 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
 
         // コメント作成
-        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new("comment"));
+        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new(body: "comment"));
 
         // Reaction作成
-        var reaction_1 = await client.Issue.AddCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new("+1"));
+        var reaction_1 = await client.Issue.AddCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new(content: "+1"));
 
         // Reaction作成
-        var reaction_2 = await client.Issue.AddCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new("heart"));
+        var reaction_2 = await client.Issue.AddCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new(content: "heart"));
 
         // Reactionリスト取得
         var reaction_list = await client.Issue.ListCommentReactionsAsync(repoOwner, repoName, comment.id!.Value);
 
         // Reaction削除
-        await client.Issue.RemoveCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new("heart"));
+        await client.Issue.RemoveCommentReactionAsync(repoOwner, repoName, comment.id!.Value, new(content: "heart"));
 
         // Reactionリスト取得
         var reaction_deleted_list = await client.Issue.ListCommentReactionsAsync(repoOwner, repoName, comment.id!.Value);
@@ -293,13 +293,13 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue2 = await resources.CreateTestIssueAsync(repoOwner, repoName, "issue2");
 
         // ブロック
-        var block = await client.Issue.BlockAsync(repoOwner, repoName, issue1.number!.Value, new(issue2.number!.Value, repoOwner, repoName));
+        var block = await client.Issue.BlockAsync(repoOwner, repoName, issue1.number!.Value, new(index: issue2.number!.Value, owner: repoOwner, repo: repoName));
 
         // ブロックリスト取得
         var blocked_list = await client.Issue.ListBlockedAsync(repoOwner, repoName, issue1.number!.Value);
 
         // ブロック解除
-        var unblock = await client.Issue.UnblockAsync(repoOwner, repoName, issue1.number!.Value, new(issue2.number!.Value, repoOwner, repoName));
+        var unblock = await client.Issue.UnblockAsync(repoOwner, repoName, issue1.number!.Value, new(index: issue2.number!.Value, owner: repoOwner, repo: repoName));
 
         // ブロックリスト取得
         var unblocked_list = await client.Issue.ListBlockedAsync(repoOwner, repoName, issue1.number!.Value);
@@ -327,13 +327,13 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue2 = await resources.CreateTestIssueAsync(repoOwner, repoName, "issue2");
 
         // ブロック
-        var dependency = await client.Issue.MakeDependencyAsync(repoOwner, repoName, issue1.number!.Value, new(issue2.number!.Value, repoOwner, repoName));
+        var dependency = await client.Issue.MakeDependencyAsync(repoOwner, repoName, issue1.number!.Value, new(index: issue2.number!.Value, owner: repoOwner, repo: repoName));
 
         // ブロックリスト取得
         var dependency_list = await client.Issue.ListDependenciesAsync(repoOwner, repoName, issue1.number!.Value);
 
         // ブロック解除
-        var undependency = await client.Issue.RemoveDependencyAsync(repoOwner, repoName, issue1.number!.Value, new(issue2.number!.Value, repoOwner, repoName));
+        var undependency = await client.Issue.RemoveDependencyAsync(repoOwner, repoName, issue1.number!.Value, new(index: issue2.number!.Value, owner: repoOwner, repo: repoName));
 
         // ブロックリスト取得
         var undependency_list = await client.Issue.ListDependenciesAsync(repoOwner, repoName, issue1.number!.Value);
@@ -362,7 +362,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
 
         // 期限設定
         var now = DateTimeOffset.Now;
-        var deadline = await client.Issue.SetDeadlineAsync(repoOwner, repoName, issue.number!.Value, new(now));
+        var deadline = await client.Issue.SetDeadlineAsync(repoOwner, repoName, issue.number!.Value, new(due_date: now));
 
         // 検証
         deadline.due_date.Should().BeSameDateAs(now);
@@ -666,7 +666,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         timeline_new.Should().BeNull();
 
         // コメントを付ける
-        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new("comment"));
+        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new(body: "comment"));
 
         // Issueタイムライン取得。
         var timeline = await client.Issue.ListTimelineAsync(repoOwner, repoName, issue.number!.Value);

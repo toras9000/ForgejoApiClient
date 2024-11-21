@@ -24,7 +24,7 @@ public class ForgejoApiClientNotificationTests : ForgejoApiClientTestsBase
         var userClient = client.Sudo(user.login!);
 
         // テストユーザでIssue作成
-        var userIssue = await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue-{DateTime.Now.Ticks:X16}"));
+        var userIssue = await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue-{DateTime.Now.Ticks:X16}"));
 
         // 通知数取得。イベントから少し時間が経たないと通知が出ないようなのでしばらく繰り返して取得する。
         await TestCallHelper.TrySatisfy(
@@ -66,9 +66,9 @@ public class ForgejoApiClientNotificationTests : ForgejoApiClientTestsBase
         var userClient = client.Sudo(user.login!);
 
         // テストユーザでIssue作成
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue1-{DateTime.Now.Ticks:X16}"));
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue2-{DateTime.Now.Ticks:X16}"));
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue3-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue1-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue2-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue3-{DateTime.Now.Ticks:X16}"));
 
         // 通知数取得。イベントから少し時間が経たないと通知が出ないようなのでしばらく繰り返して取得する。
         await TestCallHelper.TrySatisfy(
@@ -118,9 +118,9 @@ public class ForgejoApiClientNotificationTests : ForgejoApiClientTestsBase
         var userClient = client.Sudo(user.login!);
 
         // テストユーザでIssue作成
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue1-{DateTime.Now.Ticks:X16}"));
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue2-{DateTime.Now.Ticks:X16}"));
-        await userClient.Issue.CreateAsync(repoOwner, repoName, new($"issue3-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue1-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue2-{DateTime.Now.Ticks:X16}"));
+        await userClient.Issue.CreateAsync(repoOwner, repoName, new(title: $"issue3-{DateTime.Now.Ticks:X16}"));
 
         // 通知数取得。イベントから少し時間が経たないと通知が出ないようなのでしばらく繰り返して取得する。
         await TestCallHelper.TrySatisfy(

@@ -53,7 +53,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repoName = $"repo-{DateTime.Now.Ticks:X16}";
 
         // リポジトリ作成
-        var repo = await client.Repository.CreateAsync(new(repoName));
+        var repo = await client.Repository.CreateAsync(new(name: repoName));
 
         // リポジトリ検索
         var repos = await client.Repository.SearchAsync();
@@ -89,7 +89,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await using var resources = new TestForgejoResources(client);
 
         // テンプレートリポジトリ作成
-        var template = await client.Repository.CreateAsync(new(templateName, template: true)).WillBeDiscarded(resources);
+        var template = await client.Repository.CreateAsync(new(name: templateName, template: true)).WillBeDiscarded(resources);
 
         // テンプレートからリポジトリ作成
         var repo = await client.Repository.CreateUsingTemplateAsync(ownerName, templateName, new(owner: ownerName, name: repoName, git_content: true)).WillBeDiscarded(resources);
@@ -593,7 +593,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // リポジトリフォーク
-        var forked = await client.Repository.ForkAsync(ownerName, repoName, new($"forked-{repoName}")).WillBeDiscarded(resources);
+        var forked = await client.Repository.ForkAsync(ownerName, repoName, new(name: $"forked-{repoName}")).WillBeDiscarded(resources);
         forked.name.Should().Be($"forked-{repoName}");
 
         // リポジトリフォーク
@@ -614,7 +614,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // secret 設定
-        await client.Repository.SetSecretAsync(this.TestTokenUser, repoName, "secret1", new("AAA"));
+        await client.Repository.SetSecretAsync(this.TestTokenUser, repoName, "secret1", new(data: "AAA"));
 
         // secret 削除
         await client.Repository.DeleteSecretAsync(this.TestTokenUser, repoName, "secret1");
@@ -648,7 +648,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         flags1.Should().Contain(["flag1"]);
 
         // フラグ更新
-        await client.Repository.ReplaceFlagsAsync(ownerName, repoName, new(["flag2", "flag3"]));
+        await client.Repository.ReplaceFlagsAsync(ownerName, repoName, new(flags: ["flag2", "flag3"]));
 
         // フラグリスト取得
         var flags2 = await client.Repository.ListFlagsAsync(ownerName, repoName);
@@ -883,7 +883,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -929,7 +929,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -967,7 +967,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -983,7 +983,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         pr_merged.Should().BeFalse();
 
         // PRマージ
-        await client.Repository.MergePullRequestAsync(repoOwner, repoName, pr.number!.Value, new MergePullRequestOption(MergePullRequestOptionDo.Merge));
+        await client.Repository.MergePullRequestAsync(repoOwner, repoName, pr.number!.Value, new(Do: MergePullRequestOptionDo.Merge));
 
         // PRマージ済み判定。認識されるまで待機
         await TestCallHelper.TrySatisfy(
@@ -1009,7 +1009,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var other1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var other2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
         var main2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ddd.cs", new(content: "JKL".EncodeUtf8Base64()));
@@ -1048,7 +1048,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -1082,7 +1082,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -1124,7 +1124,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -1222,7 +1222,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("other"));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
 
@@ -1310,8 +1310,8 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-        var branch1 = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("branch1"));
-        var branch2 = await client.Repository.CreateBranchAsync(repoOwner, repoName, new("branch2"));
+        var branch1 = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "branch1"));
+        var branch2 = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "branch2"));
         var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: "branch1"));
         var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "GHI".EncodeUtf8Base64(), branch: "branch2"));
 
@@ -1452,7 +1452,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // SSHキー作成
-        var key = await client.Repository.AddDeployKeyAsync(repoOwner, repoName, new(TestConstants.TestSshPubKey, "test-pubkey"));
+        var key = await client.Repository.AddDeployKeyAsync(repoOwner, repoName, new(key: TestConstants.TestSshPubKey, title: "test-pubkey"));
         key.title.Should().Be("test-pubkey");
 
         // SSHキー取得
@@ -1707,7 +1707,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         topic1.topics.Should().Contain(t => comparer.Equals(t, "AAA"));
 
         // トピック置換
-        await client.Repository.ReplaceTopicsAsync(repoOwner, repoName, new(["BBB", "CCC"]));
+        await client.Repository.ReplaceTopicsAsync(repoOwner, repoName, new(topics: ["BBB", "CCC"]));
 
         // トピック取得
         var topic2 = await client.Repository.GetTopicsAsync(repoOwner, repoName);
@@ -1742,15 +1742,15 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var user2Client = client.Sudo(userName2);
 
         // ユーザ1でリポジトリ作成
-        var repo1 = await user1Client.Repository.CreateAsync(new(repoName1));
-        var repo2 = await user1Client.Repository.CreateAsync(new(repoName2));
+        var repo1 = await user1Client.Repository.CreateAsync(new(name: repoName1));
+        var repo2 = await user1Client.Repository.CreateAsync(new(name: repoName2));
 
         // 適当なコンテンツを追加
         var content1 = await user1Client.Repository.CreateFileAsync(userName1, repoName1, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
         var content2 = await user1Client.Repository.CreateFileAsync(userName1, repoName2, "bbb.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // リポジトリ転移1
-        var transferRepo1 = await user1Client.Repository.TransferOwnerAsync(userName1, repoName1, new(userName2));
+        var transferRepo1 = await user1Client.Repository.TransferOwnerAsync(userName1, repoName1, new(new_owner: userName2));
 
         // リポジトリ転移を受け付け
         var acceptRepo = await user2Client.Repository.AcceptTransferAsync(userName1, repoName1);
@@ -1759,7 +1759,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await user2Client.Repository.DeleteAsync(userName2, repoName1);
 
         // リポジトリ転移2
-        var transferRepo2 = await user1Client.Repository.TransferOwnerAsync(userName1, repoName2, new(userName2));
+        var transferRepo2 = await user1Client.Repository.TransferOwnerAsync(userName1, repoName2, new(new_owner: userName2));
 
         // リポジトリ転移を拒否
         var rejectedRepo = await user2Client.Repository.RejectTransferAsync(userName1, repoName2);
@@ -1903,7 +1903,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // 適当な画像を作ってアバターに設定
         var image = TestResourceGenerator.CreateTextImage("Test User Avator");
         var imageB64 = Convert.ToBase64String(image);
-        await client.Repository.UpdateAvatarAsync(ownerName, repoName, new(imageB64));
+        await client.Repository.UpdateAvatarAsync(ownerName, repoName, new(image: imageB64));
 
         // アバター画像を検証
         var repo_updated = await client.Repository.GetAsync(ownerName, repoName);

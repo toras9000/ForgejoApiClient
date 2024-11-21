@@ -35,8 +35,8 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         using var client = new ForgejoClient(this.TestService, this.TestToken);
         var emails = await client.User.ListEmailsAsync();
 
-        var added = await client.User.AddEmailAsync(new(["aaa@example.com", "bbb@example.com"]));
-        await client.User.DeleteEmailAsync(new(["aaa@example.com", "bbb@example.com"]));
+        var added = await client.User.AddEmailAsync(new(emails: ["aaa@example.com", "bbb@example.com"]));
+        await client.User.DeleteEmailAsync(new(emails: ["aaa@example.com", "bbb@example.com"]));
         var deleted = await client.User.ListEmailsAsync();
 
         added.Select(m => m.email).Should().Contain(["aaa@example.com", "bbb@example.com"]);
@@ -52,7 +52,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         // 適当な画像を作ってアバターに設定、アバター画像を取得
         var image = TestResourceGenerator.CreateTextImage("Test User Avator");
         var imageB64 = Convert.ToBase64String(image);
-        await client.User.UpdateAvatarAsync(new(imageB64));
+        await client.User.UpdateAvatarAsync(new(image: imageB64));
         var me1 = await client.User.GetMeAsync();
         var avatar1 = await http.GetByteArrayAsync(me1.avatar_url);
 
@@ -340,7 +340,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         // リポジトリ作成
-        var repo = await client.User.CreateRepositoryAsync(new($"repo-{DateTime.Now.Ticks:X16}"));
+        var repo = await client.User.CreateRepositoryAsync(new(name: $"repo-{DateTime.Now.Ticks:X16}"));
         repo.owner!.login.Should().Be(this.TestTokenUser);
 
         // リスト取得
@@ -431,7 +431,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         // GPGキー作成
-        var key = await client.User.CreateGpgKeyAsync(new(TestConstants.TestGpgPubKey));
+        var key = await client.User.CreateGpgKeyAsync(new(armored_public_key: TestConstants.TestGpgPubKey));
         try
         {
             // 検証トークン取得
@@ -478,7 +478,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         // GPGキー作成
-        var key = await client.User.CreateGpgKeyAsync(new(TestConstants.TestGpgPubKey));
+        var key = await client.User.CreateGpgKeyAsync(new(armored_public_key: TestConstants.TestGpgPubKey));
 
         // GPGキー取得
         var ket_get = await client.User.GetGpgKeyAsync(key.id!.Value);
@@ -505,7 +505,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         // SSHキー作成
-        var key = await client.User.AddPublicKeyAsync(new(TestConstants.TestSshPubKey, "test-pubkey"));
+        var key = await client.User.AddPublicKeyAsync(new(key: TestConstants.TestSshPubKey, title: "test-pubkey"));
 
         // SSHキー取得
         var ket_get = await client.User.GetPublicKeyAsync(key.id!.Value);

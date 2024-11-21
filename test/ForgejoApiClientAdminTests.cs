@@ -213,7 +213,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var repoName = $"repo-{DateTime.Now.Ticks:X16}";
 
         // 対象メソッド実行
-        var repo = await client.Admin.CreateUserRepoAsync(repoOwner, new(repoName));
+        var repo = await client.Admin.CreateUserRepoAsync(repoOwner, new(name: repoName));
         repo.full_name.Should().Be($"{repoOwner}/{repoName}");
 
         // クリーンナップ
@@ -230,7 +230,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var orgName = $"org-{DateTime.Now.Ticks:X16}";
 
         // 組織作成
-        var org = await client.Admin.CreateOrganizationAsync(orgOwner, new(orgName));
+        var org = await client.Admin.CreateOrganizationAsync(orgOwner, new(username: orgName));
 
         // 組織リスト取得
         var org_list = await client.Admin.ListOrganizationsAsync();
@@ -254,16 +254,16 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var userMail = $"{userName}@example.com";
 
         // ユーザ作成
-        var user_created = await client.Admin.CreateUserAsync(new(userMail, userName, password: userName));
+        var user_created = await client.Admin.CreateUserAsync(new(email: userMail, username: userName, password: userName));
 
         // ユーザリスト取得
         var user_list = await client.Admin.ListUsersAsync();
 
         // ユーザ更新
-        var user_updated = await client.Admin.UpdateUserAsync(userName, new(userName, 0, full_name: "edited-user"));
+        var user_updated = await client.Admin.UpdateUserAsync(userName, new(login_name: userName, source_id: 0, full_name: "edited-user"));
 
         // ユーザリネーム
-        await client.Admin.RenameUserAsync(userName, new($"new-{userName}"));
+        await client.Admin.RenameUserAsync(userName, new(new_username: $"new-{userName}"));
 
         // ユーザリスト取得
         var user_list_renamed = await client.Admin.ListUsersAsync();
@@ -300,7 +300,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var user = await resources.CreateTestUserAsync($"user-{DateTime.Now.Ticks:X16}");
 
         // SSHキー作成
-        var key = await client.Admin.AddUserPublicKeyAsync(user.login!, new(TestConstants.TestSshPubKey, "test-pubkey"));
+        var key = await client.Admin.AddUserPublicKeyAsync(user.login!, new(key: TestConstants.TestSshPubKey, title: "test-pubkey"));
 
         // SSHキー削除
         await client.Admin.DeleteUserPublicKeyAsync(user.login!, key.id!.Value);

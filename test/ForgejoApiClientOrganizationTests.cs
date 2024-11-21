@@ -53,8 +53,8 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var userClient = client.Sudo(user.login!);
 
         // 組織作成
-        var org1 = await userClient.Organization.CreateAsync(new($"org1-{DateTime.Now.Ticks:X16}"));
-        var org2 = await userClient.Organization.CreateAsync(new($"org2-{DateTime.Now.Ticks:X16}"));
+        var org1 = await userClient.Organization.CreateAsync(new(username: $"org1-{DateTime.Now.Ticks:X16}"));
+        var org2 = await userClient.Organization.CreateAsync(new(username: $"org2-{DateTime.Now.Ticks:X16}"));
 
         // 組織リスト取得
         var orgs = await client.Organization.ListUserOrgsAsync(user.login!);
@@ -154,7 +154,7 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // 組織にリポジトリを作成
-        var repo = await client.Organization.CreateRepositoryAsync(orgName, new($"repo-{DateTime.Now.Ticks:X16}")).WillBeDiscarded(resources);
+        var repo = await client.Organization.CreateRepositoryAsync(orgName, new(name: $"repo-{DateTime.Now.Ticks:X16}")).WillBeDiscarded(resources);
 
         // 組織のリポジトリリストを取得
         var repos = await client.Organization.ListRepositoriesAsync(orgName);
@@ -212,7 +212,7 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         // 適当な画像を作ってアバターに設定
         var image = TestResourceGenerator.CreateTextImage("Test User Avator");
         var imageB64 = Convert.ToBase64String(image);
-        await client.Organization.UpdateAvatarAsync(orgName, new(imageB64));
+        await client.Organization.UpdateAvatarAsync(orgName, new(image: imageB64));
 
         // アバター画像を検証
         var org_updated = await client.Organization.GetAsync(orgName);
@@ -243,16 +243,16 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // secretの設定
-        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new("AAA"));
-        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new("BBB"));
+        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new(data: "AAA"));
+        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new(data: "BBB"));
 
         // secretの取得
         var secrets1 = await client.Organization.ListActionSecretsAsync(orgName);
         secrets1.Select(s => s.name).Should().BeEquivalentTo([secret1Name, secret2Name], config: c => c.Using(StringComparer.OrdinalIgnoreCase));
 
         // secretの更新
-        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new("CCC"));
-        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new("DDD"));
+        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new(data: "CCC"));
+        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new(data: "DDD"));
 
         // secretの取得
         var secrets2 = await client.Organization.ListActionSecretsAsync(orgName);
@@ -382,7 +382,7 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var team_get = await client.Organization.GetTeamAsync(team.id!.Value);
 
         // チーム更新
-        var team_updated = await client.Organization.UpdateTeamAsync(team.id!.Value, new(teamName, description: "updated"));
+        var team_updated = await client.Organization.UpdateTeamAsync(team.id!.Value, new(name: teamName, description: "updated"));
 
         // チームリスト取得
         var team_list = await client.Organization.ListTeamsAsync(orgName);
