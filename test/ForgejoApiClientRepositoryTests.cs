@@ -906,10 +906,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // PRリスト取得
         var pr_list = await client.Repository.ListPullRequestsAsync(repoOwner, repoName);
         pr_list.Should().Contain(p => p.title == "pull-req-upd");
-
-        // コミットPR取得
-        var pr_commit = await client.Repository.GetCommitPullRequestAsync(repoOwner, repoName, content3.commit!.sha!);
-        pr_target.title.Should().Be("pull-req");
     }
 
     [TestMethod]
@@ -979,8 +975,8 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var pr_get = await client.Repository.GetPullRequestAsync(repoOwner, repoName, pr.number!.Value);
 
         // PRマージ済み判定
-        var pr_merged = await client.Repository.IsPullRequestMergeAsync(repoOwner, repoName, pr.number!.Value);
-        pr_merged.Should().BeFalse();
+        var pr_premerge = await client.Repository.IsPullRequestMergeAsync(repoOwner, repoName, pr.number!.Value);
+        pr_premerge.Should().BeFalse();
 
         // PRマージ
         await client.Repository.MergePullRequestAsync(repoOwner, repoName, pr.number!.Value, new(Do: MergePullRequestOptionDo.Merge));
@@ -990,6 +986,14 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             caller: breaker => client.Repository.IsPullRequestMergeAsync(repoOwner, repoName, pr.number!.Value, cancelToken: breaker).AsTask(),
             condition: merged => merged
         );
+
+        // マージされたブランチの情報取得
+        var merged_branch = await client.Repository.GetBranchAsync(repoOwner, repoName, branch: "main");
+
+        // コミットPR取得
+        var pr_commit = await client.Repository.GetCommitPullRequestAsync(repoOwner, repoName, merged_branch.commit!.id!);
+        pr_commit.title.Should().Be("pull-req");
+
     }
 
     [TestMethod]
