@@ -61,6 +61,18 @@ var team = await client.Organization.CreateTeamAsync(("org-name", new(name: "tea
 await client.Organization.AddTeamMemberAsync(team.id!.Value, "user-name");
 ```
 
+### Save content response
+
+```csharp
+using var client = new ForgejoClient(apiBase, apiToken);
+
+using (var archiveDownload = await client.Repository.GetArchiveAsync("owner-name", "repo-name", "main.zip"))
+using (var fileStream = File.OpenWrite(archiveDownload.Result.FileName ?? "main.zip"))
+{
+    await archiveDownload.Result.Stream.CopyToAsync(fileStream);
+}
+```
+
 ### Running the API in a different user context by sudo
 
 ```csharp
