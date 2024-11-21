@@ -110,7 +110,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
 
         // テスト対象メソッドを実行
         var activities = await client.User.ListUserActivitiesAsync(repo.owner!.login!);
-        activities.Should().Contain(a => a.op_type == "create_repo");
+        activities.Should().Contain(a => a.op_type == ActivityOp_type.Create_repo);
     }
 
     [TestMethod]
@@ -578,7 +578,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task SetDeleteSecretScenario()
+    public async Task ActionSecretScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -586,6 +586,37 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         await client.User.SetActionSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data"));
         await client.User.SetActionSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data-updated"));
         await client.User.DeleteActionSecretAsync(secretname);
+    }
+
+    [TestMethod]
+    public async Task ActionVariableScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var userName = $"user-{DateTime.Now.Ticks:X16}";
+        var varName = $"varname";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var user = await resources.CreateTestUserAsync(userName);
+
+        // variable作成
+        await client.User.CreateActionVariableAsync(varName, new(value: "AAA"));
+
+        // variable取得
+        var variable = await client.User.GetActionVariableAsync(varName);
+        variable.data.Should().Be("AAA");
+
+        // variable更新
+        await client.User.UpdateActionVariableAsync(varName, new(value: "BBB"));
+
+        // リリースリスト取得
+        var variable_list = await client.User.ListActionVariablesAsync();
+        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
+
+        // リリース情報削除
+        await client.User.DeleteActionVariableAsync(varName);
     }
 
     [TestMethod]

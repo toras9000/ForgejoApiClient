@@ -191,83 +191,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task CommitScenario()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var ownerName = this.TestTokenUser;
-        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var repo = await resources.CreateTestRepoAsync(repoName);
-
-        // リポジトリに適当な内容をpush
-        using var repoDir = new TestTempRepo(repo.clone_url!);
-        repoDir.Auther = "test-auther";
-        repoDir.AutherMail = "test-auther@example.com";
-        repoDir.Commit("commit1\naaaa", dir =>
-        {
-            dir.RelativeFile("aaa.cs").WriteAllText("using System;");
-            dir.RelativeFile("bbb.cs").WriteAllText("using System;");
-        });
-        repoDir.Commit("commit2\nbbb", dir =>
-        {
-            dir.RelativeFile("aaa.cs").WriteAllText("using System.Text;");
-            dir.RelativeFile("bbb.cs").WriteAllText("using System.Linq;");
-        });
-        repoDir.Push(this.TestTokenUser, this.TestToken);
-
-        // pushしたコミットの情報を取得。少し時間が経たないと情報が得られないようなのでしばらく繰り返して取得する。
-        await TestCallHelper.TrySatisfy(
-            caller: breaker => client.Repository.GetCommitAsync(ownerName, repoName, repoDir.Repo.Head.Tip.Sha, cancelToken: breaker),
-            condition: pushed => pushed.sha == repoDir.Repo.Head.Tip.Sha
-        );
-        await TestCallHelper.TrySatisfy(
-            caller: breaker => client.Repository.ListCommitsAsync(ownerName, repoName, cancelToken: breaker),
-            condition: commit_list => commit_list.Any(c => c.sha == repoDir.Repo.Head.Tip.Sha)
-        );
-
-        // コミット差分取得
-        var commit_diff = await client.Repository.GetCommitDiffAsync(ownerName, repoName, repoDir.Repo.Head.Tip.Sha, "diff");
-        commit_diff.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [TestMethod]
-    public async Task CommitStatusScenario()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var ownerName = this.TestTokenUser;
-        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var repo = await resources.CreateTestRepoAsync(repoName);
-
-        // コンテンツ作成
-        var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
-
-        // コミットステータス作成
-        var status = await client.Repository.CreateCommitStatusAsync(ownerName, repoName, content.commit!.sha!, new(context: "aaa"));
-        status.context.Should().NotBeNullOrWhiteSpace();
-
-        // ステータスリスト取得
-        var status_list = await client.Repository.ListCommitStatusesAsync(ownerName, repoName, content.commit!.sha!);
-        status_list.Should().Contain(s => s.context == "aaa");
-
-        // ステータスリスト取得
-        var statuses_list = await client.Repository.ListCommitsStatusesAsync(ownerName, repoName, content.commit!.sha!);
-        statuses_list.Should().Contain(s => s.context == "aaa");
-
-        // combinedステータス取得
-        var combine_status = await client.Repository.GetCommitsCombinedStatusAsync(ownerName, repoName, content.commit!.sha!);
-        combine_status.statuses.Should().Contain(s => s.context == "aaa");
-    }
-
-    [TestMethod]
     public async Task TagScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -302,6 +225,154 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // タグリスト取得
         var tag_deleted = await client.Repository.ListTagsAsync(ownerName, repoName);
         tag_deleted.Should().NotContain(t => t.name == tagName);
+    }
+
+    [TestMethod]
+    public async Task TagProtectionScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var userName = $"user-{DateTime.Now.Ticks:X16}";
+        var tagName = $"tag-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+        var user = await resources.CreateTestUserAsync(userName);
+
+        // コンテンツ作成
+        var content = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // タグ作成
+        var tag = await client.Repository.CreateTagAsync(repoOwner, repoName, new(tag_name: tagName));
+
+        // タグプロテクト
+        var protection = await client.Repository.CreateTagProtectionAsync(repoOwner, repoName, new(name_pattern: tagName, whitelist_usernames: [this.TestTokenUser]));
+        protection.name_pattern.Should().Be(tagName);
+
+        // タグプロテクト情報取得
+        var protection_get = await client.Repository.GetTagProtectionAsync(repoOwner, repoName, protection.id!.Value);
+        protection_get.name_pattern.Should().Be(tagName);
+
+        // タグプロテクト情報更新
+        var protection_updated = await client.Repository.UpdateTagProtectionAsync(repoOwner, repoName, protection.id!.Value, new(whitelist_usernames: [userName]));
+        protection_updated.name_pattern.Should().Be(tagName);
+
+        // タグプロテクトリスト取得
+        var protection_list = await client.Repository.ListTagProtectionsAsync(repoOwner, repoName);
+        protection_list.Select(p => p.name_pattern).Should().Contain(tagName);
+
+        // タグプロテクト削除
+        await client.Repository.DeleteTagProtectionAsync(repoOwner, repoName, protection.id!.Value);
+    }
+
+    [TestMethod]
+    public async Task CommitScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var ownerName = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // リポジトリに適当な内容をpush
+        using var repoDir = new TestTempRepo(repo.clone_url!);
+        repoDir.Auther = "test-auther";
+        repoDir.AutherMail = "test-auther@example.com";
+        var commit1 = repoDir.Commit("commit1\naaaa", dir =>
+        {
+            dir.RelativeFile("aaa.cs").WriteAllText("using System;");
+            dir.RelativeFile("bbb.cs").WriteAllText("using System;");
+        });
+        var commit2 = repoDir.Commit("commit2\nbbb", dir =>
+        {
+            dir.RelativeFile("aaa.cs").WriteAllText("using System.Text;");
+            dir.RelativeFile("bbb.cs").WriteAllText("using System.Linq;");
+        });
+        repoDir.Push(this.TestTokenUser, this.TestToken);
+
+        // pushしたコミットの情報を取得。少し時間が経たないと情報が得られないようなのでしばらく繰り返して取得する。
+        await TestCallHelper.TrySatisfy(
+            caller: breaker => client.Repository.GetCommitAsync(ownerName, repoName, repoDir.Repo.Head.Tip.Sha, cancelToken: breaker),
+            condition: pushed => pushed.sha == repoDir.Repo.Head.Tip.Sha
+        );
+        await TestCallHelper.TrySatisfy(
+            caller: breaker => client.Repository.ListCommitsAsync(ownerName, repoName, cancelToken: breaker),
+            condition: commit_list => commit_list.Any(c => c.sha == repoDir.Repo.Head.Tip.Sha)
+        );
+
+        // コミット差分取得
+        var commit_diff = await client.Repository.GetCommitDiffAsync(ownerName, repoName, repoDir.Repo.Head.Tip.Sha, "diff");
+        commit_diff.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [TestMethod]
+    public async Task CommitCompareScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var userName = $"user-{DateTime.Now.Ticks:X16}";
+        var issueTitle = $"issue-{DateTime.Now.Ticks:X16}";
+        var prTitle = $"pr-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
+        var user = await resources.CreateTestUserAsync(userName);
+
+        // コンテンツ作成
+        var content1 = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+        var branch = await client.Repository.CreateBranchAsync(repoOwner, repoName, new(new_branch_name: "other"));
+        var content2 = await client.Repository.CreateFileAsync(repoOwner, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
+        var content3 = await client.Repository.CreateFileAsync(repoOwner, repoName, "ccc.cs", new(content: "GHI".EncodeUtf8Base64(), branch: branch.name));
+
+        // コミット差分取得
+        var commit_compare = await client.Repository.GetCommitCompareAsync(repoOwner, repoName, $"main...other");
+        commit_compare.total_commits.Should().BeGreaterThan(0);
+
+    }
+
+    [TestMethod]
+    public async Task CommitStatusScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var ownerName = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // コミットステータス作成
+        var status = await client.Repository.CreateCommitStatusAsync(ownerName, repoName, content.commit!.sha!, new(context: "aaa"));
+        status.context.Should().NotBeNullOrWhiteSpace();
+
+        // ステータスリスト取得
+        var status_list = await client.Repository.ListCommitStatusesAsync(ownerName, repoName, content.commit!.sha!);
+        status_list.Should().Contain(s => s.context == "aaa");
+
+        // ステータスリスト取得
+        var statuses_list = await client.Repository.ListCommitsStatusesAsync(ownerName, repoName, content.commit!.sha!);
+        statuses_list.Should().Contain(s => s.context == "aaa");
+
+        // combinedステータス取得
+        var combine_status = await client.Repository.GetCommitsCombinedStatusAsync(ownerName, repoName, content.commit!.sha!);
+        combine_status.statuses.Should().Contain(s => s.context == "aaa");
     }
 
     [TestMethod]
@@ -602,7 +673,53 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task RepoSecretSenario()
+    public async Task GetActionTasks()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // タスク取得
+        var tasks = await client.Repository.GetActionTasks(repoOwner, repoName);
+    }
+
+    [TestMethod]
+    public async Task DispatchActionWorkflowAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: [push]
+        jobs:
+          test:
+            runs-on: docker
+            steps:
+              - run: echo All Good
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        // 適切にセットアップしていないので現状はあまり意味がない。呼び出すだけ。
+        await client.Repository.DispatchActionWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main"));
+    }
+
+    [TestMethod]
+    public async Task ActionSecretSenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -614,10 +731,47 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // secret 設定
-        await client.Repository.SetSecretAsync(this.TestTokenUser, repoName, "secret1", new(data: "AAA"));
+        await client.Repository.SetActionSecretAsync(this.TestTokenUser, repoName, "secret1", new(data: "AAA"));
+
+        // secret リスト取得
+        var secrets = await client.Repository.ListActionSecretsAsync(this.TestTokenUser, repoName);
+        secrets.Should().Contain(s => string.Equals(s.name, "secret1", StringComparison.OrdinalIgnoreCase));
 
         // secret 削除
-        await client.Repository.DeleteSecretAsync(this.TestTokenUser, repoName, "secret1");
+        await client.Repository.DeleteActionSecretAsync(this.TestTokenUser, repoName, "secret1");
+    }
+
+    [TestMethod]
+    public async Task ActionVariableScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var varName = $"varname";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // variable作成
+        await client.Repository.CreateActionVariableAsync(repoOwner, repoName, varName, new(value: "AAA"));
+
+        // variable取得
+        var variable = await client.Repository.GetActionVariableAsync(repoOwner, repoName, varName);
+        variable.data.Should().Be("AAA");
+
+        // variable更新
+        await client.Repository.UpdateActionVariableAsync(repoOwner, repoName, varName, new(value: "BBB"));
+
+        // リリースリスト取得
+        Assert.Inconclusive("ListActionVariablesAsync で変数値が得られない。バグ？");
+        var variable_list = await client.Repository.ListActionVariablesAsync(repoOwner, repoName);
+        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
+
+        // リリース情報削除
+        await client.Repository.DeleteActionVariableAsync(repoOwner, repoName, varName);
     }
 
     [TestMethod]
@@ -1368,7 +1522,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var release_updated = await client.Repository.UpdateReleaseAsync(ownerName, repoName, release.id!.Value, new(body: "updated"));
         release_updated.tag_name.Should().Be(releaseName);
 
-        // リリース情報更新
+        // リリース情報削除
         await client.Repository.DeleteReleaseAsync(ownerName, repoName, release.id!.Value);
     }
 
@@ -1779,11 +1933,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     [TestMethod]
     public async Task WikiScenario()
     {
-        Assert.Inconclusive("v7でWiki APIはバグで正しく動作しない模様。");
-
-        // おそらくこれ。v8で修正され、v7へのバックポートは行われない模様。
-        // https://codeberg.org/forgejo/forgejo/pulls/3430
-
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         // テスト用エンティティ情報

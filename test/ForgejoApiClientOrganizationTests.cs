@@ -268,6 +268,37 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task ActionVariableScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var orgName = $"org-{DateTime.Now.Ticks:X16}";
+        var varName = $"varname";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var org = await resources.CreateTestOrgAsync(orgName);
+
+        // variable作成
+        await client.Organization.CreateActionVariableAsync(orgName, varName, new(value: "AAA"));
+
+        // variable取得
+        var variable = await client.Organization.GetActionVariableAsync(orgName, varName);
+        variable.data.Should().Be("AAA");
+
+        // variable更新
+        await client.Organization.UpdateActionVariableAsync(orgName, varName, new(value: "BBB"));
+
+        // リリースリスト取得
+        var variable_list = await client.Organization.ListActionVariablesAsync(orgName);
+        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
+
+        // リリース情報削除
+        await client.Organization.DeleteActionVariableAsync(orgName, varName);
+    }
+
+    [TestMethod]
     public async Task BlockUnblockSenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
