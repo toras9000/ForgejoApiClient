@@ -2,6 +2,7 @@
 #r "nuget: Kokuban, 0.2.0"
 #r "nuget: Lestaly, 0.68.0"
 #nullable enable
+using System.Security;
 using Kokuban;
 using Lestaly;
 using NJsonSchema;
@@ -101,15 +102,17 @@ return await Paved.RunAsync(async () =>
 // 型の概要コメント生成
 IEnumerable<string> generateDescription(string? description, string beginTag, string endTag)
 {
+    static string? escape(string? text) => SecurityElement.Escape(text);
+
     var descLines = description?.Split(['\r', '\n']) ?? [];
     if (descLines.Length < 2)
     {
-        yield return $"/// {beginTag}{description}{endTag}";
+        yield return $"/// {beginTag}{escape(description)}{endTag}";
     }
     else
     {
         yield return $"/// {beginTag}";
-        foreach (var line in descLines) yield return $"/// {line}";
+        foreach (var line in descLines) yield return $"/// {escape(line)}";
         yield return $"/// {endTag}";
     }
 }
@@ -141,7 +144,10 @@ IEnumerable<string> generateTypeDefines(CSharpTypeResolver resolver, IEnumerable
             foreach (var entryModel in enumModel.Enums)
             {
                 var entryName = config.ReserveWords.Contains(entryModel.Name) ? $"@{entryModel.Name}" : entryModel.Name;
-                yield return $"    /// <summary>{entryModel.Value}</summary>";
+                foreach (var desc in generateDescription(entryModel.Value, "<summary>", "</summary>"))
+                {
+                    yield return $"    {desc}";
+                }
                 yield return $"    [MapEnum(\"{entryModel.Value}\")]";
                 yield return $"    {entryName} = {entryModel.InternalValue},";
             }

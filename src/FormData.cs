@@ -9,24 +9,35 @@ internal class FormData : MultipartFormDataContent
     #region コンストラクタ
     /// <summary>デフォルトコンストラクタ</summary>
     public FormData() : base() { }
-
-    /// <summary>ファイル内容データを追加するコンストラクタ</summary>
-    public FormData(Stream content, [CallerArgumentExpression(nameof(content))] string? name = "")
-    {
-        this.File(content, name);
-    }
     #endregion
 
     // 公開メソッド
     #region コンテンツ
     /// <summary>ファイル内容パラメータを追加する</summary>
     /// <param name="content">ファイル内容ストリーム</param>
-    /// <param name="name">ファイル名</param>
+    /// <param name="name">パラメータ名</param>
     /// <returns>自身のインスタンス</returns>
-    public FormData File(Stream content, [CallerArgumentExpression(nameof(content))] string? name = "")
+    public FormData File(Stream? content, [CallerArgumentExpression(nameof(content))] string? name = "")
     {
-        if (name == null) this.Add(new StreamContent(content));
-        else this.Add(new StreamContent(content), name, "file.txt");
+        if (content != null)
+        {
+            if (name == null) this.Add(new StreamContent(content));
+            else this.Add(new StreamContent(content), name, "file.txt");
+        }
+        return this;
+    }
+
+    /// <summary>文字列パラメータを追加する</summary>
+    /// <param name="value">文字列パラメータ値</param>
+    /// <param name="name">パラメータ名</param>
+    /// <returns>自身のインスタンス</returns>
+    public FormData Scalar(string? value, [CallerArgumentExpression(nameof(value))] string? name = "")
+    {
+        if (value != null)
+        {
+            if (name == null) this.Add(new StringContent(value));
+            else this.Add(new StringContent(value), name);
+        }
         return this;
     }
     #endregion
