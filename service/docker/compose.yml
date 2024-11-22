@@ -1,6 +1,6 @@
 services:
   app:
-    image: codeberg.org/forgejo/forgejo:8.0.0
+    image: codeberg.org/forgejo/forgejo:9.0.0
     restart: unless-stopped
     healthcheck:
       test: curl -f -s http://localhost:3000 || exit 1
@@ -27,5 +27,7 @@ services:
       - FORGEJO__repository__ENABLE_FLAGS=true
       - FORGEJO__repository__SETTABLE_FLAGS=flag1,flag2,flag3
       - FORGEJO__federation__ENABLED=true
+      - FORGEJO__quota__ENABLED=true
+      - FORGEJO__quota_0x2E_default__TOTAL=8G
     extra_hosts:
       - testhost-gateway:host-gateway
