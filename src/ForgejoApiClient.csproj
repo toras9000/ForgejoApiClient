@@ -16,7 +16,7 @@
   <PropertyGroup>
     <Authors>toras9000</Authors>
     <Company />
-    <Version>7.0.5-rev.0</Version>
+    <Version>8.0.0-rev.1</Version>
   </PropertyGroup>
   <PropertyGroup>
     <PackageProjectUrl>https://github.com/toras9000/BookStackApiClient</PackageProjectUrl>
