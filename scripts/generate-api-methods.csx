@@ -369,14 +369,16 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     }
 
     // FormData パラメータ
-    foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData))
+    foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData).OrderBy(p => p.Required ? 0 : 1))
     {
         var paramType = param.Type switch
         {
-            "FileParameter" => "Stream",
+            "FileParameter" => param.Required ? "Stream" : "Stream?",
             _ => param.Type,
         };
-        paramsBuilder.Append($"{paramType} {param.Variable}, ");
+        paramsBuilder.Append($"{paramType} {param.Variable}");
+        if (!param.Required) paramsBuilder.Append(" = default");
+        paramsBuilder.Append($", ");
     }
 
     // Query パラメータにページングパラメータが含まれる場合は特別扱いする。個別のパラメータからは取り除く。
@@ -385,7 +387,7 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     if (hasPaging) queryParams.RemoveAll(p => p.Name is "limit" or "page");
 
     // Query パラメータを並べる。
-    foreach (var param in queryParams)
+    foreach (var param in queryParams.OrderBy(p => p.Required ? 0 : 1))
     {
         paramsBuilder.Append($"{param.Type} {param.Variable}");
         if (!param.Required) paramsBuilder.Append(" = default");
@@ -440,11 +442,16 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     }
     else if (hasForm)
     {
+        bodyArg = $", new FormData()";
         foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData))
         {
-            if (param.Type != "FileParameter") throw new Exception("ファイル内容以外のformdataをどう扱うべきかを決めていない");
-            bodyArg = $", new FormData({param.Variable}).AsContent()";
+            bodyArg += param.Type switch
+            {
+                "FileParameter" => $".File({param.Variable})",
+                _ => $".Scalar({param.Variable})",
+            };
         }
+        bodyArg += $".AsContent()";
     }
 
     // 結果取得コード

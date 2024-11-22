@@ -36,7 +36,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="archived">show only archived, non-archived or all repositories (defaults to all)</param>
     /// <param name="mode">type of repository to search for. Supported values are &quot;fork&quot;, &quot;source&quot;, &quot;mirror&quot; and &quot;collaborative&quot;</param>
     /// <param name="exclusive">if `uid` is given, search only for repos that the user owns</param>
-    /// <param name="sort">sort repos by attribute. Supported values are &quot;alpha&quot;, &quot;created&quot;, &quot;updated&quot;, &quot;size&quot;, &quot;git_size&quot;, &quot;lfs_size&quot;, &quot;stars&quot;, &quot;forks&quot; and &quot;id&quot;. Default is &quot;alpha&quot;</param>
+    /// <param name="sort">sort repos by attribute. Supported values are &quot;alpha&quot;, &quot;created&quot;, &quot;updated&quot;, &quot;size&quot;, and &quot;id&quot;. Default is &quot;alpha&quot;</param>
     /// <param name="order">sort order, either &quot;asc&quot; (ascending) or &quot;desc&quot; (descending). Default is &quot;asc&quot;, ignored if &quot;sort&quot; is not specified.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -1156,8 +1156,8 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases/{id}/assets", "Create a release attachment")]
-    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream attachment, string? name = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream? attachment = default, string? name = default, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData().File(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
