@@ -471,6 +471,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="filepath">filepath of the file to get</param>
     /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/media/{filepath}", "Get a file or it's LFS object from a repository")]
     [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
     public Task<ResponseResult<DownloadResult>> GetObjectAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
@@ -482,6 +483,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="filepath">filepath of the file to get</param>
     /// <param name="ref">The name of the commit/branch/tag. Default the repository’s default branch (usually master)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/raw/{filepath}", "Get a file from a repository")]
     [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
     public Task<ResponseResult<DownloadResult>> GetFileAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
@@ -1301,13 +1303,14 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="id">id of the release</param>
-    /// <param name="attachment">attachment to upload</param>
+    /// <param name="attachment">attachment to upload (this parameter is incompatible with `external_url`)</param>
+    /// <param name="external_url">url to external asset (this parameter is incompatible with `attachment`)</param>
     /// <param name="name">name of the attachment</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases/{id}/assets", "Create a release attachment")]
-    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream? attachment = default, string? name = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData().File(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream? attachment = default, string? external_url = default, string? name = default, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData().File(attachment).Scalar(external_url).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1764,8 +1767,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/runners/registration-token", "Get a repository's actions runner registration token")]
-    [ManualEdit("Swaggerのエンドポイントパスが間違っていたため要求に利用するパスは修正")]
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/registration-token", "Get a repository's actions runner registration token")]
     [ManualEdit("結果値が得られるため独自型を定義して利用")]
     public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);

@@ -240,12 +240,13 @@ public interface IUserApi : IApiScope
 
     #region Repository
     /// <summary>List the repos that the authenticated user owns</summary>
+    /// <param name="order_by">order the repositories by name (default), id, or size</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/user/repos", "List the repos that the authenticated user owns")]
-    public Task<Repository[]> ListRepositoriesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/repos".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+    public Task<Repository[]> ListRepositoriesAsync(string? order_by = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/repos".WithQuery(order_by).Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>Create a repository</summary>
     /// <param name="options"></param>
@@ -583,6 +584,49 @@ public interface IUserApi : IApiScope
     [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
     public Task DeleteUserApiTokenAsync(BasicAuthCredential auth, string username, string token, CancellationToken cancelToken = default)
         => DeleteRequest(auth, $"users/{username}/tokens/{token}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Quota
+    /// <summary>List the artifacts affecting the authenticated user&apos;s quota</summary>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedArtifactList</returns>
+    [ForgejoEndpoint("GET", "/user/quota/artifacts", "List the artifacts affecting the authenticated user's quota")]
+    public Task<QuotaUsedArtifact[]> ListQuotaArtifactsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/quota/artifacts".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
+
+    /// <summary>List the attachments affecting the authenticated user&apos;s quota</summary>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedAttachmentList</returns>
+    [ForgejoEndpoint("GET", "/user/quota/attachments", "List the attachments affecting the authenticated user's quota")]
+    public Task<QuotaUsedAttachment[]> ListQuotaAttachmentsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/quota/attachments".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
+
+    /// <summary>List the packages affecting the authenticated user&apos;s quota</summary>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedPackageList</returns>
+    [ForgejoEndpoint("GET", "/user/quota/packages", "List the packages affecting the authenticated user's quota")]
+    public Task<QuotaUsedPackage[]> ListQuotaPackagesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/quota/packages".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
+
+    /// <summary>Get quota information for the authenticated user</summary>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaInfo</returns>
+    [ForgejoEndpoint("GET", "/user/quota", "Get quota information for the authenticated user")]
+    public Task<QuotaInfo> GetQuotaAsync(CancellationToken cancelToken = default)
+        => GetRequest("user/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
+
+    /// <summary>Check if the authenticated user is over quota for a given subject</summary>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <param name="subject">quota limit subject</param>
+    /// <returns>quota compliance</returns>
+    [ForgejoEndpoint("GET", "/user/quota/check", "Check if the authenticated user is over quota for a given subject")]
+    [ManualEdit("Swagger定義にsubjectが無かったので追加")]
+    [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
+    public Task<bool> CheckQuotaOverAsync(string subject, CancellationToken cancelToken = default)
+        => GetRequest("user/quota/check".WithQuery(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
     #endregion
 
 }

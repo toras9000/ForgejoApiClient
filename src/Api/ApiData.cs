@@ -118,7 +118,7 @@ public record ActivityPub(
 /// <summary>AddCollaboratorOption options when adding a user as a collaborator of a repository</summary>
 /// <param name="permission"></param>
 public record AddCollaboratorOption(
-    string? permission = default
+    AddCollaboratorOptionPermission? permission = default
 );
 
 /// <summary>AddTimeOption options for adding time to an issue</summary>
@@ -168,6 +168,7 @@ public record AnnotatedTagObject(
 /// <param name="id"></param>
 /// <param name="name"></param>
 /// <param name="size"></param>
+/// <param name="type"></param>
 /// <param name="uuid"></param>
 public record Attachment(
     string? browser_download_url = default,
@@ -176,6 +177,7 @@ public record Attachment(
     long? id = default,
     string? name = default,
     long? size = default,
+    AttachmentType? type = default,
     string? uuid = default
 );
 
@@ -631,7 +633,7 @@ public record CreateGPGKeyOption(
 /// <param name="authorization_header"></param>
 /// <param name="branch_filter"></param>
 /// <param name="events"></param>
-[ManualEdit("congig")]
+[ManualEdit("config プロパティの型を変更")]
 public record CreateHookOption(
     IDictionary<string, string> config,
     CreateHookOptionType type,
@@ -640,12 +642,6 @@ public record CreateHookOption(
     string? branch_filter = default,
     ICollection<string>? events = default
 );
-
-/// <summary>
-/// CreateHookOptionConfig has all config options in it
-/// required are &quot;content_type&quot; and &quot;url&quot; Required
-/// </summary>
-public record CreateHookOptionConfig();
 
 /// <summary>CreateIssueCommentOption options for creating a comment on an issue</summary>
 /// <param name="body"></param>
@@ -801,12 +797,35 @@ public record CreatePullReviewOptions(
 /// <param name="remote_password"></param>
 /// <param name="remote_username"></param>
 /// <param name="sync_on_commit"></param>
+/// <param name="use_ssh"></param>
 public record CreatePushMirrorOption(
     string? interval = default,
     string? remote_address = default,
     string? remote_password = default,
     string? remote_username = default,
-    bool? sync_on_commit = default
+    bool? sync_on_commit = default,
+    bool? use_ssh = default
+);
+
+/// <summary>CreateQutaGroupOptions represents the options for creating a quota group</summary>
+/// <param name="name">Name of the quota group to create</param>
+/// <param name="rules">
+/// Rules to add to the newly created group.
+/// If a rule does not exist, it will be created.
+/// </param>
+public record CreateQuotaGroupOptions(
+    string? name = default,
+    ICollection<CreateQuotaRuleOptions>? rules = default
+);
+
+/// <summary>CreateQuotaRuleOptions represents the options for creating a quota rule</summary>
+/// <param name="limit">The limit set by the rule</param>
+/// <param name="name">Name of the rule to create</param>
+/// <param name="subjects">The subjects affected by the rule</param>
+public record CreateQuotaRuleOptions(
+    long? limit = default,
+    string? name = default,
+    ICollection<string>? subjects = default
 );
 
 /// <summary>CreateReleaseOption options when creating a release</summary>
@@ -1039,8 +1058,10 @@ public record DispatchWorkflowOption(
 );
 
 /// <summary>EditAttachmentOptions options for editing attachments</summary>
+/// <param name="browser_download_url">(Can only be set if existing attachment is of external type)</param>
 /// <param name="name"></param>
 public record EditAttachmentOptions(
+    string? browser_download_url = default,
     string? name = default
 );
 
@@ -1220,6 +1241,14 @@ public record EditPullRequestOption(
     string? state = default,
     string? title = default,
     bool? unset_due_date = default
+);
+
+/// <summary>EditQuotaRuleOptions represents the options for editing a quota rule</summary>
+/// <param name="limit">The limit set by the rule</param>
+/// <param name="subjects">The subjects affected by the rule</param>
+public record EditQuotaRuleOptions(
+    long? limit = default,
+    ICollection<string>? subjects = default
 );
 
 /// <summary>EditReactionOption contain the reaction type</summary>
@@ -1483,9 +1512,6 @@ public record FilesResponse(
     ICollection<ContentsResponse>? files = default,
     PayloadCommitVerification? verification = default
 );
-
-/// <summary>ForgeLike activity data type</summary>
-public record ForgeLike();
 
 /// <summary>GPGKey a user GPG key to sign commit and tag in repository</summary>
 /// <param name="can_certify"></param>
@@ -1855,19 +1881,17 @@ public record IssueMeta(
 /// <param name="name"></param>
 /// <param name="ref"></param>
 /// <param name="title"></param>
+[ManualEdit("labels")]
 public record IssueTemplate(
     string? about = default,
     ICollection<IssueFormField>? body = default,
     string? content = default,
     string? file_name = default,
-    IssueTemplateLabels? labels = default,
+    string[]? labels = default,
     string? name = default,
     string? @ref = default,
     string? title = default
 );
-
-/// <summary></summary>
-public record IssueTemplateLabels();
 
 /// <summary>Label a label to an issue or a pr</summary>
 /// <param name="color"></param>
@@ -2415,6 +2439,7 @@ public record PublicKey(
 /// <param name="patch_url"></param>
 /// <param name="pin_order"></param>
 /// <param name="requested_reviewers"></param>
+/// <param name="requested_reviewers_teams"></param>
 /// <param name="review_comments">number of review comments made on the diff of a PR review (not including comments on commits or issues in a PR)</param>
 /// <param name="state"></param>
 /// <param name="title"></param>
@@ -2452,6 +2477,7 @@ public record PullRequest(
     string? patch_url = default,
     long? pin_order = default,
     ICollection<User>? requested_reviewers = default,
+    ICollection<Team>? requested_reviewers_teams = default,
     long? review_comments = default,
     string? state = default,
     string? title = default,
@@ -2551,6 +2577,7 @@ public record PullReviewRequestOptions(
 /// <param name="interval"></param>
 /// <param name="last_error"></param>
 /// <param name="last_update"></param>
+/// <param name="public_key"></param>
 /// <param name="remote_address"></param>
 /// <param name="remote_name"></param>
 /// <param name="repo_name"></param>
@@ -2560,10 +2587,128 @@ public record PushMirror(
     string? interval = default,
     string? last_error = default,
     DateTimeOffset? last_update = default,
+    string? public_key = default,
     string? remote_address = default,
     string? remote_name = default,
     string? repo_name = default,
     bool? sync_on_commit = default
+);
+
+/// <summary>QuotaGroup represents a quota group</summary>
+/// <param name="name">Name of the group</param>
+/// <param name="rules">Rules associated with the group</param>
+public record QuotaGroup(
+    string? name = default,
+    ICollection<QuotaRuleInfo>? rules = default
+);
+
+/// <summary>QuotaInfo represents information about a user&apos;s quota</summary>
+/// <param name="groups"></param>
+/// <param name="used"></param>
+[ManualEdit("groups プロパティの型を変更")]
+public record QuotaInfo(
+    CreateQuotaGroupOptions[]? groups = default,
+    QuotaUsed? used = default
+);
+
+/// <summary>QuotaRuleInfo contains information about a quota rule</summary>
+/// <param name="limit">The limit set by the rule</param>
+/// <param name="name">Name of the rule (only shown to admins)</param>
+/// <param name="subjects">Subjects the rule affects</param>
+public record QuotaRuleInfo(
+    long? limit = default,
+    string? name = default,
+    ICollection<string>? subjects = default
+);
+
+/// <summary>QuotaUsed represents the quota usage of a user</summary>
+/// <param name="size"></param>
+public record QuotaUsed(
+    QuotaUsedSize? size = default
+);
+
+/// <summary>QuotaUsedArtifact represents an artifact counting towards a user&apos;s quota</summary>
+/// <param name="html_url">HTML URL to the action run containing the artifact</param>
+/// <param name="name">Name of the artifact</param>
+/// <param name="size">Size of the artifact (compressed)</param>
+public record QuotaUsedArtifact(
+    string? html_url = default,
+    string? name = default,
+    long? size = default
+);
+
+/// <summary>QuotaUsedAttachment represents an attachment counting towards a user&apos;s quota</summary>
+/// <param name="api_url">API URL for the attachment</param>
+/// <param name="contained_in">Context for the attachment: URLs to the containing object</param>
+/// <param name="name">Filename of the attachment</param>
+/// <param name="size">Size of the attachment (in bytes)</param>
+public record QuotaUsedAttachment(
+    string? api_url = default,
+    Contained_in? contained_in = default,
+    string? name = default,
+    long? size = default
+);
+
+/// <summary>QuotaUsedPackage represents a package counting towards a user&apos;s quota</summary>
+/// <param name="html_url">HTML URL to the package version</param>
+/// <param name="name">Name of the package</param>
+/// <param name="size">Size of the package version</param>
+/// <param name="type">Type of the package</param>
+/// <param name="version">Version of the package</param>
+public record QuotaUsedPackage(
+    string? html_url = default,
+    string? name = default,
+    long? size = default,
+    string? type = default,
+    string? version = default
+);
+
+/// <summary>QuotaUsedSize represents the size-based quota usage of a user</summary>
+/// <param name="assets"></param>
+/// <param name="git"></param>
+/// <param name="repos"></param>
+public record QuotaUsedSize(
+    QuotaUsedSizeAssets? assets = default,
+    QuotaUsedSizeGit? git = default,
+    QuotaUsedSizeRepos? repos = default
+);
+
+/// <summary>QuotaUsedSizeAssets represents the size-based asset usage of a user</summary>
+/// <param name="artifacts">Storage size used for the user&apos;s artifacts</param>
+/// <param name="attachments"></param>
+/// <param name="packages"></param>
+public record QuotaUsedSizeAssets(
+    long? artifacts = default,
+    QuotaUsedSizeAssetsAttachments? attachments = default,
+    QuotaUsedSizeAssetsPackages? packages = default
+);
+
+/// <summary>QuotaUsedSizeAssetsAttachments represents the size-based attachment quota usage of a user</summary>
+/// <param name="issues">Storage size used for the user&apos;s issue &amp; comment attachments</param>
+/// <param name="releases">Storage size used for the user&apos;s release attachments</param>
+public record QuotaUsedSizeAssetsAttachments(
+    long? issues = default,
+    long? releases = default
+);
+
+/// <summary>QuotaUsedSizeAssetsPackages represents the size-based package quota usage of a user</summary>
+/// <param name="all">Storage suze used for the user&apos;s packages</param>
+public record QuotaUsedSizeAssetsPackages(
+    long? all = default
+);
+
+/// <summary>QuotaUsedSizeGit represents the size-based git (lfs) quota usage of a user</summary>
+/// <param name="LFS">Storage size of the user&apos;s Git LFS objects</param>
+public record QuotaUsedSizeGit(
+    long? LFS = default
+);
+
+/// <summary>QuotaUsedSizeRepos represents the size-based repository quota usage of a user</summary>
+/// <param name="private">Storage size of the user&apos;s private repositories</param>
+/// <param name="public">Storage size of the user&apos;s public repositories</param>
+public record QuotaUsedSizeRepos(
+    long? @private = default,
+    long? @public = default
 );
 
 /// <summary>Reaction contain one reaction</summary>
@@ -2840,6 +2985,12 @@ public record Secret(
 /// <param name="version"></param>
 public record ServerVersion(
     string? version = default
+);
+
+/// <summary>SetUserQuotaGroupsOptions represents the quota groups of a user</summary>
+/// <param name="groups">Quota groups the user shall have</param>
+public record SetUserQuotaGroupsOptions(
+    ICollection<string> groups
 );
 
 /// <summary>StopWatch represent a running stopwatch</summary>
@@ -3351,6 +3502,31 @@ public enum ActivityOp_type
     Auto_merge_pull_request = 26,
 };
 
+/// <summary></summary>
+public enum AddCollaboratorOptionPermission
+{
+    /// <summary>read</summary>
+    [MapEnum("read")]
+    Read = 0,
+    /// <summary>write</summary>
+    [MapEnum("write")]
+    Write = 1,
+    /// <summary>admin</summary>
+    [MapEnum("admin")]
+    Admin = 2,
+};
+
+/// <summary></summary>
+public enum AttachmentType
+{
+    /// <summary>attachment</summary>
+    [MapEnum("attachment")]
+    Attachment = 0,
+    /// <summary>external</summary>
+    [MapEnum("external")]
+    External = 1,
+};
+
 /// <summary>indicates what to do with the file</summary>
 public enum ChangeFileOperationOperation
 {
@@ -3549,6 +3725,14 @@ public enum MigrateRepoOptionsService
     [MapEnum("codebase")]
     Codebase = 7,
 };
+
+/// <summary>Context for the attachment: URLs to the containing object</summary>
+/// <param name="api_url">API URL for the object that contains this attachment</param>
+/// <param name="html_url">HTML URL for the object that contains this attachment</param>
+public record Contained_in(
+    string? api_url = default,
+    string? html_url = default
+);
 
 /// <summary>ObjectFormatName of the underlying git repository</summary>
 public enum RepositoryObject_format_name

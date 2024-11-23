@@ -527,4 +527,52 @@ public interface IOrganizationApi : IApiScope
         => GetRequest($"users/{username}/orgs/{org}/permissions", cancelToken).JsonResponseAsync<OrganizationPermissions>(cancelToken);
     #endregion
 
+    #region Quota
+    /// <summary>List the artifacts affecting the organization&apos;s quota</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedArtifactList</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/quota/artifacts", "List the artifacts affecting the organization's quota")]
+    public Task<QuotaUsedArtifact[]> ListQuotaArtifactsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/quota/artifacts".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
+
+    /// <summary>List the attachments affecting the organization&apos;s quota</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedAttachmentList</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/quota/attachments", "List the attachments affecting the organization's quota")]
+    public Task<QuotaUsedAttachment[]> ListQuotaAttachmentsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/quota/attachments".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
+
+    /// <summary>List the packages affecting the organization&apos;s quota</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaUsedPackageList</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/quota/packages", "List the packages affecting the organization's quota")]
+    public Task<QuotaUsedPackage[]> ListQuotaPackagesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/quota/packages".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
+
+    /// <summary>Get quota information for an organization</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaInfo</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/quota", "Get quota information for an organization")]
+    public Task<QuotaInfo> GetQuotaAsync(string org, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
+
+    /// <summary>Check if the organization is over quota for a given subject</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="subject">quota limit subject</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>quota compliance</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/quota/check", "Check if the organization is over quota for a given subject")]
+    [ManualEdit("Swagger定義にsubjectが無かったので追加")]
+    [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
+    public Task<bool> CheckQuotaOverAsync(string org, string subject, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/quota/check".WithQuery(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
+    #endregion
+
 }

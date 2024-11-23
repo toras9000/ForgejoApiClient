@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 
 namespace ForgejoApiClient.Api;
 
@@ -125,3 +126,58 @@ public record VerifyGPGKeyOption(
 /// <summary>トピック検索結果型</summary>
 /// <param name="topics">検索結果</param>
 public record TopicSearchResults(TopicResponse[] topics);
+
+/// <summary>ActivityPubの取得情報内PublicKey型</summary>
+/// <remarks>この型はテスト呼び出しの結果から起こしており、決まったスキーマが存在するのか否かも不明</remarks>
+public record ActivityPubPublicKey(
+    string id,
+    string owner,
+    string publicKeyPem
+);
+
+/// <summary>ActivityPubの取得情報型</summary>
+/// <remarks>この型はテスト呼び出しの結果から起こしており、決まったスキーマが存在するのか否かも不明</remarks>
+public record ActivityPubResult(
+    [property: JsonPropertyName("@context")]
+    string[] @context,
+    string id,
+    string type,
+    string url,
+    string inbox,
+    string outbox,
+    string preferredUsername,
+    ActivityPubPublicKey publicKey
+);
+
+/// <summary>ActivityPubの取得情報内Icon型</summary>
+/// <remarks>この型はテスト呼び出しの結果から起こしており、決まったスキーマが存在するのか否かも不明</remarks>
+public record ActivityPubIcon(
+    string type,
+    string mediaType,
+    string url
+);
+
+/// <summary>ActivityPubのUser取得情報型</summary>
+/// <remarks>この型はテスト呼び出しの結果から起こしており、決まったスキーマが存在するのか否かも不明</remarks>
+public record ActivityPubUserResult(
+    [property: JsonPropertyName("@context")]
+    string[] @context,
+    string id,
+    string type,
+    string url,
+    string inbox,
+    string outbox,
+    string preferredUsername,
+    ActivityPubPublicKey publicKey,
+    ActivityPubIcon icon
+);
+
+/// <summary>ActivityPubのRepository取得情報型</summary>
+/// <remarks>この型はテスト呼び出しの結果から起こしており、決まったスキーマが存在するのか否かも不明</remarks>
+public record ActivityPubRepositoryResult(
+    [property: JsonPropertyName("@context")]
+    string[] @context,
+    string id,
+    string type,
+    string name
+);

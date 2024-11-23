@@ -207,4 +207,130 @@ public interface IAdminApi : IApiScope
         => DeleteRequest($"admin/users/{username}/keys/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
+    #region Quota
+    /// <summary>List the available quota rules</summary>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaRuleInfoList</returns>
+    [ForgejoEndpoint("GET", "/admin/quota/rules", "List the available quota rules")]
+    public Task<QuotaRuleInfo[]> ListQuotaRulesAsync(CancellationToken cancelToken = default)
+        => GetRequest("admin/quota/rules", cancelToken).JsonResponseAsync<QuotaRuleInfo[]>(cancelToken);
+
+    /// <summary>Get information about a quota rule</summary>
+    /// <param name="quotarule">quota rule to query</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaRuleInfo</returns>
+    [ForgejoEndpoint("GET", "/admin/quota/rules/{quotarule}", "Get information about a quota rule")]
+    public Task<QuotaRuleInfo> GetQuotaRuleAsync(string quotarule, CancellationToken cancelToken = default)
+        => GetRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+
+    /// <summary>Create a new quota rule</summary>
+    /// <param name="options">Definition of the quota rule</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaRuleInfo</returns>
+    [ForgejoEndpoint("POST", "/admin/quota/rules", "Create a new quota rule")]
+    public Task<QuotaRuleInfo> CreateQuotaRuleAsync(CreateQuotaRuleOptions options, CancellationToken cancelToken = default)
+        => PostRequest("admin/quota/rules", options, cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+
+    /// <summary>Change an existing quota rule</summary>
+    /// <param name="quotarule">Quota rule to change</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaRuleInfo</returns>
+    [ForgejoEndpoint("PATCH", "/admin/quota/rules/{quotarule}", "Change an existing quota rule")]
+    public Task<QuotaRuleInfo> UpdateQuotaRuleAsync(string quotarule, EditQuotaRuleOptions options, CancellationToken cancelToken = default)
+        => PatchRequest($"admin/quota/rules/{quotarule}", options, cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+
+    /// <summary>Deletes a quota rule</summary>
+    /// <param name="quotarule">quota rule to delete</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/quota/rules/{quotarule}", "Deletes a quota rule")]
+    public Task DeleteQuotaRuleAsync(string quotarule, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Get the user&apos;s quota info</summary>
+    /// <param name="username">username of user to query</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaInfo</returns>
+    [ForgejoEndpoint("GET", "/admin/users/{username}/quota", "Get the user's quota info")]
+    public Task<QuotaInfo> GetUserQuotaRuleAsync(string username, CancellationToken cancelToken = default)
+        => GetRequest($"admin/users/{username}/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
+
+    /// <summary>Set the user&apos;s quota groups to a given list.</summary>
+    /// <param name="username">username of the user to modify the quota groups from</param>
+    /// <param name="options">list of groups that the user should be a member of</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/admin/users/{username}/quota/groups", "Set the user's quota groups to a given list.")]
+    public Task SetUserQuotaGroupAsync(string username, SetUserQuotaGroupsOptions options, CancellationToken cancelToken = default)
+        => PostRequest($"admin/users/{username}/quota/groups", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>List the available quota groups</summary>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaGroupList</returns>
+    [ForgejoEndpoint("GET", "/admin/quota/groups", "List the available quota groups")]
+    public Task<QuotaGroup[]> ListQuotaGroupsAsync(CancellationToken cancelToken = default)
+        => GetRequest("admin/quota/groups", cancelToken).JsonResponseAsync<QuotaGroup[]>(cancelToken);
+
+    /// <summary>Get information about the quota group</summary>
+    /// <param name="quotagroup">quota group to query</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaGroup</returns>
+    [ForgejoEndpoint("GET", "/admin/quota/groups/{quotagroup}", "Get information about the quota group")]
+    public Task<QuotaGroup> GetQuotaGroupAsync(string quotagroup, CancellationToken cancelToken = default)
+        => GetRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync<QuotaGroup>(cancelToken);
+
+    /// <summary>Create a new quota group</summary>
+    /// <param name="options">Definition of the quota group</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>QuotaGroup</returns>
+    [ForgejoEndpoint("POST", "/admin/quota/groups", "Create a new quota group")]
+    public Task<QuotaGroup> CreateQuotaGroupAsync(CreateQuotaGroupOptions options, CancellationToken cancelToken = default)
+        => PostRequest("admin/quota/groups", options, cancelToken).JsonResponseAsync<QuotaGroup>(cancelToken);
+
+    /// <summary>Delete a quota group</summary>
+    /// <param name="quotagroup">quota group to delete</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}", "Delete a quota group")]
+    public Task DeleteQuotaGroupAsync(string quotagroup, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Adds a rule to a quota group</summary>
+    /// <param name="quotagroup">quota group to add a rule to</param>
+    /// <param name="quotarule">the name of the quota rule to add to the group</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PUT", "/admin/quota/groups/{quotagroup}/rules/{quotarule}", "Adds a rule to a quota group")]
+    public Task AddQuotaGroupRuleAsync(string quotagroup, string quotarule, CancellationToken cancelToken = default)
+        => PutRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Removes a rule from a quota group</summary>
+    /// <param name="quotagroup">quota group to remove a rule from</param>
+    /// <param name="quotarule">the name of the quota rule to remove from the group</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}/rules/{quotarule}", "Removes a rule from a quota group")]
+    public Task RemoveQuotaGroupRuleAsync(string quotagroup, string quotarule, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>List users in a quota group</summary>
+    /// <param name="quotagroup">quota group to list members of</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>UserList</returns>
+    [ForgejoEndpoint("GET", "/admin/quota/groups/{quotagroup}/users", "List users in a quota group")]
+    public Task<User[]> ListQuotaGroupUsersAsync(string quotagroup, CancellationToken cancelToken = default)
+        => GetRequest($"admin/quota/groups/{quotagroup}/users", cancelToken).JsonResponseAsync<User[]>(cancelToken);
+
+    /// <summary>Add a user to a quota group</summary>
+    /// <param name="quotagroup">quota group to add the user to</param>
+    /// <param name="username">username of the user to add to the quota group</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PUT", "/admin/quota/groups/{quotagroup}/users/{username}", "Add a user to a quota group")]
+    public Task AddQuotaGroupUserAsync(string quotagroup, string username, CancellationToken cancelToken = default)
+        => PutRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Remove a user from a quota group</summary>
+    /// <param name="quotagroup">quota group to remove a user from</param>
+    /// <param name="username">username of the user to remove from the quota group</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}/users/{username}", "Remove a user from a quota group")]
+    public Task RemoveQuotaGroupUserAsync(string quotagroup, string username, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
 }
