@@ -1306,8 +1306,8 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases/{id}/assets", "Create a release attachment")]
-    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream attachment, string? name = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+    public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream? attachment = default, string? name = default, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery(name), new FormData().File(attachment).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
 
     /// <summary>Edit a release attachment</summary>
     /// <param name="owner">owner of the repo</param>

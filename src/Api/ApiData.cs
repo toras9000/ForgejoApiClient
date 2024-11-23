@@ -470,7 +470,7 @@ public record Compare(
     long? total_commits = default
 );
 
-/// <summary>ContentsResponse contains information about a repo's entry's (dir, file, symlink, submodule) metadata and content</summary>
+/// <summary>ContentsResponse contains information about a repo&apos;s entry&apos;s (dir, file, symlink, submodule) metadata and content</summary>
 /// <param name="_links"></param>
 /// <param name="content">`content` is populated when `type` is `file`, otherwise null</param>
 /// <param name="download_url"></param>
@@ -643,7 +643,7 @@ public record CreateHookOption(
 
 /// <summary>
 /// CreateHookOptionConfig has all config options in it
-/// required are "content_type" and "url" Required
+/// required are &quot;content_type&quot; and &quot;url&quot; Required
 /// </summary>
 public record CreateHookOptionConfig();
 
@@ -910,8 +910,8 @@ public record CreateTeamOption(
 /// <param name="username"></param>
 /// <param name="created_at">
 /// For explicitly setting the user creation timestamp. Useful when users are
-/// migrated from other systems. When omitted, the user's creation timestamp
-/// will be set to "now".
+/// migrated from other systems. When omitted, the user&apos;s creation timestamp
+/// will be set to &quot;now&quot;.
 /// </param>
 /// <param name="full_name"></param>
 /// <param name="login_name"></param>
@@ -1246,7 +1246,7 @@ public record EditReleaseOption(
     string? target_commitish = default
 );
 
-/// <summary>EditRepoOption options when editing a repository's properties</summary>
+/// <summary>EditRepoOption options when editing a repository&apos;s properties</summary>
 /// <param name="allow_fast_forward_only_merge">either `true` to allow fast-forward-only merging pull requests, or `false` to prevent fast-forward-only merging.</param>
 /// <param name="allow_manual_merge">either `true` to allow mark pr as merged manually, or `false` to prevent it.</param>
 /// <param name="allow_merge_commits">either `true` to allow merging pull requests with a merge commit, or `false` to prevent merging pull requests with merge commits.</param>
@@ -1259,7 +1259,7 @@ public record EditReleaseOption(
 /// <param name="default_allow_maintainer_edit">set to `true` to allow edits from maintainers by default</param>
 /// <param name="default_branch">sets the default branch for this repository.</param>
 /// <param name="default_delete_branch_after_merge">set to `true` to delete pr branch after merge by default</param>
-/// <param name="default_merge_style">set to a merge style to be used by this repository: "merge", "rebase", "rebase-merge", "squash", or "fast-forward-only".</param>
+/// <param name="default_merge_style">set to a merge style to be used by this repository: &quot;merge&quot;, &quot;rebase&quot;, &quot;rebase-merge&quot;, &quot;squash&quot;, or &quot;fast-forward-only&quot;.</param>
 /// <param name="description">a short description of the repository.</param>
 /// <param name="enable_prune">enable prune - remove obsolete remote-tracking references when mirroring</param>
 /// <param name="external_tracker"></param>
@@ -1283,7 +1283,7 @@ public record EditReleaseOption(
 /// </param>
 /// <param name="template">either `true` to make this repository a template or `false` to make it a normal repository</param>
 /// <param name="website">a URL with more information about the repository.</param>
-/// <param name="wiki_branch">sets the branch used for this repository's wiki.</param>
+/// <param name="wiki_branch">sets the branch used for this repository&apos;s wiki.</param>
 public record EditRepoOption(
     bool? allow_fast_forward_only_merge = default,
     bool? allow_manual_merge = default,
@@ -1444,7 +1444,7 @@ public record FileCommitResponse(
     string? url = default
 );
 
-/// <summary>FileDeleteResponse contains information about a repo's file that was deleted</summary>
+/// <summary>FileDeleteResponse contains information about a repo&apos;s file that was deleted</summary>
 /// <param name="commit"></param>
 /// <param name="content"></param>
 /// <param name="verification"></param>
@@ -1454,7 +1454,7 @@ public record FileDeleteResponse(
     PayloadCommitVerification? verification = default
 );
 
-/// <summary>FileLinksResponse contains the links for a repo's file</summary>
+/// <summary>FileLinksResponse contains the links for a repo&apos;s file</summary>
 /// <param name="git"></param>
 /// <param name="html"></param>
 /// <param name="self"></param>
@@ -1464,7 +1464,7 @@ public record FileLinksResponse(
     string? self = default
 );
 
-/// <summary>FileResponse contains information about a repo's file</summary>
+/// <summary>FileResponse contains information about a repo&apos;s file</summary>
 /// <param name="commit"></param>
 /// <param name="content"></param>
 /// <param name="verification"></param>
@@ -1707,7 +1707,7 @@ public record Hook(
     string? url = default
 );
 
-/// <summary>Identity for a person's identity like an author or committer</summary>
+/// <summary>Identity for a person&apos;s identity like an author or committer</summary>
 /// <param name="email"></param>
 /// <param name="name"></param>
 public record Identity(
@@ -2006,7 +2006,7 @@ public record MergePullRequestOption(
 );
 
 /// <summary>
-/// MigrateRepoOptions options for migrating repository's
+/// MigrateRepoOptions options for migrating repository&apos;s
 /// this is used to interact with api v1
 /// </summary>
 /// <param name="clone_addr"></param>
@@ -2830,7 +2830,7 @@ public record SearchResults(
 
 /// <summary>Secret represents a secret</summary>
 /// <param name="created_at"></param>
-/// <param name="name">the secret's name</param>
+/// <param name="name">the secret&apos;s name</param>
 public record Secret(
     DateTimeOffset? created_at = default,
     string? name = default
@@ -3032,7 +3032,7 @@ public record TrackedTime(
     string? user_name = default
 );
 
-/// <summary>TransferRepoOption options when transfer a repository's ownership</summary>
+/// <summary>TransferRepoOption options when transfer a repository&apos;s ownership</summary>
 /// <param name="new_owner"></param>
 /// <param name="team_ids">ID of the team or teams to add to the repository. Teams can only be added to organization-owned repositories.</param>
 public record TransferRepoOption(
@@ -3081,7 +3081,7 @@ public record UpdateUserAvatarOption(
 
 /// <summary>UpdateVariableOption the option when updating variable</summary>
 /// <param name="value">Value of the variable to update</param>
-/// <param name="name">New name for the variable. If the field is empty, the variable name won't be updated.</param>
+/// <param name="name">New name for the variable. If the field is empty, the variable name won&apos;t be updated.</param>
 public record UpdateVariableOption(
     string value,
     string? name = default
@@ -3089,28 +3089,28 @@ public record UpdateVariableOption(
 
 /// <summary>User represents a user</summary>
 /// <param name="active">Is user active</param>
-/// <param name="avatar_url">URL to the user's avatar</param>
+/// <param name="avatar_url">URL to the user&apos;s avatar</param>
 /// <param name="created"></param>
-/// <param name="description">the user's description</param>
+/// <param name="description">the user&apos;s description</param>
 /// <param name="email"></param>
 /// <param name="followers_count">user counts</param>
 /// <param name="following_count"></param>
-/// <param name="full_name">the user's full name</param>
-/// <param name="html_url">URL to the user's gitea page</param>
-/// <param name="id">the user's id</param>
+/// <param name="full_name">the user&apos;s full name</param>
+/// <param name="html_url">URL to the user&apos;s gitea page</param>
+/// <param name="id">the user&apos;s id</param>
 /// <param name="is_admin">Is the user an administrator</param>
 /// <param name="language">User locale</param>
 /// <param name="last_login"></param>
-/// <param name="location">the user's location</param>
-/// <param name="login">the user's username</param>
-/// <param name="login_name">the user's authentication sign-in name.</param>
+/// <param name="location">the user&apos;s location</param>
+/// <param name="login">the user&apos;s username</param>
+/// <param name="login_name">the user&apos;s authentication sign-in name.</param>
 /// <param name="prohibit_login">Is user login prohibited</param>
-/// <param name="pronouns">the user's pronouns</param>
+/// <param name="pronouns">the user&apos;s pronouns</param>
 /// <param name="restricted">Is user restricted</param>
-/// <param name="source_id">The ID of the user's Authentication Source</param>
+/// <param name="source_id">The ID of the user&apos;s Authentication Source</param>
 /// <param name="starred_repos_count"></param>
 /// <param name="visibility">User visibility level option: public, limited, private</param>
-/// <param name="website">the user's website</param>
+/// <param name="website">the user&apos;s website</param>
 public record User(
     bool? active = default,
     string? avatar_url = default,
