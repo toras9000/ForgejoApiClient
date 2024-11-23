@@ -52,7 +52,7 @@ public static class RepositoryApiExtensions
     /// <param name="file">添付するファイル情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>添付情報</returns>
-    public static async Task<Attachment> CreateReleaseAttachmentAsync(this IRepositoryApi self, string owner, string repo, long id, FileInfo file, CancellationToken cancelToken = default)
+    public static async Task<Attachment> CreateReleaseFileAttachmentAsync(this IRepositoryApi self, string owner, string repo, long id, FileInfo file, CancellationToken cancelToken = default)
     {
         var options = new FileStreamOptions();
         options.Mode = FileMode.Open;
@@ -61,7 +61,7 @@ public static class RepositoryApiExtensions
         options.BufferSize = 0;
 
         using var fileStream = new FileStream(file.FullName, options);
-        return await self.CreateReleaseAttachmentAsync(owner, repo, id, fileStream, file.Name, cancelToken);
+        return await self.CreateReleaseAttachmentAsync(owner, repo, id, attachment: fileStream, name: file.Name, cancelToken: cancelToken);
     }
 
     /// <summary>リリースにファイルを添付する</summary>
@@ -73,9 +73,9 @@ public static class RepositoryApiExtensions
     /// <param name="name">ファイル名</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>添付情報</returns>
-    public static async Task<Attachment> CreateReleaseAttachmentAsync(this IRepositoryApi self, string owner, string repo, long id, byte[] content, string? name = default, CancellationToken cancelToken = default)
+    public static async Task<Attachment> CreateReleaseFileAttachmentAsync(this IRepositoryApi self, string owner, string repo, long id, byte[] content, string? name = default, CancellationToken cancelToken = default)
     {
         using var stream = new MemoryStream(content, writable: false);
-        return await self.CreateReleaseAttachmentAsync(owner, repo, id, stream, name, cancelToken);
+        return await self.CreateReleaseAttachmentAsync(owner, repo, id, attachment: stream, name: name, cancelToken: cancelToken);
     }
 }

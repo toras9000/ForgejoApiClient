@@ -19,16 +19,12 @@ public abstract class ForgejoApiClientTestsBase
         if (svcInfo.Token == null) throw new Exception("Cannot load test token");
         this.TestService = new Uri(svcInfo.Url);
         this.TestToken = svcInfo.Token;
+        this.TestTokenUser = svcInfo.Admin.Username;
         this.TestAdminUser = svcInfo.Admin;
-
-        // よく使うのでAPIトークンのユーザ名を取得しておく
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-        var tokenUser = client.User.GetMeAsync().GetAwaiter().GetResult();
-        this.TestTokenUser = tokenUser?.login ?? throw new Exception("Cannot get user info");
     }
 
     public Uri TestService { get; }
     public string TestToken { get; }
-    public BasicAuthCredential TestAdminUser { get; }
     public string TestTokenUser { get; }
+    public BasicAuthCredential TestAdminUser { get; }
 }

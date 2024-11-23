@@ -70,34 +70,59 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
 
         // Attachment作成
-        var content = Encoding.UTF8.GetBytes("file-content");
-        var attach_created = await client.Issue.CreateAttachmentAsync(repoOwner, repoName, issue.number!.Value, content, "first.txt");
+        using var attachContent = new MemoryStream(Encoding.UTF8.GetBytes("file-content"));
+        var attach_time = DateTimeOffset.Now;
+        var attach_created = await client.Issue.CreateAttachmentAsync(repoOwner, repoName, issue.number!.Value, attachContent, "first.txt", attach_time);
+        attach_created.name.Should().Be("first.txt");
 
         // Attachment取得
         var attach_get = await client.Issue.GetAttachmentAsync(repoOwner, repoName, issue.number!.Value, attach_created.id!.Value);
+        attach_get.name.Should().Be("first.txt");
 
         // Attachmentリスト取得
         var attach_list = await client.Issue.ListAttachmentsAsync(repoOwner, repoName, issue.number!.Value);
+        attach_list.Should().Contain(i => i.name == "first.txt");
 
         // Attachment更新
         var attach_updated = await client.Issue.UpdateAttachmentAsync(repoOwner, repoName, issue.number!.Value, attach_created.id!.Value, new(name: "second.txt"));
+        attach_updated.name.Should().Be("second.txt");
 
         // Attachmentリスト取得
         var attach_updated_list = await client.Issue.ListAttachmentsAsync(repoOwner, repoName, issue.number!.Value);
+        attach_updated_list.Should().Contain(i => i.name == "second.txt");
 
         // Attachment削除
         await client.Issue.DeleteAttachmentAsync(repoOwner, repoName, issue.number!.Value, attach_created.id!.Value);
 
         // Attachmentリスト取得
         var attach_deleted_list = await client.Issue.ListAttachmentsAsync(repoOwner, repoName, issue.number!.Value);
-
-        // 検証
-        attach_created.name.Should().Be("first.txt");
-        attach_get.name.Should().Be("first.txt");
-        attach_list.Should().Contain(i => i.name == "first.txt");
-        attach_updated.name.Should().Be("second.txt");
-        attach_updated_list.Should().Contain(i => i.name == "second.txt");
         attach_deleted_list.Should().NotContain(i => i.name == "second.txt");
+    }
+
+    [TestMethod]
+    public async Task IssueAttachmentExtensionScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var issueTitle = $"issue-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
+        var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
+
+        // ファイル情報で添付
+        var attach_file = TestPathHelper.GetProjectDir().RelativeFile($"assets/texts/DummyText.txt");
+        var attach_by_file = await client.Issue.CreateFileAttachmentAsync(repoOwner, repoName, issue.number!.Value, attach_file);
+        attach_by_file.name.Should().Be(attach_file.Name);
+
+        // バイト列で添付
+        var attach_bin = await attach_file.ReadAllBytesAsync();
+        var attach_by_bin = await client.Issue.CreateFileAttachmentAsync(repoOwner, repoName, issue.number!.Value, attach_bin, "test.txt");
+        attach_by_bin.name.Should().Be("test.txt");
     }
 
     [TestMethod]
@@ -208,7 +233,8 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
 
         // Attachment作成
         using var content = new MemoryStream(Encoding.UTF8.GetBytes("file-content"), writable: false);
-        var attach_created = await client.Issue.CreateCommentAttachmentAsync(repoOwner, repoName, comment.id!.Value, content, "first.txt");
+        var attach_time = DateTimeOffset.Now;
+        var attach_created = await client.Issue.CreateCommentAttachmentAsync(repoOwner, repoName, comment.id!.Value, content, "first.txt", attach_time);
 
         // Attachment取得
         var attach_get = await client.Issue.GetCommentAttachmentAsync(repoOwner, repoName, comment.id!.Value, attach_created.id!.Value);
@@ -235,6 +261,35 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         attach_updated.name.Should().Be("second.txt");
         attach_updated_list.Should().Contain(i => i.name == "second.txt");
         attach_deleted_list.Should().NotContain(i => i.name == "second.txt");
+    }
+
+    [TestMethod]
+    public async Task IssueCommentAttachmentExtensionScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var issueTitle = $"issue-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
+        var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
+
+        // コメント作成
+        var comment = await client.Issue.CreateCommentAsync(repoOwner, repoName, issue.number!.Value, new(body: "comment"));
+
+        // ファイル情報で添付
+        var attach_file = TestPathHelper.GetProjectDir().RelativeFile($"assets/texts/DummyText.txt");
+        var attach_by_file = await client.Issue.CreateCommentFileAttachmentAsync(repoOwner, repoName, comment.id!.Value, attach_file);
+        attach_by_file.name.Should().Be(attach_file.Name);
+
+        // バイト列で添付
+        var attach_bin = await attach_file.ReadAllBytesAsync();
+        var attach_by_bin = await client.Issue.CreateCommentFileAttachmentAsync(repoOwner, repoName, comment.id!.Value, attach_bin, "test.txt");
+        attach_by_bin.name.Should().Be("test.txt");
     }
 
     [TestMethod]
