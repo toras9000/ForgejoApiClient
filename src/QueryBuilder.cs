@@ -142,4 +142,23 @@ internal static class QueryBuilderExtensions
         return value == null ? self : self.Append(name, value);
     }
 
+    /// <summary>QueryBuilderにパラメータを追加する</summary>
+    /// <param name="self">対象QueryBuilder</param>
+    /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>
+    /// <param name="name">valueパラメータに指定した式の文字列表現。パラメータ名として利用する。</param>
+    /// <returns>対象QueryBuilder自身</returns>
+    public static QueryBuilder Param(in this QueryBuilder self, DateTime? value, [CallerArgumentExpression(nameof(value))] string name = "")
+    {
+        return value == null ? self : self.Append(name, $"{value.Value.ToUniversalTime():yyyy-MM-dd'T'HH:mm:ss'Z'}");
+    }
+
+    /// <summary>QueryBuilderにパラメータを追加する</summary>
+    /// <param name="self">対象QueryBuilder</param>
+    /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>
+    /// <param name="name">valueパラメータに指定した式の文字列表現。パラメータ名として利用する。</param>
+    /// <returns>対象QueryBuilder自身</returns>
+    public static QueryBuilder Param(in this QueryBuilder self, DateTimeOffset? value, [CallerArgumentExpression(nameof(value))] string name = "")
+    {
+        return value == null ? self : self.Append(name, $"{value.Value.ToUniversalTime():yyyy-MM-dd'T'HH:mm:ss'Z'}");
+    }
 }

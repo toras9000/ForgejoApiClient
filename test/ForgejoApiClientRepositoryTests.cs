@@ -1580,8 +1580,9 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // リリース添付ファイル作成
         var attach_file = TestPathHelper.GetProjectDir().RelativeFile("assets/packages/Dummy.0.0.0.nupkg");
-        var attach = await client.Repository.CreateReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach_file);
-        attach.name.Should().Be("Dummy.0.0.0.nupkg");
+        using var attach_content = new MemoryStream(await attach_file.ReadAllBytesAsync());
+        var attach = await client.Repository.CreateReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach_content, attach_file.Name);
+        attach.name.Should().Be(attach_file.Name);
 
         // リリース添付ファイル情報取得
         var attach_get = await client.Repository.GetReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach.id!.Value);
@@ -1597,6 +1598,37 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // リリース添付ファイル削除
         await client.Repository.DeleteReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach.id!.Value);
+    }
+
+    [TestMethod]
+    public async Task ReleaseAttachmentExtensionScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var ownerName = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var releaseName = $"release-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // リリース作成
+        var release = await client.Repository.CreateReleaseAsync(ownerName, repoName, new(tag_name: releaseName));
+
+        // ファイル情報で添付
+        var attach_file = TestPathHelper.GetProjectDir().RelativeFile("assets/packages/Dummy.0.0.0.nupkg");
+        var attach_by_file = await client.Repository.CreateReleaseFileAttachmentAsync(ownerName, repoName, release.id!.Value, attach_file);
+        attach_by_file.name.Should().Be("Dummy.0.0.0.nupkg");
+
+        // バイト列で添付
+        var attach_bin = await attach_file.ReadAllBytesAsync();
+        var attach_by_bin = await client.Repository.CreateReleaseFileAttachmentAsync(ownerName, repoName, release.id!.Value, attach_bin, name: "test.bin");
+        attach_by_bin.name.Should().Be("test.bin");
     }
 
     [TestMethod]
