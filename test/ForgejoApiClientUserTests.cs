@@ -685,4 +685,59 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         token.name.Should().Be(tokenname);
         token_list.Should().Contain(t => t.name == tokenname);
     }
+
+    [TestMethod]
+    public async Task QuotaSenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        var issueTitle = $"issue-{DateTime.Now.Ticks:X16}";
+        var pkgName = "Dummy";
+        var pkgVer = "0.0.0";
+        var pkgFile = TestPathHelper.GetProjectDir().RelativeFile($"assets/packages/{pkgName}.{pkgVer}.nupkg");
+        var txtFile = TestPathHelper.GetProjectDir().RelativeFile($"assets/texts/DummyText.txt");
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+        var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, issueTitle);
+        var rule = await resources.CreateTestQuotaRuleAsync($"rule-{DateTime.Now.Ticks:X16}", 100 * 1024 * 1024, ["size:assets:attachments:all"]);
+        var quotaGroup = await resources.CreateTestQuotaGroupAsync($"qg-{DateTime.Now.Ticks:X16}", [new(name: rule.name),]);
+
+        // テスト用のパッケージをアップロード
+        await this.UploadPackageAsync(repoOwner, this.TestToken, pkgFile);
+
+        // パッケージ情報取得
+        var package = await client.Package.GetAsync(repoOwner, "nuget", pkgName, pkgVer);
+
+        // Attachment作成
+        var attach = await client.Issue.CreateFileAttachmentAsync(repoOwner, repoName, issue.number!.Value, txtFile);
+
+        // artifacts クォータ使用リスト取得
+        var quota_artifacts = await client.User.ListQuotaArtifactsAsync();
+
+        // attachments クォータ使用リスト取得
+        var quota_attachments = await client.User.ListQuotaAttachmentsAsync();
+
+        // packages クォータ使用リスト取得
+        var quota_packages = await client.User.ListQuotaPackagesAsync();
+        quota_packages.Should().NotBeEmpty();
+
+        // ユーザにクォータグループを設定
+        await client.Admin.SetUserQuotaGroupAsync(repoOwner, new([quotaGroup.name!]));
+
+        // クォータ情報取得
+        var quota = await client.User.GetQuotaAsync();
+        quota.used.Should().NotBeNull();
+
+        // クォータ超過取得
+        var quota_within = await client.User.CheckQuotaOverAsync("size:git:all");
+        quota_within.Should().BeFalse();
+
+        // パッケージ削除
+        await client.Package.DeleteAsync(repoOwner, "nuget", pkgName, pkgVer);
+    }
 }

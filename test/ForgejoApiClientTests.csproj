@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <Folder Include="assets\packages\" />
+    <Folder Include="assets\templates\" />
   </ItemGroup>
 
 </Project>

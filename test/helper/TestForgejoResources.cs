@@ -69,6 +69,22 @@ public sealed class TestForgejoResources : IAsyncDisposable
     public Task<Issue> CreateTestIssueAsync(string owner, string repo, CreateIssueOption options)
         => this.Client.Issue.CreateAsync(owner, repo, options).WillBeDiscarded(this);
 
+    /// <summary>テスト用クォータルールを作成</summary>
+    public Task<QuotaRuleInfo> CreateTestQuotaRuleAsync(string name, long limit, ICollection<string> subjects)
+        => CreateTestQuotaRuleAsync(new CreateQuotaRuleOptions(name: name, limit: limit, subjects: subjects));
+
+    /// <summary>テスト用クォータルールを作成</summary>
+    public Task<QuotaRuleInfo> CreateTestQuotaRuleAsync(CreateQuotaRuleOptions options)
+        => this.Client.Admin.CreateQuotaRuleAsync(options).WillBeDiscarded(this);
+
+    /// <summary>テスト用クォータグループを作成</summary>
+    public Task<QuotaGroup> CreateTestQuotaGroupAsync(string name, ICollection<CreateQuotaRuleOptions>? rules = default)
+        => CreateTestQuotaGroupAsync(new CreateQuotaGroupOptions(name: name, rules: rules));
+
+    /// <summary>テスト用クォータグループを作成</summary>
+    public Task<QuotaGroup> CreateTestQuotaGroupAsync(CreateQuotaGroupOptions options)
+        => this.Client.Admin.CreateQuotaGroupAsync(options).WillBeDiscarded(this);
+
 
     public User ToBeDiscarded(User user)
     {
@@ -98,6 +114,18 @@ public sealed class TestForgejoResources : IAsyncDisposable
     {
         this.resources.Add(new(() => this.Client.Issue.DeleteAsync(issue.repository!.owner!, issue.repository!.name!, issue.number!.Value)));
         return issue;
+    }
+
+    public QuotaRuleInfo ToBeDiscarded(QuotaRuleInfo rule)
+    {
+        this.resources.Add(new(() => this.Client.Admin.DeleteQuotaRuleAsync(rule.name!)));
+        return rule;
+    }
+
+    public QuotaGroup ToBeDiscarded(QuotaGroup group)
+    {
+        this.resources.Add(new(() => this.Client.Admin.DeleteQuotaGroupAsync(group.name!)));
+        return group;
     }
 
     public async ValueTask DisposeAsync()
@@ -143,6 +171,12 @@ public static class TestResourceContainerExtensions
         => resources.ToBeDiscarded(await self.ConfigureAwait(false));
 
     public static async Task<Issue> WillBeDiscarded(this Task<Issue> self, TestForgejoResources resources)
+        => resources.ToBeDiscarded(await self.ConfigureAwait(false));
+
+    public static async Task<QuotaRuleInfo> WillBeDiscarded(this Task<QuotaRuleInfo> self, TestForgejoResources resources)
+        => resources.ToBeDiscarded(await self.ConfigureAwait(false));
+
+    public static async Task<QuotaGroup> WillBeDiscarded(this Task<QuotaGroup> self, TestForgejoResources resources)
         => resources.ToBeDiscarded(await self.ConfigureAwait(false));
 
 }

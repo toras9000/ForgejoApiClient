@@ -942,81 +942,13 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
-        var content1 = await client.Repository.CreateFileAsync(ownerName, repoName, ".github/issue_template/markdown_template.md", new(content: """
-        ---
-        name: 'Template Name'
-        about: 'This template is for testing!'
-        title: '[TEST] '
-        ref: 'main'
-        labels:
-          - bug
-          - 'help needed'
-        ---
+        var template1_file = TestPathHelper.GetProjectDir().RelativeFile($"assets/templates/markdown_template.md");
+        var template1_content = template1_file.ReadAllText();
+        var template1 = await client.Repository.CreateFileAsync(ownerName, repoName, ".github/issue_template/markdown_template.md", new(content: template1_content.EncodeUtf8Base64()));
 
-        This is the template!
-        """.EncodeUtf8Base64()));
-
-        var content2 = await client.Repository.CreateFileAsync(ownerName, repoName, ".github/issue_template/yaml_template.yml", new(content: """
-        name: Bug Report
-        about: File a bug report
-        title: '[Bug]: '
-        body:
-          - type: markdown
-            attributes:
-              value: |
-                Thanks for taking the time to fill out this bug report!
-          - type: input
-            id: contact
-            attributes:
-              label: Contact Details
-              description: How can we get in touch with you if we need more info?
-              placeholder: ex. email@example.com
-            validations:
-              required: false
-          - type: textarea
-            id: what-happened
-            attributes:
-              label: What happened?
-              description: Also tell us, what did you expect to happen?
-              placeholder: Tell us what you see!
-              value: 'A bug happened!'
-            validations:
-              required: true
-          - type: dropdown
-            id: version
-            attributes:
-              label: Version
-              description: What version of our software are you running?
-              options:
-                - 1.0.2 (Default)
-                - 1.0.3 (Edge)
-            validations:
-              required: true
-          - type: dropdown
-            id: browsers
-            attributes:
-              label: What browsers are you seeing the problem on?
-              multiple: true
-              options:
-                - Firefox
-                - Chrome
-                - Safari
-                - Microsoft Edge
-          - type: textarea
-            id: logs
-            attributes:
-              label: Relevant log output
-              description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-              render: shell
-          - type: checkboxes
-            id: terms
-            attributes:
-              label: Code of Conduct
-              description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
-              options:
-                - label: I agree to follow this project's Code of Conduct
-                  required: true
-        """.EncodeUtf8Base64()));
+        var template2_file = TestPathHelper.GetProjectDir().RelativeFile($"assets/templates/yaml_template.yml");
+        var template2_content = template1_file.ReadAllText();
+        var template2 = await client.Repository.CreateFileAsync(ownerName, repoName, ".github/issue_template/yaml_template.yml", new(content: template2_content.EncodeUtf8Base64()));
 
         // Issue template を取得
         var templates = await client.Repository.ListIssueTemplatesAsync(ownerName, repoName);
@@ -1581,7 +1513,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // リリース添付ファイル作成
         var attach_file = TestPathHelper.GetProjectDir().RelativeFile("assets/packages/Dummy.0.0.0.nupkg");
         using var attach_content = new MemoryStream(await attach_file.ReadAllBytesAsync());
-        var attach = await client.Repository.CreateReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach_content, attach_file.Name);
+        var attach = await client.Repository.CreateReleaseAttachmentAsync(ownerName, repoName, release.id!.Value, attach_content, name: attach_file.Name);
         attach.name.Should().Be(attach_file.Name);
 
         // リリース添付ファイル情報取得

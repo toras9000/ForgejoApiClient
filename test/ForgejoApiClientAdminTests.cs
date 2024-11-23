@@ -309,8 +309,114 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         key.title.Should().Be("test-pubkey");
     }
 
+    [TestMethod]
+    public async Task QuotaRuleSenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
 
+        // テスト用エンティティ情報
+        var ruleName1 = $"rule1-{DateTime.Now.Ticks:X16}";
+        var ruleName2 = $"rule2-{DateTime.Now.Ticks:X16}";
 
+        // Quotaルール作成
+        var rule1 = await client.Admin.CreateQuotaRuleAsync(new(name: ruleName1, limit: 100 * 1024 * 1024, subjects: ["size:assets:attachments:all"]));
+        var rule2 = await client.Admin.CreateQuotaRuleAsync(new(name: ruleName2, limit: 200 * 1024 * 1024, subjects: ["size:assets:packages:all"]));
+        rule1.name.Should().Be(ruleName1);
+        rule2.name.Should().Be(ruleName2);
+
+        // Quotaルール取得
+        var rule_get = await client.Admin.GetQuotaRuleAsync(ruleName2);
+        rule_get.name.Should().Be(ruleName2);
+
+        // Quotaルール更新
+        var rule_updated = await client.Admin.UpdateQuotaRuleAsync(ruleName2, new(limit: 333 * 1024 * 1024));
+        rule_updated.name.Should().Be(ruleName2);
+
+        // Quotaルールリスト取得
+        var rule_list = await client.Admin.ListQuotaRulesAsync();
+        rule_list.Select(r => r.name).Should().Contain(ruleName1, ruleName2);
+
+        // Quotaルール削除
+        await client.Admin.DeleteQuotaRuleAsync(ruleName1);
+        await client.Admin.DeleteQuotaRuleAsync(ruleName2);
+    }
+
+    [TestMethod]
+    public async Task QuotaGroupSenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var quotaGroupName = $"qg-{DateTime.Now.Ticks:X16}";
+        var ruleName1 = $"rule1-{DateTime.Now.Ticks:X16}";
+        var ruleName2 = $"rule2-{DateTime.Now.Ticks:X16}";
+        var userName = $"user-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var rule1 = await resources.CreateTestQuotaRuleAsync(ruleName1, 100 * 1024, ["size:assets:attachments:all"]);
+        var rule2 = await resources.CreateTestQuotaRuleAsync(ruleName2, 200 * 1024, ["size:assets:packages:all"]);
+        var user = await resources.CreateTestUserAsync(userName);
+
+        // Quotaグループ作成
+        var quotaGroup = await client.Admin.CreateQuotaGroupAsync(new(name: quotaGroupName));
+        quotaGroup.name.Should().Be(quotaGroupName);
+
+        // Quotaグループ情報取得
+        var quotaGroup_get = await client.Admin.GetQuotaGroupAsync(quotaGroupName);
+        quotaGroup_get.name.Should().Be(quotaGroupName);
+
+        // Quotaグループリスト取得
+        var quotaGroup_list = await client.Admin.ListQuotaGroupsAsync();
+        quotaGroup_list.Should().Contain(q => q.name == quotaGroupName);
+
+        // Quotaグループにルール追加
+        await client.Admin.AddQuotaGroupRuleAsync(quotaGroupName, ruleName1);
+
+        // Quotaグループにユーザ追加
+        await client.Admin.AddQuotaGroupUserAsync(quotaGroupName, userName);
+
+        // Quotaグループのユーザリストを取得
+        var quotaGroupUsers = await client.Admin.ListQuotaGroupUsersAsync(quotaGroupName);
+        quotaGroupUsers.Should().Contain(u => u.login == userName);
+
+        // ユーザのQuota情報を取得
+        var userQuota = await client.Admin.GetUserQuotaRuleAsync(userName);
+        userQuota.groups.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // Quotaグループからルール削除
+        await client.Admin.RemoveQuotaGroupRuleAsync(quotaGroupName, ruleName1);
+
+        // Quotaグループからユーザ削除
+        await client.Admin.RemoveQuotaGroupUserAsync(quotaGroupName, userName);
+
+        // Quotaグループ削除
+        await client.Admin.DeleteQuotaGroupAsync(quotaGroupName);
+    }
+
+    [TestMethod]
+    public async Task SetUserQuotaGroupAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var quotaGroupName = $"qg-{DateTime.Now.Ticks:X16}";
+        var ruleName = $"rule-{DateTime.Now.Ticks:X16}";
+        var userName = $"user-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var rule = await resources.CreateTestQuotaRuleAsync(ruleName, 100 * 1024, ["size:assets:attachments:all"]);
+        var quotaGroup = await resources.CreateTestQuotaGroupAsync(quotaGroupName, [new(name: rule.name),]);
+        var user = await resources.CreateTestUserAsync(userName);
+
+        // ユーザにクォータグループを設定
+        await client.Admin.SetUserQuotaGroupAsync(userName, new([quotaGroupName]));
+
+        // ユーザのQuota情報を取得
+        var userQuota = await client.Admin.GetUserQuotaRuleAsync(userName);
+        userQuota.groups.Should().Contain(g => g.name == quotaGroupName);
+    }
 
 
 
