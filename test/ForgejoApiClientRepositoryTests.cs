@@ -766,12 +766,15 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await client.Repository.UpdateActionVariableAsync(repoOwner, repoName, varName, new(value: "BBB"));
 
         // リリースリスト取得
-        Assert.Inconclusive("ListActionVariablesAsync で変数値が得られない。バグ？");
         var variable_list = await client.Repository.ListActionVariablesAsync(repoOwner, repoName);
-        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
+        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase));
 
         // リリース情報削除
         await client.Repository.DeleteActionVariableAsync(repoOwner, repoName, varName);
+
+        // 追加検証
+        Assert.Inconclusive("ListActionVariablesAsync で変数値が得られない。バグ？");
+        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
     }
 
     [TestMethod]

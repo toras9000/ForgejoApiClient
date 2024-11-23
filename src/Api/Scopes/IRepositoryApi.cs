@@ -724,8 +724,9 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Delete a repo-level variable")]
-    public Task<ActionVariable> DeleteActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+    [ManualEdit("Swaggerの戻り値定義誤りを訂正")]
+    public Task DeleteActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     #endregion
 
