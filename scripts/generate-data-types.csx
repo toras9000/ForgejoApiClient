@@ -156,13 +156,8 @@ IEnumerable<string> generateTypeDefines(CSharpTypeResolver resolver, IEnumerable
         }
         else
         {
-            // オブジェクト型定義の出力
+            // 型情報取得
             var classModel = new ClassTemplateModel(typeName, resolver.Settings, resolver, typeSchema, new());
-            foreach (var desc in generateDescription(classModel.Description, "<summary>", "</summary>"))
-            {
-                yield return desc;
-            }
-
             var properties = classModel.Properties
                 .Select(p =>
                 {
@@ -171,39 +166,47 @@ IEnumerable<string> generateTypeDefines(CSharpTypeResolver resolver, IEnumerable
                 })
                 .OrderBy(p => p.Model.IsNullable)
                 .ToArray();
-            foreach (var prop in properties)
+            if (0 < properties.Length)
             {
-                foreach (var desc in generateDescription(prop.Model.Description, $"<param name=\"{prop.PropName.TrimStart('@')}\">", "</param>"))
+                // オブジェクト型定義の出力
+                foreach (var desc in generateDescription(classModel.Description, "<summary>", "</summary>"))
                 {
                     yield return desc;
                 }
-            }
-            if (typeSchema.IsDeprecated)
-            {
-                yield return $"[Obsolete(\"{typeSchema.DeprecatedMessage}\")]";
-            }
-            if (properties.Length == 0)
-            {
-                yield return $"public record {classModel.ClassName}();";
-            }
-            else
-            {
-                yield return $"public record {classModel.ClassName}(";
-                var count = 0;
-                for (var i = 0; i < properties.Length; i++)
+                foreach (var prop in properties)
                 {
-                    var prop = properties[i];
-                    var neesSepa = i < (properties.Length - 1);
-                    if (prop.Model.IsDeprecated)
+                    foreach (var desc in generateDescription(prop.Model.Description, $"<param name=\"{prop.PropName.TrimStart('@')}\">", "</param>"))
                     {
-                        yield return $"[Obsolete(\"{prop.Model.DeprecatedMessage}\")]";
+                        yield return desc;
                     }
-                    yield return $"    {prop.Model.Type} {prop.PropName}{(prop.Model.IsNullable ? $" = default" : "")}{(neesSepa ? "," : "")}";
-                    count++;
                 }
-                yield return $");";
+                if (typeSchema.IsDeprecated)
+                {
+                    yield return $"[Obsolete(\"{typeSchema.DeprecatedMessage}\")]";
+                }
+                if (properties.Length == 0)
+                {
+                    yield return $"public record {classModel.ClassName}();";
+                }
+                else
+                {
+                    yield return $"public record {classModel.ClassName}(";
+                    var count = 0;
+                    for (var i = 0; i < properties.Length; i++)
+                    {
+                        var prop = properties[i];
+                        var neesSepa = i < (properties.Length - 1);
+                        if (prop.Model.IsDeprecated)
+                        {
+                            yield return $"[Obsolete(\"{prop.Model.DeprecatedMessage}\")]";
+                        }
+                        yield return $"    {prop.Model.Type} {prop.PropName}{(prop.Model.IsNullable ? $" = default" : "")}{(neesSepa ? "," : "")}";
+                        count++;
+                    }
+                    yield return $");";
+                }
+                yield return "";
             }
-            yield return "";
         }
     }
 }
