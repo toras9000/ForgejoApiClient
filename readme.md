@@ -57,7 +57,7 @@ using var client = new ForgejoClient(apiBase, apiToken);
 
 var org = await client.Organization.CreateAsync(new(username: "org-name"));
 var team_units = new Dictionary<string, string> { ["repo.code"] = "write", };
-var team = await client.Organization.CreateTeamAsync(("org-name", new(name: "team-name", units_map: team_units));
+var team = await client.Organization.CreateTeamAsync("org-name", new(name: "team-name", units_map: team_units));
 await client.Organization.AddTeamMemberAsync(team.id!.Value, "user-name");
 ```
 
@@ -71,6 +71,18 @@ using (var fileStream = File.OpenWrite(archiveDownload.Result.FileName ?? "main.
 {
     await archiveDownload.Result.Stream.CopyToAsync(fileStream);
 }
+```
+
+### Create quota settings and assign users
+
+```csharp
+using var client = new ForgejoClient(apiBase, apiToken);
+
+var quotaGroup = await client.Admin.CreateQuotaGroupAsync(new(name: "pacage-quota"));
+var quotaRule = await client.Admin.CreateQuotaRuleAsync(new(name: "limit-packages-500M", limit: 500 * 1024 * 1024, subjects: ["size:assets:packages:all"]));
+await client.Admin.AddQuotaGroupRuleAsync("pacage-quota", "limit-packages-500M");
+
+await client.Admin.AddQuotaGroupUserAsync("pacage-quota", "user-name");
 ```
 
 ### Running the API in a different user context by sudo
