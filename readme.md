@@ -78,11 +78,11 @@ using (var fileStream = File.OpenWrite(archiveDownload.Result.FileName ?? "main.
 ```csharp
 using var client = new ForgejoClient(apiBase, apiToken);
 
-var quotaGroup = await client.Admin.CreateQuotaGroupAsync(new(name: "pacage-quota"));
+var quotaGroup = await client.Admin.CreateQuotaGroupAsync(new(name: "package-quota"));
 var quotaRule = await client.Admin.CreateQuotaRuleAsync(new(name: "limit-packages-500M", limit: 500 * 1024 * 1024, subjects: ["size:assets:packages:all"]));
-await client.Admin.AddQuotaGroupRuleAsync("pacage-quota", "limit-packages-500M");
+await client.Admin.AddQuotaGroupRuleAsync("package-quota", "limit-packages-500M");
 
-await client.Admin.AddQuotaGroupUserAsync("pacage-quota", "user-name");
+await client.Admin.AddQuotaGroupUserAsync("package-quota", "user-name");
 ```
 
 ### Running the API in a different user context by sudo
