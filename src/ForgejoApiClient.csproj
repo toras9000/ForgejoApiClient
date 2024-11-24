@@ -19,7 +19,7 @@
     <Version>9.0.0-rev.1</Version>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageProjectUrl>https://github.com/toras9000/BookStackApiClient</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/toras9000/ForgejoApiClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/toras9000/ForgejoApiClient</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
