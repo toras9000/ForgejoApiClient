@@ -36,7 +36,7 @@ public interface IActivityPubApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/activitypub/repository-id/{repository-id}/inbox", "Send to the inbox")]
     [ManualEdit("id パラメータの型を変更")]
-    public Task SendRepositoryToInboxAsync(long repository_id, ForgeLike options, CancellationToken cancelToken = default)
+    public Task SendRepositoryToInboxAsync(long repository_id, System.Text.Json.JsonElement options, CancellationToken cancelToken = default)
         => PostRequest($"activitypub/repository-id/{repository_id}/inbox", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 

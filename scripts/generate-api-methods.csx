@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Humanizer;
 using Kokuban;
 using Lestaly;
+using Namotion.Reflection;
 using NJsonSchema.CodeGeneration.CSharp;
 using NJsonSchema.CodeGeneration.CSharp.Models;
 using NSwag;
@@ -238,6 +239,12 @@ static ApiParameter InterpretParameter(this GenerationContext context, CSharpPar
         {
             paramType = model.Type.EndsWith('?') ? "string[]?" : "string[]";
         }
+    }
+    // パラメータがプロパティを持っていないオブジェクト型であるか
+    else if (schema.IsObject && schema.Properties.Count <= 0)
+    {
+        // ちゃんとスキーママップが定義されていない型なので、JSON型のまま扱わせる。
+        paramType = "System.Text.Json.JsonElement";
     }
 
     return new ApiParameter(model.Kind, model.Name, model.VariableName, model.Description, paramType, model.IsRequired);
