@@ -1881,7 +1881,7 @@ public record IssueMeta(
 /// <param name="name"></param>
 /// <param name="ref"></param>
 /// <param name="title"></param>
-[ManualEdit("labels")]
+[ManualEdit("labels プロパティの型を変更")]
 public record IssueTemplate(
     string? about = default,
     ICollection<IssueFormField>? body = default,
