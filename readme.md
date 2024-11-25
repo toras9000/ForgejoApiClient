@@ -57,7 +57,7 @@ using var client = new ForgejoClient(apiBase, apiToken);
 
 var org = await client.Organization.CreateAsync(new(username: "org-name"));
 var team_units = new Dictionary<string, string> { ["repo.code"] = "write", };
-var team = await client.Organization.CreateTeamAsync(("org-name", new(name: "team-name", units_map: team_units));
+var team = await client.Organization.CreateTeamAsync("org-name", new(name: "team-name", units_map: team_units));
 await client.Organization.AddTeamMemberAsync(team.id!.Value, "user-name");
 ```
 
