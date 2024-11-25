@@ -571,7 +571,7 @@ public record CreateGPGKeyOption(
 /// <param name="authorization_header"></param>
 /// <param name="branch_filter"></param>
 /// <param name="events"></param>
-[ManualEdit("congig")]
+[ManualEdit("config プロパティの型を変更")]
 public record CreateHookOption(
     IDictionary<string, string> config,
     CreateHookOptionType type,
@@ -580,12 +580,6 @@ public record CreateHookOption(
     string? branch_filter = default,
     ICollection<string>? events = default
 );
-
-/// <summary>
-/// CreateHookOptionConfig has all config options in it
-/// required are &quot;content_type&quot; and &quot;url&quot; Required
-/// </summary>
-public record CreateHookOptionConfig();
 
 /// <summary>CreateIssueCommentOption options for creating a comment on an issue</summary>
 /// <param name="body"></param>
@@ -1749,19 +1743,17 @@ public record IssueMeta(
 /// <param name="name"></param>
 /// <param name="ref"></param>
 /// <param name="title"></param>
+[ManualEdit("labels プロパティの型を変更")]
 public record IssueTemplate(
     string? about = default,
     ICollection<IssueFormField>? body = default,
     string? content = default,
     string? file_name = default,
-    IssueTemplateLabels? labels = default,
+    string[]? labels = default,
     string? name = default,
     string? @ref = default,
     string? title = default
 );
-
-/// <summary></summary>
-public record IssueTemplateLabels();
 
 /// <summary>Label a label to an issue or a pr</summary>
 /// <param name="color"></param>
