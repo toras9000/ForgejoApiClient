@@ -897,13 +897,13 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             await client.Repository.TestWebhookAsync(ownerName, repoName, webhook.id!.Value);
 
             // 受信待機
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5000));
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var notify = await receiver.Task.WaitAsync(timeout.Token);
             notify.Should().NotBeNullOrWhiteSpace();
         }
         finally
         {
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5000));
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             await webapp.StopAsync(timeout.Token);
         }
     }
