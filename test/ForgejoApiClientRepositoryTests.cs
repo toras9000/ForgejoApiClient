@@ -1,4 +1,5 @@
-﻿using ForgejoApiClient.Api;
+﻿using System.Net;
+using ForgejoApiClient.Api;
 using ForgejoApiClient.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -889,8 +890,8 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         try
         {
             // Webhook作成
-            var testgateway = "testhost-gateway";
-            var config = new Dictionary<string, string> { ["content_type"] = "json", ["url"] = $"http://{testgateway}:{servicePort}{servicePath}", };
+            var testhost = Dns.GetHostAddresses(Dns.GetHostName()).First(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            var config = new Dictionary<string, string> { ["content_type"] = "json", ["url"] = $"http://{testhost}:{servicePort}{servicePath}", };
             var webhook = await client.Repository.CreateWebhookAsync(ownerName, repoName, new(config, CreateHookOptionType.Forgejo, active: true));
 
             // Webhook削除
