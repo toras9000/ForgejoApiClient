@@ -890,7 +890,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         try
         {
             // Webhook作成
-            var testhost = Dns.GetHostAddresses(Dns.GetHostName()).First(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+            var testhost = "host.docker.internal";
             var config = new Dictionary<string, string> { ["content_type"] = "json", ["url"] = $"http://{testhost}:{servicePort}{servicePath}", };
             var webhook = await client.Repository.CreateWebhookAsync(ownerName, repoName, new(config, CreateHookOptionType.Forgejo, active: true));
 
