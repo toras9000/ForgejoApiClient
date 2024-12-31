@@ -16,7 +16,7 @@
   <PropertyGroup>
     <Authors>toras9000</Authors>
     <Company />
-    <Version>9.0.0-rev.2</Version>
+    <Version>9.0.0-rev.3</Version>
   </PropertyGroup>
   <PropertyGroup>
     <PackageProjectUrl>https://github.com/toras9000/ForgejoApiClient</PackageProjectUrl>
