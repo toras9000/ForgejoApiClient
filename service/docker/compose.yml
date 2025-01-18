@@ -1,6 +1,6 @@
 services:
   app:
-    image: codeberg.org/forgejo/forgejo:9
+    image: codeberg.org/forgejo/forgejo:10
     restart: unless-stopped
     healthcheck:
       test: curl -f -s http://localhost:3000 || exit 1
