@@ -147,12 +147,13 @@ public interface IAdminApi : IApiScope
     /// <summary>Search users according filter conditions</summary>
     /// <param name="source_id">ID of the user&apos;s login source to search for</param>
     /// <param name="login_name">user&apos;s login name to search for</param>
+    /// <param name="sort">sort order of results</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/admin/users", "Search users according filter conditions")]
-    public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/users".WithQuery(source_id).Param(login_name).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+    public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("admin/users".WithQuery(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Create a user</summary>
     /// <param name="options"></param>

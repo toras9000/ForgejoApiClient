@@ -5,21 +5,21 @@ public interface IIssueApi : IApiScope
 {
     #region Issue
     /// <summary>Search for issues across the repositories that the user has access to</summary>
-    /// <param name="state">whether issue is open or closed</param>
-    /// <param name="labels">comma separated list of labels. Fetch only issues that have any of this labels. Non existent labels are discarded</param>
-    /// <param name="milestones">comma separated list of milestone names. Fetch only issues that have any of this milestones. Non existent are discarded</param>
-    /// <param name="q">search string</param>
-    /// <param name="priority_repo_id">repository to prioritize in the results</param>
-    /// <param name="type">filter by type (issues / pulls) if set</param>
-    /// <param name="since">Only show notifications updated after the given time. This is a timestamp in RFC 3339 format</param>
-    /// <param name="before">Only show notifications updated before the given time. This is a timestamp in RFC 3339 format</param>
-    /// <param name="assigned">filter (issues / pulls) assigned to you, default is false</param>
-    /// <param name="created">filter (issues / pulls) created by you, default is false</param>
-    /// <param name="mentioned">filter (issues / pulls) mentioning you, default is false</param>
-    /// <param name="review_requested">filter pulls requesting your review, default is false</param>
-    /// <param name="reviewed">filter pulls reviewed by you, default is false</param>
-    /// <param name="owner">filter by owner</param>
-    /// <param name="team">filter by team (requires organization owner parameter to be provided)</param>
+    /// <param name="state">State of the issue</param>
+    /// <param name="labels">Comma-separated list of label names. Fetch only issues that have any of these labels. Non existent labels are discarded.</param>
+    /// <param name="milestones">Comma-separated list of milestone names. Fetch only issues that have any of these milestones. Non existent milestones are discarded.</param>
+    /// <param name="q">Search string</param>
+    /// <param name="priority_repo_id">Repository ID to prioritize in the results</param>
+    /// <param name="type">Filter by issue type</param>
+    /// <param name="since">Only show issues updated after the given time (RFC 3339 format)</param>
+    /// <param name="before">Only show issues updated before the given time (RFC 3339 format)</param>
+    /// <param name="assigned">Filter issues or pulls assigned to the authenticated user</param>
+    /// <param name="created">Filter issues or pulls created by the authenticated user</param>
+    /// <param name="mentioned">Filter issues or pulls mentioning the authenticated user</param>
+    /// <param name="review_requested">Filter pull requests where the authenticated user&apos;s review was requested</param>
+    /// <param name="reviewed">Filter pull requests reviewed by the authenticated user</param>
+    /// <param name="owner">Filter by repository owner</param>
+    /// <param name="team">Filter by team (requires organization owner parameter)</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>IssueList</returns>

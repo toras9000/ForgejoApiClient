@@ -130,6 +130,16 @@ public interface IRepositoryApi : IApiScope
     public Task<Branch> CreateBranchAsync(string owner, string repo, CreateBranchRepoOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/branches", options, cancelToken).JsonResponseAsync<Branch>(cancelToken);
 
+    /// <summary>Update a branch</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="branch">name of the branch</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/branches/{branch}", "Update a branch")]
+    public Task UpdateBranchAsync(string owner, string repo, string branch, UpdateBranchRepoOption options, CancellationToken cancelToken = default)
+        => PatchRequest($"repos/{owner}/{repo}/branches/{branch}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
     /// <summary>Delete a specific branch from a repository</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -346,7 +356,9 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/commits/{sha}/pull", "Get the pull request of the commit")]
     public Task<PullRequest> GetCommitPullRequestAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/commits/{sha}/pull", cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+    #endregion
 
+    #region CommitNote
     /// <summary>Get a note corresponding to a single commit from a repository</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -358,6 +370,26 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/notes/{sha}", "Get a note corresponding to a single commit from a repository")]
     public Task<Note> GetCommitNoteAsync(string owner, string repo, string sha, bool? verification = default, bool? files = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/git/notes/{sha}".WithQuery(verification).Param(files), cancelToken).JsonResponseAsync<Note>(cancelToken);
+
+    /// <summary>Set a note corresponding to a single commit from a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="sha">a git ref or commit sha</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Note</returns>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/git/notes/{sha}", "Set a note corresponding to a single commit from a repository")]
+    public Task<Note> SetCommitNoteAsync(string owner, string repo, string sha, NoteOptions options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/git/notes/{sha}", options, cancelToken).JsonResponseAsync<Note>(cancelToken);
+
+    /// <summary>Removes a note corresponding to a single commit from a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="sha">a git ref or commit sha</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/git/notes/{sha}", "Removes a note corresponding to a single commit from a repository")]
+    public Task DeleteCommitNoteAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/git/notes/{sha}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region CommitStatus
@@ -880,18 +912,19 @@ public interface IRepositoryApi : IApiScope
 
     #region PullRequest
     /// <summary>List a repo&apos;s pull requests</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="state">State of pull request: open or closed (optional)</param>
+    /// <param name="owner">Owner of the repo</param>
+    /// <param name="repo">Name of the repo</param>
+    /// <param name="state">State of pull request</param>
     /// <param name="sort">Type of sort</param>
     /// <param name="milestone">ID of the milestone</param>
     /// <param name="labels">Label IDs</param>
+    /// <param name="poster">Filter by pull request author</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>PullRequestList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls", "List a repo's pull requests")]
-    public Task<PullRequest[]> ListPullRequestsAsync(string owner, string repo, string? state = default, string? sort = default, long? milestone = default, ICollection<long>? labels = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery(state).Param(sort).Param(milestone).Param(labels).Param(paging), cancelToken).JsonResponseAsync<PullRequest[]>(cancelToken);
+    public Task<PullRequest[]> ListPullRequestsAsync(string owner, string repo, string? state = default, string? sort = default, long? milestone = default, ICollection<long>? labels = default, string? poster = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery(state).Param(sort).Param(milestone).Param(labels).Param(poster).Param(paging), cancelToken).JsonResponseAsync<PullRequest[]>(cancelToken);
 
     /// <summary>Create a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1203,12 +1236,13 @@ public interface IRepositoryApi : IApiScope
     /// <param name="repo">name of the repo</param>
     /// <param name="draft">filter (exclude / include) drafts, if you dont have repo write access none will show</param>
     /// <param name="pre_release">filter (exclude / include) pre-releases</param>
+    /// <param name="q">Search string</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ReleaseList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases", "List a repo's releases")]
-    public Task<Release[]> ListReleasesAsync(string owner, string repo, bool? draft = default, bool? pre_release = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases".WithQuery(draft).Param(pre_release).Param(paging), cancelToken).JsonResponseAsync<Release[]>(cancelToken);
+    public Task<Release[]> ListReleasesAsync(string owner, string repo, bool? draft = default, bool? pre_release = default, string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/releases".WithQuery(draft).Param(pre_release).Param(q).Param(paging), cancelToken).JsonResponseAsync<Release[]>(cancelToken);
 
     /// <summary>Get a release</summary>
     /// <param name="owner">owner of the repo</param>

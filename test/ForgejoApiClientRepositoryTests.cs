@@ -133,16 +133,20 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // ブランチ情報取得
         var branch_get = await client.Repository.GetBranchAsync(ownerName, repoName, branchName);
 
+        // ブランチ情報更新
+        var newBranchName = "test2";
+        await client.Repository.UpdateBranchAsync(ownerName, repoName, branchName, new(name: newBranchName));
+
         // ブランチリスト取得
         var branch_list = await client.Repository.ListBranchesAsync(ownerName, repoName);
 
         // ブランチ削除
-        await client.Repository.DeleteBranchAsync(ownerName, repoName, branchName);
+        await client.Repository.DeleteBranchAsync(ownerName, repoName, newBranchName);
 
         // 検証
         branch_created.name.Should().Be(branchName);
         branch_get.name.Should().Be(branchName);
-        branch_list.Select(p => p.name).Should().Contain(branchName);
+        branch_list.Select(p => p.name).Should().Contain(newBranchName);
     }
 
     [TestMethod]
@@ -341,6 +345,34 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var commit_compare = await client.Repository.GetCommitCompareAsync(repoOwner, repoName, $"main...other");
         commit_compare.total_commits.Should().BeGreaterThan(0);
 
+    }
+
+    [TestMethod]
+    public async Task CommitNotesScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var ownerName = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // Note作成
+        var note = await client.Repository.SetCommitNoteAsync(ownerName, repoName, content.commit!.sha!, new(message: "NOTE-MSG"));
+        note.message.Should().Contain("NOTE-MSG");
+
+        // Note取得
+        var note_get = await client.Repository.GetCommitNoteAsync(ownerName, repoName, content.commit!.sha!);
+        note_get.message.Should().Contain("NOTE-MSG");
+
+        // Note削除
+        await client.Repository.DeleteCommitNoteAsync(ownerName, repoName, content.commit!.sha!);
     }
 
     [TestMethod]

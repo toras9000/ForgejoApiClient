@@ -16,6 +16,56 @@ public record APIError(
 );
 
 /// <summary></summary>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APIForbiddenError(
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
+/// <param name="invalidTopics"></param>
+/// <param name="message"></param>
+public record APIInvalidTopicsError(
+    ICollection<string>? invalidTopics = default,
+    string? message = default
+);
+
+/// <summary></summary>
+/// <param name="errors"></param>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APINotFound(
+    ICollection<string>? errors = default,
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APIRepoArchivedError(
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APIUnauthorizedError(
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APIValidationError(
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
 /// <param name="id"></param>
 /// <param name="name"></param>
 /// <param name="scopes"></param>
@@ -1289,6 +1339,7 @@ public record EditReleaseOption(
 /// <param name="default_branch">sets the default branch for this repository.</param>
 /// <param name="default_delete_branch_after_merge">set to `true` to delete pr branch after merge by default</param>
 /// <param name="default_merge_style">set to a merge style to be used by this repository: &quot;merge&quot;, &quot;rebase&quot;, &quot;rebase-merge&quot;, &quot;squash&quot;, or &quot;fast-forward-only&quot;.</param>
+/// <param name="default_update_style">set to a update style to be used by this repository: &quot;rebase&quot; or &quot;merge&quot;</param>
 /// <param name="description">a short description of the repository.</param>
 /// <param name="enable_prune">enable prune - remove obsolete remote-tracking references when mirroring</param>
 /// <param name="external_tracker"></param>
@@ -1327,6 +1378,7 @@ public record EditRepoOption(
     string? default_branch = default,
     bool? default_delete_branch_after_merge = default,
     string? default_merge_style = default,
+    string? default_update_style = default,
     string? description = default,
     bool? enable_prune = default,
     ExternalTracker? external_tracker = default,
@@ -1976,6 +2028,11 @@ public record MarkdownOption(
 );
 
 /// <summary>MarkupOption markup options</summary>
+/// <param name="BranchPath">
+/// The current branch path where the form gets posted
+/// 
+/// in: body
+/// </param>
 /// <param name="Context">
 /// Context to render
 /// 
@@ -2002,6 +2059,7 @@ public record MarkdownOption(
 /// in: body
 /// </param>
 public record MarkupOption(
+    string? BranchPath = default,
     string? Context = default,
     string? FilePath = default,
     string? Mode = default,
@@ -2171,6 +2229,12 @@ public record NodeInfoUsageUsers(
 /// <param name="message"></param>
 public record Note(
     Commit? commit = default,
+    string? message = default
+);
+
+/// <summary></summary>
+/// <param name="message"></param>
+public record NoteOptions(
     string? message = default
 );
 
@@ -2841,6 +2905,7 @@ public record RepoTransfer(
 /// <param name="default_branch"></param>
 /// <param name="default_delete_branch_after_merge"></param>
 /// <param name="default_merge_style"></param>
+/// <param name="default_update_style"></param>
 /// <param name="description"></param>
 /// <param name="empty"></param>
 /// <param name="external_tracker"></param>
@@ -2904,6 +2969,7 @@ public record Repository(
     string? default_branch = default,
     bool? default_delete_branch_after_merge = default,
     string? default_merge_style = default,
+    string? default_update_style = default,
     string? description = default,
     bool? empty = default,
     ExternalTracker? external_tracker = default,
@@ -3189,6 +3255,12 @@ public record TrackedTime(
 public record TransferRepoOption(
     string new_owner,
     ICollection<long>? team_ids = default
+);
+
+/// <summary>UpdateBranchRepoOption options when updating a branch in a repository</summary>
+/// <param name="name">New branch name</param>
+public record UpdateBranchRepoOption(
+    string name
 );
 
 /// <summary>
