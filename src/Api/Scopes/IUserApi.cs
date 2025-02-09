@@ -553,6 +553,16 @@ public interface IUserApi : IApiScope
     #endregion
 
     #region Token
+
+    /// <summary>List the authenticated user&apos;s access tokens</summary>
+    /// <param name="username">username of user</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>AccessTokenList represents a list of API access token.</returns>
+    [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
+    public Task<AccessToken[]> ListUserApiTokensAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"users/{username}/tokens".WithQuery(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
+
     /// <summary>List the authenticated user&apos;s access tokens</summary>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
@@ -560,7 +570,7 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>AccessTokenList represents a list of API access token.</returns>
     [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
-    [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
+    [ManualEdit("以前のバージョンではこのAPIの利用にBasic認証情報が必要であった。過去バージョンサーバに対して使えるように残している。")]
     public Task<AccessToken[]> ListUserApiTokensAsync(BasicAuthCredential auth, string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest(auth, $"users/{username}/tokens".WithQuery(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 

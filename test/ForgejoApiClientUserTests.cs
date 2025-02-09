@@ -676,7 +676,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         var token = await client.User.CreateUserApiTokenAsync(this.TestAdminUser, username, new(name: tokenname, scopes: scopes));
 
         // アプリケーション管理リスト取得
-        var token_list = await client.User.ListUserApiTokensAsync(this.TestAdminUser, username);
+        var token_list = await client.User.ListUserApiTokensAsync(username);
 
         // アプリケーション管理削除
         await client.User.DeleteUserApiTokenAsync(this.TestAdminUser, username, token.name!);
