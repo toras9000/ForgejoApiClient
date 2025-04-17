@@ -32,6 +32,14 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task GetActionJobsAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        var jobs = await client.Admin.GetActionJobsAsync("node");
+    }
+
+    [TestMethod]
     public async Task ListEmailsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);

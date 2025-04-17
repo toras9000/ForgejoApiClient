@@ -24,6 +24,14 @@ public record APIForbiddenError(
 );
 
 /// <summary></summary>
+/// <param name="message"></param>
+/// <param name="url"></param>
+public record APIInternalServerError(
+    string? message = default,
+    string? url = default
+);
+
+/// <summary></summary>
 /// <param name="invalidTopics"></param>
 /// <param name="message"></param>
 public record APIInvalidTopicsError(
@@ -77,6 +85,26 @@ public record AccessToken(
     ICollection<string>? scopes = default,
     string? sha1 = default,
     string? token_last_eight = default
+);
+
+/// <summary>ActionRunJob represents a job of a run</summary>
+/// <param name="id">the action run job id</param>
+/// <param name="name">the action run job name</param>
+/// <param name="needs">the action run job needed ids</param>
+/// <param name="owner_id">the owner id</param>
+/// <param name="repo_id">the repository id</param>
+/// <param name="runs_on">the action run job labels to run on</param>
+/// <param name="status">the action run job status</param>
+/// <param name="task_id">the action run job latest task id</param>
+public record ActionRunJob(
+    long? id = default,
+    string? name = default,
+    ICollection<string>? needs = default,
+    long? owner_id = default,
+    long? repo_id = default,
+    ICollection<string>? runs_on = default,
+    string? status = default,
+    long? task_id = default
 );
 
 /// <summary>ActionTask represents a ActionTask</summary>
@@ -516,9 +544,11 @@ public record CommitUser(
 
 /// <summary></summary>
 /// <param name="commits"></param>
+/// <param name="files"></param>
 /// <param name="total_commits"></param>
 public record Compare(
     ICollection<Commit>? commits = default,
+    ICollection<CommitAffectedFiles>? files = default,
     long? total_commits = default
 );
 
@@ -1102,9 +1132,21 @@ public record DismissPullReviewOptions(
 /// <summary>DispatchWorkflowOption options when dispatching a workflow</summary>
 /// <param name="ref">Git reference for the workflow</param>
 /// <param name="inputs">Input keys and values configured in the workflow file.</param>
+/// <param name="return_run_info">Flag to return the run info</param>
 public record DispatchWorkflowOption(
     string @ref,
-    IDictionary<string, string>? inputs = default
+    IDictionary<string, string>? inputs = default,
+    bool? return_run_info = default
+);
+
+/// <summary>DispatchWorkflowRun represents a workflow run</summary>
+/// <param name="id">the workflow run id</param>
+/// <param name="jobs">the jobs name</param>
+/// <param name="run_number">a unique number for each run of a repository</param>
+public record DispatchWorkflowRun(
+    long? id = default,
+    ICollection<string>? jobs = default,
+    long? run_number = default
 );
 
 /// <summary>EditAttachmentOptions options for editing attachments</summary>
@@ -1338,7 +1380,7 @@ public record EditReleaseOption(
 /// <param name="default_allow_maintainer_edit">set to `true` to allow edits from maintainers by default</param>
 /// <param name="default_branch">sets the default branch for this repository.</param>
 /// <param name="default_delete_branch_after_merge">set to `true` to delete pr branch after merge by default</param>
-/// <param name="default_merge_style">set to a merge style to be used by this repository: &quot;merge&quot;, &quot;rebase&quot;, &quot;rebase-merge&quot;, &quot;squash&quot;, or &quot;fast-forward-only&quot;.</param>
+/// <param name="default_merge_style">set to a merge style to be used by this repository: &quot;merge&quot;, &quot;rebase&quot;, &quot;rebase-merge&quot;, &quot;squash&quot;, &quot;fast-forward-only&quot;, &quot;manually-merged&quot;, or &quot;rebase-update-only&quot;.</param>
 /// <param name="default_update_style">set to a update style to be used by this repository: &quot;rebase&quot; or &quot;merge&quot;</param>
 /// <param name="description">a short description of the repository.</param>
 /// <param name="enable_prune">enable prune - remove obsolete remote-tracking references when mirroring</param>
@@ -2487,6 +2529,7 @@ public record PublicKey(
 /// <param name="diff_url"></param>
 /// <param name="draft"></param>
 /// <param name="due_date"></param>
+/// <param name="flow"></param>
 /// <param name="head"></param>
 /// <param name="html_url"></param>
 /// <param name="id"></param>
@@ -2525,6 +2568,7 @@ public record PullRequest(
     string? diff_url = default,
     bool? draft = default,
     DateTimeOffset? due_date = default,
+    long? flow = default,
     PRBranchInfo? head = default,
     string? html_url = default,
     long? id = default,
@@ -2833,6 +2877,12 @@ public record Release(
     string? upload_url = default,
     string? url = default,
     string? zipball_url = default
+);
+
+/// <summary>RenameOrgOption options when renaming an organization</summary>
+/// <param name="new_name">New username for this org. This name cannot be in use yet by any other user.</param>
+public record RenameOrgOption(
+    string new_name
 );
 
 /// <summary>RenameUserOption options when renaming a user</summary>
@@ -3319,7 +3369,7 @@ public record UpdateVariableOption(
 /// <param name="followers_count">user counts</param>
 /// <param name="following_count"></param>
 /// <param name="full_name">the user&apos;s full name</param>
-/// <param name="html_url">URL to the user&apos;s gitea page</param>
+/// <param name="html_url">URL to the user&apos;s profile page</param>
 /// <param name="id">the user&apos;s id</param>
 /// <param name="is_admin">Is the user an administrator</param>
 /// <param name="language">User locale</param>
@@ -3375,6 +3425,7 @@ public record UserHeatmapData(
 /// <param name="full_name"></param>
 /// <param name="hide_activity"></param>
 /// <param name="hide_email">Privacy</param>
+/// <param name="hide_pronouns"></param>
 /// <param name="language"></param>
 /// <param name="location"></param>
 /// <param name="pronouns"></param>
@@ -3387,6 +3438,7 @@ public record UserSettings(
     string? full_name = default,
     bool? hide_activity = default,
     bool? hide_email = default,
+    bool? hide_pronouns = default,
     string? language = default,
     string? location = default,
     string? pronouns = default,
@@ -3401,6 +3453,7 @@ public record UserSettings(
 /// <param name="full_name"></param>
 /// <param name="hide_activity"></param>
 /// <param name="hide_email">Privacy</param>
+/// <param name="hide_pronouns"></param>
 /// <param name="language"></param>
 /// <param name="location"></param>
 /// <param name="pronouns"></param>
@@ -3413,6 +3466,7 @@ public record UserSettingsOptions(
     string? full_name = default,
     bool? hide_activity = default,
     bool? hide_email = default,
+    bool? hide_pronouns = default,
     string? language = default,
     string? location = default,
     string? pronouns = default,

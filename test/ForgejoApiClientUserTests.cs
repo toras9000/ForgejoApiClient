@@ -578,6 +578,14 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task GetActionJobsAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        var jobs = await client.User.GetActionJobsAsync("node");
+    }
+
+    [TestMethod]
     public async Task ActionSecretScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);

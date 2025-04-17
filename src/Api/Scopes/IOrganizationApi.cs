@@ -44,6 +44,14 @@ public interface IOrganizationApi : IApiScope
     public Task DeleteAsync(string org, CancellationToken cancelToken = default)
         => DeleteRequest($"orgs/{org}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
+    /// <summary>Rename an organization</summary>
+    /// <param name="org">existing org name</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/orgs/{org}/rename", "Rename an organization")]
+    public Task RenameAsync(string org, RenameOrgOption options, CancellationToken cancelToken = default)
+        => PostRequest($"orgs/{org}/rename", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
     /// <summary>List the current user&apos;s organizations</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -143,14 +151,6 @@ public interface IOrganizationApi : IApiScope
     #endregion
 
     #region Org Misc
-    /// <summary>Get an organization&apos;s actions runner registration token</summary>
-    /// <param name="org">name of the organization</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/registration-token", "Get an organization's actions runner registration token")]
-    [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string org, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
-
     /// <summary>List an organization&apos;s activity feeds</summary>
     /// <param name="org">name of the org</param>
     /// <param name="date">the date of the activities to be found</param>
@@ -175,6 +175,26 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("DELETE", "/orgs/{org}/avatar", "Delete Avatar")]
     public Task DeleteAvatarAsync(string org, CancellationToken cancelToken = default)
         => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Action
+    /// <summary>Get an organization&apos;s actions runner registration token</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/registration-token", "Get an organization's actions runner registration token")]
+    [ManualEdit("結果値が得られるため独自型を定義して利用")]
+    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string org, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+
+    /// <summary>Search for organization&apos;s action jobs according filter conditions</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="labels">a comma separated list of run job labels to search for</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RunJobList is a list of action run jobs</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/jobs", "Search for organization's action jobs according filter conditions")]
+    [ManualEdit("戻り値を nullable に変更")]
+    public Task<ActionRunJob[]?> GetActionJobsAsync(string org, string? labels = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Action Secret

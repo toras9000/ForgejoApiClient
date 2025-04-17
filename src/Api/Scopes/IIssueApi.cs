@@ -40,12 +40,13 @@ public interface IIssueApi : IApiScope
     /// <param name="created_by">Only show items which were created by the given user</param>
     /// <param name="assigned_by">Only show items for which the given user is assigned</param>
     /// <param name="mentioned_by">Only show items in which the given user was mentioned</param>
+    /// <param name="sort">Type of sort</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>IssueList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues", "List a repository's issues")]
-    public Task<Issue[]> ListAsync(string owner, string repo, string? state = default, string? labels = default, string? q = default, string? type = default, string? milestones = default, DateTimeOffset? since = default, DateTimeOffset? before = default, string? created_by = default, string? assigned_by = default, string? mentioned_by = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issues".WithQuery(state).Param(labels).Param(q).Param(type).Param(milestones).Param(since).Param(before).Param(created_by).Param(assigned_by).Param(mentioned_by).Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
+    public Task<Issue[]> ListAsync(string owner, string repo, string? state = default, string? labels = default, string? q = default, string? type = default, string? milestones = default, DateTimeOffset? since = default, DateTimeOffset? before = default, string? created_by = default, string? assigned_by = default, string? mentioned_by = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/issues".WithQuery(state).Param(labels).Param(q).Param(type).Param(milestones).Param(since).Param(before).Param(created_by).Param(assigned_by).Param(mentioned_by).Param(sort).Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
 
     /// <summary>Get an issue</summary>
     /// <param name="owner">owner of the repo</param>

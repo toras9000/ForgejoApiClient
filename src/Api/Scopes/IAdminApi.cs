@@ -25,6 +25,15 @@ public interface IAdminApi : IApiScope
     [ManualEdit("結果値が得られるため独自型を定義して利用")]
     public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
         => GetRequest("admin/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+
+    /// <summary>Search action jobs according filter conditions</summary>
+    /// <param name="labels">a comma separated list of run job labels to search for</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RunJobList is a list of action run jobs</returns>
+    [ForgejoEndpoint("GET", "/admin/runners/jobs", "Search action jobs according filter conditions")]
+    [ManualEdit("戻り値を nullable に変更")]
+    public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
+        => GetRequest("admin/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Profile
@@ -334,4 +343,5 @@ public interface IAdminApi : IApiScope
     public Task RemoveQuotaGroupUserAsync(string quotagroup, string username, CancellationToken cancelToken = default)
         => DeleteRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
+
 }

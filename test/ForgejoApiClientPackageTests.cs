@@ -27,6 +27,17 @@ public class ForgejoApiClientPackageTests : ForgejoApiClientTestsBase
         // パッケージファイルリスト取得
         var pkg_files = await client.Package.GetFilesAsync(ownerName, "nuget", pkgName, pkgVer);
 
+        // テスト用のリポジトリを作成
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // パッケージとリポジトリをリンク
+        await client.Package.LinkRepository(ownerName, $"{package.type}", $"{package.name}", repoName);
+
+        // パッケージとリポジトリのリンク解除
+        await client.Package.UnlinkRepository(ownerName, $"{package.type}", $"{package.name}");
+
         // パッケージ削除
         await client.Package.DeleteAsync(ownerName, "nuget", pkgName, pkgVer);
 

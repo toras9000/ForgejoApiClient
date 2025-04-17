@@ -31,7 +31,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="team_id">search only for repos that belong to the given team id</param>
     /// <param name="starredBy">search only for repos that the user with the given id has starred</param>
     /// <param name="private">include private repositories this user has access to (defaults to true)</param>
-    /// <param name="is_private">show only pubic, private or all repositories (defaults to all)</param>
+    /// <param name="is_private">show only public, private or all repositories (defaults to all)</param>
     /// <param name="template">include template repositories this user has access to (defaults to true)</param>
     /// <param name="archived">show only archived, non-archived or all repositories (defaults to all)</param>
     /// <param name="mode">type of repository to search for. Supported values are &quot;fork&quot;, &quot;source&quot;, &quot;mirror&quot; and &quot;collaborative&quot;</param>
@@ -658,6 +658,15 @@ public interface IRepositoryApi : IApiScope
     #endregion
 
     #region Action
+    /// <summary>Get a repository&apos;s actions runner registration token</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/registration-token", "Get a repository's actions runner registration token")]
+    [ManualEdit("結果値が得られるため独自型を定義して利用")]
+    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+
     /// <summary>List a repository&apos;s action tasks</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -665,7 +674,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>TasksList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/tasks", "List a repository's action tasks")]
-    public Task<ActionTaskResponse> GetActionTasks(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<ActionTaskResponse> GetActionTasksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
 
     /// <summary>Dispatches a workflow</summary>
@@ -675,8 +684,20 @@ public interface IRepositoryApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", "Dispatches a workflow")]
+    [ManualEdit("swagger 定義の戻り値が得られる状況が不明のため、戻り値無しにしている")]
     public Task DispatchActionWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Search for repository&apos;s action jobs according filter conditions</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="labels">a comma separated list of run job labels to search for</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RunJobList is a list of action run jobs</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/jobs", "Search for repository's action jobs according filter conditions")]
+    [ManualEdit("戻り値を nullable に変更")]
+    public Task<ActionRunJob[]?> GetActionJobsAsync(string owner, string repo, string? labels = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Action Secret
@@ -1796,15 +1817,6 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/languages", "Get languages and number of bytes of code written")]
     public Task<IDictionary<string, long>> GetCodeLanguagesAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/languages", cancelToken).JsonResponseAsync<IDictionary<string, long>>(cancelToken);
-
-    /// <summary>Get a repository&apos;s actions runner registration token</summary>
-    /// <param name="owner">owner of the repo</param>
-    /// <param name="repo">name of the repo</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/registration-token", "Get a repository's actions runner registration token")]
-    [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
 
     /// <summary>List a repo&apos;s stargazers</summary>
     /// <param name="owner">owner of the repo</param>

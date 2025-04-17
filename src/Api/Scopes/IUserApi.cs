@@ -240,7 +240,7 @@ public interface IUserApi : IApiScope
 
     #region Repository
     /// <summary>List the repos that the authenticated user owns</summary>
-    /// <param name="order_by">order the repositories by name (default), id, or size</param>
+    /// <param name="order_by">order the repositories</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>RepositoryList</returns>
@@ -455,6 +455,17 @@ public interface IUserApi : IApiScope
     public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
         => GetRequest("user/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
 
+    /// <summary>Search for user&apos;s action jobs according filter conditions</summary>
+    /// <param name="labels">a comma separated list of run job labels to search for</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RunJobList is a list of action run jobs</returns>
+    [ForgejoEndpoint("GET", "/user/actions/runners/jobs", "Search for user's action jobs according filter conditions")]
+    [ManualEdit("戻り値を nullable に変更")]
+    public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
+        => GetRequest("user/actions/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+    #endregion
+
+    #region Action Secret
     /// <summary>Create or Update a secret value in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="options"></param>
@@ -469,7 +480,9 @@ public interface IUserApi : IApiScope
     [ForgejoEndpoint("DELETE", "/user/actions/secrets/{secretname}", "Delete a secret in a user scope")]
     public Task DeleteActionSecretAsync(string secretname, CancellationToken cancelToken = default)
         => DeleteRequest($"user/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
 
+    #region Action Variable
     /// <summary>Get the user-level list of variables which is created by current doer</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>

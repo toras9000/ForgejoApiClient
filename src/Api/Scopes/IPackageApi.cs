@@ -46,4 +46,23 @@ public interface IPackageApi : IApiScope
     public Task<PackageFile[]> GetFilesAsync(string owner, string type, string name, string version, CancellationToken cancelToken = default)
         => GetRequest($"packages/{owner}/{type}/{name}/{version}/files", cancelToken).JsonResponseAsync<PackageFile[]>(cancelToken);
 
+    /// <summary>Link a package to a repository</summary>
+    /// <param name="owner">owner of the package</param>
+    /// <param name="type">type of the package</param>
+    /// <param name="name">name of the package</param>
+    /// <param name="repo_name">name of the repository to link.</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/packages/{owner}/{type}/{name}/-/link/{repo_name}", "Link a package to a repository")]
+    public Task LinkRepository(string owner, string type, string name, string repo_name, CancellationToken cancelToken = default)
+        => PostRequest($"packages/{owner}/{type}/{name}/-/link/{repo_name}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>Unlink a package from a repository</summary>
+    /// <param name="owner">owner of the package</param>
+    /// <param name="type">type of the package</param>
+    /// <param name="name">name of the package</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/packages/{owner}/{type}/{name}/-/unlink", "Unlink a package from a repository")]
+    public Task UnlinkRepository(string owner, string type, string name, CancellationToken cancelToken = default)
+        => PostRequest($"packages/{owner}/{type}/{name}/-/unlink", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
 }

@@ -706,24 +706,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionTasks()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var repoOwner = this.TestTokenUser;
-        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var repo = await resources.CreateTestRepoAsync(repoName);
-
-        // タスク取得
-        var tasks = await client.Repository.GetActionTasks(repoOwner, repoName);
-    }
-
-    [TestMethod]
-    public async Task DispatchActionWorkflowAsync()
+    public async Task DispatchActionWorkflowAsync_Taks_Jobs()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -737,18 +720,24 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         var content = """
-        on: [push]
+        on: 
+          workflow_dispatch:
         jobs:
           test:
-            runs-on: docker
+            runs-on: node
             steps:
               - run: echo All Good
         """.ReplaceLineEndings("\n");
         var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        // 適切にセットアップしていないので現状はあまり意味がない。呼び出すだけ。
         await client.Repository.DispatchActionWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main"));
+
+        // タスク取得
+        var tasks = await client.Repository.GetActionTasksAsync(repoOwner, repoName);
+
+        // ジョブ取得
+        var jobs = await client.Repository.GetActionJobsAsync(repoOwner, repoName, "node");
     }
 
     [TestMethod]

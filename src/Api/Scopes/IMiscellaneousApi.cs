@@ -81,10 +81,10 @@ public interface IMiscellaneousApi : IApiScope
     #endregion
 
     #region Info
-    /// <summary>Returns the nodeinfo of the Gitea application</summary>
+    /// <summary>Returns the nodeinfo of the Forgejo application</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>NodeInfo</returns>
-    [ForgejoEndpoint("GET", "/nodeinfo", "Returns the nodeinfo of the Gitea application")]
+    [ForgejoEndpoint("GET", "/nodeinfo", "Returns the nodeinfo of the Forgejo application")]
     public Task<NodeInfo> GetNodeInfoAsync(CancellationToken cancelToken = default)
         => GetRequest("nodeinfo", cancelToken).JsonResponseAsync<NodeInfo>(cancelToken);
 
@@ -95,10 +95,10 @@ public interface IMiscellaneousApi : IApiScope
     public Task<string> GetSigningKeyGpgAsync(CancellationToken cancelToken = default)
         => GetRequest("signing-key.gpg", cancelToken).TextResponseAsync(cancelToken);
 
-    /// <summary>Returns the version of the Gitea application</summary>
+    /// <summary>Returns the version of the running application</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ServerVersion</returns>
-    [ForgejoEndpoint("GET", "/version", "Returns the version of the Gitea application")]
+    [ForgejoEndpoint("GET", "/version", "Returns the version of the running application")]
     public Task<ServerVersion> GetVersionAsync(CancellationToken cancelToken = default)
         => GetRequest("version", cancelToken).JsonResponseAsync<ServerVersion>(cancelToken);
     #endregion

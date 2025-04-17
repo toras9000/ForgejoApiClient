@@ -180,6 +180,22 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task GetActionJobsAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var orgName = $"org-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var org = await resources.CreateTestOrgAsync(orgName);
+
+        // テスト対象呼び出し
+        var jobs = await client.Organization.GetActionJobsAsync(orgName, "node");
+    }
+
+    [TestMethod]
     public async Task ListActivitiesAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
