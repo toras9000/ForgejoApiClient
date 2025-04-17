@@ -1,4 +1,4 @@
-#r "nuget: Lestaly, 0.68.0"
+#r "nuget: Lestaly, 0.73.0"
 #nullable enable
 using System.Text.Json;
 using Lestaly;

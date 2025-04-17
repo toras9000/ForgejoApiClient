@@ -1,6 +1,6 @@
-#r "nuget: NSwag.CodeGeneration.CSharp, 14.2.0"
+#r "nuget: NSwag.CodeGeneration.CSharp, 14.3.0"
 #r "nuget: Kokuban, 0.2.0"
-#r "nuget: Lestaly, 0.69.0"
+#r "nuget: Lestaly, 0.73.0"
 #nullable enable
 using System.Security;
 using Kokuban;
