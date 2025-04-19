@@ -1,3 +1,8 @@
+
+volumes:
+  forgejo-data:
+  forgejo-runner-data:
+
 services:
   app:
     volumes:
@@ -5,6 +10,8 @@ services:
         source: forgejo-data
         target: /data
 
-volumes:
-  forgejo-data:
-
+  runner:
+    volumes:
+      - type: volume
+        source: forgejo-runner-data
+        target: /data

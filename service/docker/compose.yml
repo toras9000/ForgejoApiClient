@@ -9,6 +9,10 @@ services:
       timeout: 5s
       interval: 300s
       retries: 3
+    networks:
+      default:
+        aliases:
+          - forgejo-app-container
     ports:
       - "9970:3000"
       - "9972:22"
@@ -31,3 +35,42 @@ services:
       - FORGEJO__quota_0x2E_default__TOTAL=8G
     extra_hosts:
       - testhost-gateway:host-gateway
+
+  docker:
+    image: docker:dind
+    restart: 'unless-stopped'
+    privileged: 'true'
+    networks:
+      default:
+        aliases:
+          - forgejo-docker-container
+    command: ['dockerd', '-H', 'tcp://0.0.0.0:2375', '--tls=false']
+    healthcheck:
+      test: docker -H tcp://localhost:2375 info || exit 1
+      start_period: 60s
+      start_interval: 3s
+      timeout: 5s
+      interval: 300s
+      retries: 3
+
+  runner:
+    image: code.forgejo.org/forgejo/runner:6
+    restart: unless-stopped
+    depends_on:
+      docker:
+        condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - forgejo-runner-container
+    user: 1000:1000
+    command: '/bin/sh /assets/scripts/startup.sh --config /assets/configs/config.yml'
+    volumes:
+      - type: bind
+        source: ./assets
+        target: /assets
+        read_only: true
+        bind:
+          create_host_path: false
+    environment:
+      DOCKER_HOST: tcp://forgejo-docker-container:2375

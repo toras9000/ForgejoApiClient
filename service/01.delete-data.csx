@@ -11,10 +11,11 @@ await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
     var composeFile = ThisSource.RelativeFile("./docker/compose.yml");
     var mountVolumeFile = ThisSource.RelativeFile("./docker/mount-volume.yml");
     await "docker".args("compose", "--file", composeFile.FullName, "--file", mountVolumeFile.FullName, "down", "--remove-orphans", "--volumes").result().success();
+    WriteLine();
 
     // データディレクトリを削除
-    WriteLine();
     WriteLine("Delete data directory ...");
     var volumesDir = ThisSource.RelativeDirectory("./docker/volumes");
     volumesDir.DeleteRecurse();
+    WriteLine();
 });
