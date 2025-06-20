@@ -1,5 +1,5 @@
-#r "nuget: Lestaly, 0.73.0"
-#r "nuget: AngleSharp, 1.2.0"
+#r "nuget: Lestaly, 0.84.0"
+#r "nuget: AngleSharp, 1.3.0"
 #nullable enable
 using System.Threading;
 using AngleSharp;
@@ -60,7 +60,7 @@ var composes = new
 record TestUserCredential(string Username, string Password);
 record TestServiceInfo(string Url, TestUserCredential Admin, string Token);
 
-await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
+return await Paved.ProceedAsync(async () =>
 {
     using var signal = new SignalCancellationPeriod();
     using var outenc = ConsoleWig.OutputEncodingPeriod(Encoding.UTF8);
@@ -72,8 +72,8 @@ await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
 
     // サービスの起動
     WriteLine($"Restart service ({modeName}) ...");
-    await "docker".args("compose", "--file", composes.ServiceFile.FullName, "down", "--remove-orphans").result().success();
-    await "docker".args("compose", "--file", composes.ServiceFile.FullName, "--file", mountFile.FullName, "up", "-d", "--wait").result().success();
+    await "docker".args("compose", "--file", composes.ServiceFile, "down", "--remove-orphans").result().success();
+    await "docker".args("compose", "--file", composes.ServiceFile, "--file", mountFile, "up", "-d", "--wait").result().success();
     WriteLine("Container up completed.");
 
     // サービスリンクを表示
@@ -133,7 +133,7 @@ await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
     // コンテナ内の管理コマンドを実行してAPIトークンを生成する
     WriteLine("Generate access token ...");
     var apiToken = await "docker".args([
-        "compose", "--file", composes.ServiceFile.FullName, "exec", "-u", "1000", "app",
+        "compose", "--file", composes.ServiceFile, "exec", "-u", "1000", "app",
         "forgejo", "admin", "user", "generate-access-token",
             "--raw",
             "--username", settings.Setup.AdminUser,
@@ -172,7 +172,7 @@ await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
         try
         {
             runnerToken = await "docker".args([
-                "compose", "--file", composes.ServiceFile.FullName, "exec", "-u", "1000", "app",
+                "compose", "--file", composes.ServiceFile, "exec", "-u", "1000", "app",
             "forgejo", "forgejo-cli", "actions", "generate-runner-token"
             ]).silent().result().success().output();
             WriteLine($"  Runner Token: {runnerToken}");
@@ -189,7 +189,7 @@ await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
     // ランナーをForgejoインスタンスに登録
     WriteLine("Register runner for forgejo ...");
     await "docker".args(
-        "compose", "--file", composes.ServiceFile.FullName, "exec", "runner",
+        "compose", "--file", composes.ServiceFile, "exec", "runner",
         "forgejo-runner", "register",
             "--no-interactive",
             "--name", settings.Runner.Name,

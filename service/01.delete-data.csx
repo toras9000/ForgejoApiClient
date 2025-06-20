@@ -1,16 +1,16 @@
-#r "nuget: Lestaly, 0.73.0"
+#r "nuget: Lestaly, 0.84.0"
 #nullable enable
 using System.Text.Json;
 using Lestaly;
 using Lestaly.Cx;
 
-await Paved.RunAsync(config: c => c.AnyPause(), action: async () =>
+return await Paved.ProceedAsync(async () =>
 {
     // コンテナを停止
     WriteLine("Stop service ...");
     var composeFile = ThisSource.RelativeFile("./docker/compose.yml");
     var mountVolumeFile = ThisSource.RelativeFile("./docker/mount-volume.yml");
-    await "docker".args("compose", "--file", composeFile.FullName, "--file", mountVolumeFile.FullName, "down", "--remove-orphans", "--volumes").result().success();
+    await "docker".args("compose", "--file", composeFile, "--file", mountVolumeFile, "down", "--remove-orphans", "--volumes").result().success();
     WriteLine();
 
     // データディレクトリを削除
