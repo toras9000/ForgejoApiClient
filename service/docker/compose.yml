@@ -1,6 +1,7 @@
+name: forgejo-for-library-test
 services:
   app:
-    image: codeberg.org/forgejo/forgejo:11.0.0
+    image: codeberg.org/forgejo/forgejo:12.0.1
     restart: unless-stopped
     healthcheck:
       test: curl -f -s http://localhost:3000 || exit 1
@@ -16,6 +17,13 @@ services:
     ports:
       - "9970:3000"
       - "9972:22"
+    volumes:
+      - type: bind
+        source: ./assets/app
+        target: /assets
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       - TZ=JST-9
       - USER_UID=1000
@@ -30,6 +38,11 @@ services:
       - FORGEJO__migrations__ALLOW_LOCALNETWORKS=true
       - FORGEJO__repository__ENABLE_FLAGS=true
       - FORGEJO__repository__SETTABLE_FLAGS=flag1,flag2,flag3
+      #- FORGEJO__repository_0x2E_signing__FORMAT=ssh
+      #- FORGEJO__repository_0x2E_signing__SIGNING_KEY=/assets/key/id_ed25519.pub
+      #- FORGEJO__repository_0x2E_signing__SIGNING_NAME=forgejo-admin
+      #- FORGEJO__repository_0x2E_signing__SIGNING_EMAIL=forgejo-admin@example.com
+      #- FORGEJO__repository_0x2E_signing__INITIAL_COMMIT=never
       - FORGEJO__federation__ENABLED=true
       - FORGEJO__quota__ENABLED=true
       - FORGEJO__quota_0x2E_default__TOTAL=8G
@@ -67,7 +80,7 @@ services:
     command: '/bin/sh /assets/scripts/startup.sh --config /assets/configs/config.yml'
     volumes:
       - type: bind
-        source: ./assets
+        source: ./assets/runner
         target: /assets
         read_only: true
         bind:
