@@ -95,6 +95,13 @@ public interface IMiscellaneousApi : IApiScope
     public Task<string> GetSigningKeyGpgAsync(CancellationToken cancelToken = default)
         => GetRequest("signing-key.gpg", cancelToken).TextResponseAsync(cancelToken);
 
+    /// <summary>Get default signing-key.ssh</summary>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>SSH public key in OpenSSH authorized key format</returns>
+    [ForgejoEndpoint("GET", "/signing-key.ssh", "Get default signing-key.ssh")]
+    public Task<string> GetSigningKeySshAsync(CancellationToken cancelToken = default)
+        => GetRequest("signing-key.ssh", cancelToken).TextResponseAsync(cancelToken);
+
     /// <summary>Returns the version of the running application</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ServerVersion</returns>

@@ -92,6 +92,17 @@ public class ForgejoApiClientMiscellaneousTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task GetSigningKeySshAsync()
+    {
+        Assert.Inconclusive("このAPIは構成で [repository.signing] FORMAT=ssh の時に機能する模様");
+
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+        var key = await client.Miscellaneous.GetSigningKeySshAsync();
+        key.Should().NotBeNull();
+
+    }
+
+    [TestMethod]
     public async Task GetVersionAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);

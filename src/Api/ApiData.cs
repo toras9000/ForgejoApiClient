@@ -87,6 +87,56 @@ public record AccessToken(
     string? token_last_eight = default
 );
 
+/// <summary>ActionRun represents an action run</summary>
+/// <param name="ScheduleID">the cron id for the schedule trigger</param>
+/// <param name="approved_by">who approved this action run</param>
+/// <param name="commit_sha">the commit sha the action run ran on</param>
+/// <param name="created">when the action run was created</param>
+/// <param name="duration"></param>
+/// <param name="event">the webhook event that causes the workflow to run</param>
+/// <param name="event_payload">the payload of the webhook event that causes the workflow to run</param>
+/// <param name="html_url">the url of this action run</param>
+/// <param name="id">the action run id</param>
+/// <param name="index_in_repo">a unique number for each run of a repository</param>
+/// <param name="is_fork_pull_request">If this is triggered by a PR from a forked repository or an untrusted user, we need to check if it is approved and limit permissions when running the workflow.</param>
+/// <param name="is_ref_deleted">has the commit/tag/… the action run ran on been deleted</param>
+/// <param name="need_approval">may need approval if it&apos;s a fork pull request</param>
+/// <param name="prettyref">the commit/tag/… the action run ran on</param>
+/// <param name="repository"></param>
+/// <param name="started">when the action run was started</param>
+/// <param name="status">the current status of this run</param>
+/// <param name="stopped">when the action run was stopped</param>
+/// <param name="title">the action run&apos;s title</param>
+/// <param name="trigger_event">the trigger event defined in the `on` configuration of the triggered workflow</param>
+/// <param name="trigger_user"></param>
+/// <param name="updated">when the action run was last updated</param>
+/// <param name="workflow_id">the name of workflow file</param>
+public record ActionRun(
+    long? ScheduleID = default,
+    long? approved_by = default,
+    string? commit_sha = default,
+    DateTimeOffset? created = default,
+    long? duration = default,
+    string? @event = default,
+    string? event_payload = default,
+    string? html_url = default,
+    long? id = default,
+    long? index_in_repo = default,
+    bool? is_fork_pull_request = default,
+    bool? is_ref_deleted = default,
+    bool? need_approval = default,
+    string? prettyref = default,
+    Repository? repository = default,
+    DateTimeOffset? started = default,
+    string? status = default,
+    DateTimeOffset? stopped = default,
+    string? title = default,
+    string? trigger_event = default,
+    User? trigger_user = default,
+    DateTimeOffset? updated = default,
+    string? workflow_id = default
+);
+
 /// <summary>ActionRunJob represents a job of a run</summary>
 /// <param name="id">the action run job id</param>
 /// <param name="name">the action run job name</param>
@@ -560,6 +610,7 @@ public record Compare(
 /// <param name="git_url"></param>
 /// <param name="html_url"></param>
 /// <param name="last_commit_sha"></param>
+/// <param name="last_commit_when"></param>
 /// <param name="name"></param>
 /// <param name="path"></param>
 /// <param name="sha"></param>
@@ -576,6 +627,7 @@ public record ContentsResponse(
     string? git_url = default,
     string? html_url = default,
     string? last_commit_sha = default,
+    DateTimeOffset? last_commit_when = default,
     string? name = default,
     string? path = default,
     string? sha = default,
@@ -1725,13 +1777,13 @@ public record GenerateRepoOption(
     bool? webhooks = default
 );
 
-/// <summary>GitBlobResponse represents a git blob</summary>
+/// <summary>GitBlob represents a git blob</summary>
 /// <param name="content"></param>
 /// <param name="encoding"></param>
 /// <param name="sha"></param>
 /// <param name="size"></param>
 /// <param name="url"></param>
-public record GitBlobResponse(
+public record GitBlob(
     string? content = default,
     string? encoding = default,
     string? sha = default,
@@ -2039,6 +2091,14 @@ public record LicensesTemplateListEntry(
     string? key = default,
     string? name = default,
     string? url = default
+);
+
+/// <summary>ListActionRunResponse return a list of ActionRun</summary>
+/// <param name="total_count"></param>
+/// <param name="workflow_runs"></param>
+public record ListActionRunResponse(
+    long? total_count = default,
+    ICollection<ActionRun>? workflow_runs = default
 );
 
 /// <summary>MarkdownOption markdown options</summary>
@@ -3133,6 +3193,18 @@ public record StopWatch(
 public record SubmitPullReviewOptions(
     string? body = default,
     string? @event = default
+);
+
+/// <summary>SyncForkInfo information about syncing a fork</summary>
+/// <param name="allowed"></param>
+/// <param name="base_commit"></param>
+/// <param name="commits_behind"></param>
+/// <param name="fork_commit"></param>
+public record SyncForkInfo(
+    bool? allowed = default,
+    string? base_commit = default,
+    long? commits_behind = default,
+    string? fork_commit = default
 );
 
 /// <summary>Tag represents a repository tag</summary>

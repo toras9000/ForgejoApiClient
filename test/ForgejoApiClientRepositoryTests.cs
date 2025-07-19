@@ -444,6 +444,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.GetContentAsync(ownerName, repoName, "aaa.cs");
         content.path.Should().Be("aaa.cs");
 
+        // BLOB一覧取得
+        var blobs = await client.Repository.GetBlobsAsync(ownerName, repoName, content_list.Select(c => c.sha).JoinString(","));
+        blobs.Should().NotBeEmpty();
+
         // BLOB取得
         var blob = await client.Repository.GetBlobAsync(ownerName, repoName, content.sha!);
         blob.content.Should().Be(fileContent.EncodeUtf8().EncodeBase64());
@@ -507,7 +511,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // コンテンツ更新
         var updateOptions = new ChangeFilesOptions(files: [
-            new(ChangeFileOperationOperation.Update, "aaa.cs",content: "GHI".EncodeUtf8Base64()),
+            new(ChangeFileOperationOperation.Update, "aaa.cs",content: "GHI".EncodeUtf8Base64(), sha: content1.content!.sha!),
             new(ChangeFileOperationOperation.Create, "ccc.cs",content: "JKL".EncodeUtf8Base64()),
         ]);
         var updated = await client.Repository.UpdateFilesAsync(ownerName, repoName, updateOptions);
@@ -697,12 +701,65 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // リポジトリフォーク
-        var forked = await client.Repository.ForkAsync(ownerName, repoName, new(name: $"forked-{repoName}")).WillBeDiscarded(resources);
+        var forkName = $"forked-{repoName}";
+        var forked = await client.Repository.ForkAsync(ownerName, repoName, new(name: forkName)).WillBeDiscarded(resources);
         forked.name.Should().Be($"forked-{repoName}");
+
+        // 元リポジトリにコンテンツ追加
+        var content_add = await client.Repository.CreateFileAsync(ownerName, repoName, "bbb.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // フォークリポジトリの同期情報取得 (デフォルトブランチ)
+        var syncInfo = await client.Repository.GetForkInfoAsync(ownerName, forkName);
+        syncInfo.commits_behind.Should().BeGreaterThanOrEqualTo(1);
+
+        // フォークリポジトリの同期 (デフォルトブランチ)
+        await client.Repository.SyncForkAsync(ownerName, forkName);
+
+        // フォークリポジトリの同期情報取得 (デフォルトブランチ)
+        var syncInfoAfter = await client.Repository.GetForkInfoAsync(ownerName, forkName);
+        syncInfoAfter.commits_behind.Should().Be(0);
 
         // リポジトリフォーク
         var fork_list = await client.Repository.ListForksAsync(ownerName, repoName);
         fork_list.Should().Contain(f => f.name == $"forked-{repoName}");
+    }
+
+    [TestMethod]
+    public async Task ForkSenario_Branch()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var ownerName = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content1 = await client.Repository.CreateFileAsync(ownerName, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+        var branch = await client.Repository.CreateBranchAsync(ownerName, repoName, new(new_branch_name: "other"));
+        var content2 = await client.Repository.CreateFileAsync(ownerName, repoName, "bbb.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
+
+        // リポジトリフォーク
+        var forkName = $"forked-{repoName}";
+        var forked = await client.Repository.ForkAsync(ownerName, repoName, new(name: forkName)).WillBeDiscarded(resources);
+        forked.name.Should().Be($"forked-{repoName}");
+
+        // 元リポジトリの other ブランチにコンテンツ追加
+        var content3 = await client.Repository.CreateFileAsync(ownerName, repoName, "ccc.cs", new(content: "DEF".EncodeUtf8Base64(), branch: branch.name));
+
+        // フォークリポジトリの同期情報取得 (ブランチ指定)
+        var syncInfo = await client.Repository.GetForkBranchInfoAsync(ownerName, forkName, branch.name!);
+        syncInfo.commits_behind.Should().BeGreaterThanOrEqualTo(1);
+
+        // フォークリポジトリの同期 (ブランチ指定)
+        await client.Repository.SyncForkBranchAsync(ownerName, forkName, branch.name!);
+
+        // フォークリポジトリの同期情報取得 (ブランチ指定)
+        var syncInfoAfter = await client.Repository.GetForkBranchInfoAsync(ownerName, forkName, branch.name!);
+        syncInfoAfter.commits_behind.Should().Be(0);
     }
 
     [TestMethod]
@@ -738,6 +795,15 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // ジョブ取得
         var jobs = await client.Repository.GetActionJobsAsync(repoOwner, repoName, "node");
+
+        // 実行一覧取得
+        var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName);
+        runs.total_count.Should().BeGreaterThanOrEqualTo(1);
+        runs.workflow_runs.Should().NotBeEmpty();
+
+        // 実行単独取得
+        var run = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runs.workflow_runs.First().id!.Value);
+        run.id.Should().Be(runs.workflow_runs.First().id!.Value);
     }
 
     [TestMethod]
