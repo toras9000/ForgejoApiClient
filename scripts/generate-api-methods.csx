@@ -37,7 +37,6 @@ var config = new
     // スコープ名と生成物の名称マップ
     ScopeMapping = new[]
     {
-        new { Scope = "activitypub",    Name = "ActivityPub",   },
         new { Scope = "admin",          Name = "Admin",         },
         new { Scope = "miscellaneous",  Name = "Miscellaneous", },
         new { Scope = "notification",   Name = "Notification",  },
