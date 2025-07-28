@@ -12,7 +12,7 @@ public interface IPackageApi : IApiScope
     /// <returns>PackageList</returns>
     [ForgejoEndpoint("GET", "/packages/{owner}", "Gets all packages of an owner")]
     public Task<Package[]> ListAsync(string owner, string? type = default, string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"packages/{owner}".WithQuery(type).Param(q).Param(paging), cancelToken).JsonResponseAsync<Package[]>(cancelToken);
+        => GetRequest($"packages/{owner}".WithQuery().Param(type).Param(q).Param(paging), cancelToken).JsonResponseAsync<Package[]>(cancelToken);
 
     /// <summary>Gets a package</summary>
     /// <param name="owner">owner of the package</param>

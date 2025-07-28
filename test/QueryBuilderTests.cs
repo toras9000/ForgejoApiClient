@@ -26,23 +26,6 @@ public class QueryBuilderTests
     }
 
     [TestMethod]
-    public void WithQuery_string_paging()
-    {
-        var path = "path";
-        var paging = new PagingOptions(page: 5, limit: 6);
-        path.WithQuery(paging).ToString().Should().Be("path?page=5&limit=6");
-    }
-
-    [TestMethod]
-    public void WithQuery_string_value()
-    {
-        var path = "path";
-        var value = 100;
-        var paging = new PagingOptions(page: 5, limit: 6);
-        path.WithQuery(value).ToString().Should().Be($"path?value={value}");
-    }
-
-    [TestMethod]
     public void Param_paging()
     {
         var builder = new QueryBuilder("path", append: false);
@@ -62,6 +45,21 @@ public class QueryBuilderTests
             var builder = new QueryBuilder("path", append: false);
             var value = (int?)null;
             builder.Param(value).ToString().Should().Be($"path");
+        }
+    }
+
+    [TestMethod]
+    public void Param_array()
+    {
+        {
+            var builder = new QueryBuilder("path", append: false);
+            var values = new[] { 100, 200 };
+            builder.Param(values).ToString().Should().Be("path?values=100&values=200");
+        }
+        {
+            var builder = new QueryBuilder("path", append: false);
+            var values = (ICollection<int>)new[] { 100, 200 };
+            builder.Param(values).ToString().Should().Be("path?values=100&values=200");
         }
     }
 

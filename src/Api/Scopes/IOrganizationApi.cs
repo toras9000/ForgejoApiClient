@@ -10,7 +10,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/orgs", "Get list of organizations")]
     public Task<Organization[]> ListAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("orgs".WithQuery(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
 
     /// <summary>Get an organization</summary>
     /// <param name="org">name of the organization to get</param>
@@ -58,7 +58,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/user/orgs", "List the current user's organizations")]
     public Task<Organization[]> ListMyOrgsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/orgs".WithQuery(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("user/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
 
     /// <summary>List a user&apos;s organizations</summary>
     /// <param name="username">username of user</param>
@@ -67,7 +67,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/orgs", "List a user's organizations")]
     public Task<Organization[]> ListUserOrgsAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/orgs".WithQuery(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest($"users/{username}/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
     #endregion
 
     #region Org Member
@@ -78,7 +78,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/members", "List an organization's members")]
     public Task<User[]> ListMembersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/members".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"orgs/{org}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Check if a user is a member of an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -103,7 +103,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/public_members", "List an organization's public members")]
     public Task<User[]> ListPublicMembersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/public_members".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"orgs/{org}/public_members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Check if a user is a public member of an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -138,7 +138,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/repos", "List an organization's repos")]
     public Task<Repository[]> ListRepositoriesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/repos".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"orgs/{org}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>Create a repository in an organization</summary>
     /// <param name="org">name of organization</param>
@@ -159,7 +159,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/activities/feeds", "List an organization's activity feeds")]
     public Task<Activity[]> ListActivitiesAsync(string org, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/activities/feeds".WithQuery(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"orgs/{org}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
 
     /// <summary>Update Avatar</summary>
     /// <param name="org">name of the organization</param>
@@ -194,7 +194,7 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/jobs", "Search for organization's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
     public Task<ActionRunJob[]?> GetActionJobsAsync(string org, string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Action Secret
@@ -205,7 +205,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>SecretList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/secrets", "List an organization's actions secrets")]
     public Task<Secret[]> ListActionSecretsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/secrets".WithQuery(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
 
     /// <summary>Create or Update a secret value in an organization</summary>
     /// <param name="org">name of organization</param>
@@ -233,7 +233,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables", "Get an org-level variables list")]
     public Task<ActionVariable[]> ListActionVariablesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/variables".WithQuery(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
 
     /// <summary>Get an org-level variable</summary>
     /// <param name="org">name of the organization</param>
@@ -281,7 +281,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>BlockedUserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/list_blocked", "List the organization's blocked users")]
     public Task<BlockedUser[]> ListBlockedUsersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/list_blocked".WithQuery(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
+        => GetRequest($"orgs/{org}/list_blocked".WithQuery().Param(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
 
     /// <summary>Blocks a user from the organization</summary>
     /// <param name="org">name of the org</param>
@@ -308,7 +308,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>HookList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/hooks", "List an organization's webhooks")]
     public Task<Hook[]> ListWebhooksAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/hooks".WithQuery(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest($"orgs/{org}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="org">name of the organization</param>
@@ -355,7 +355,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>LabelList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/labels", "List an organization's labels")]
     public Task<Label[]> ListLabelsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/labels".WithQuery(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
+        => GetRequest($"orgs/{org}/labels".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
 
     /// <summary>Get a single label</summary>
     /// <param name="org">name of the organization</param>
@@ -402,7 +402,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>TeamList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/teams", "List an organization's teams")]
     public Task<Team[]> ListTeamsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/teams".WithQuery(paging), cancelToken).JsonResponseAsync<Team[]>(cancelToken);
+        => GetRequest($"orgs/{org}/teams".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Team[]>(cancelToken);
 
     /// <summary>Search for teams within an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -414,7 +414,7 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("GET", "/orgs/{org}/teams/search", "Search for teams within an organization")]
     [ManualEdit("結果値に独自定義型を利用")]
     public Task<TeamSearchResults> SearchTeamsAsync(string org, string? q = default, bool? include_desc = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/teams/search".WithQuery(q).Param(include_desc).Param(paging), cancelToken).JsonResponseAsync<TeamSearchResults>(cancelToken);
+        => GetRequest($"orgs/{org}/teams/search".WithQuery().Param(q).Param(include_desc).Param(paging), cancelToken).JsonResponseAsync<TeamSearchResults>(cancelToken);
 
     /// <summary>Get a team</summary>
     /// <param name="id">id of the team to get</param>
@@ -459,7 +459,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/members", "List a team's members")]
     public Task<User[]> ListTeamMembersAsync(long id, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/members".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"teams/{id}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>List a particular member of team</summary>
     /// <param name="id">id of the team</param>
@@ -495,7 +495,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/repos", "List a team's repos")]
     public Task<Repository[]> ListTeamRepositoriesAsync(long id, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/repos".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"teams/{id}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>List a particular repo of team</summary>
     /// <param name="id">id of the team</param>
@@ -535,7 +535,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/activities/feeds", "List a team's activity feeds")]
     public Task<Activity[]> ListTeamActivitiesAsync(long id, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/activities/feeds".WithQuery(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"teams/{id}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
 
     /// <summary>Get user permissions in organization</summary>
     /// <param name="username">username of user</param>
@@ -555,7 +555,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedArtifactList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/artifacts", "List the artifacts affecting the organization's quota")]
     public Task<QuotaUsedArtifact[]> ListQuotaArtifactsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/artifacts".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/artifacts".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
 
     /// <summary>List the attachments affecting the organization&apos;s quota</summary>
     /// <param name="org">name of the organization</param>
@@ -564,7 +564,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedAttachmentList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/attachments", "List the attachments affecting the organization's quota")]
     public Task<QuotaUsedAttachment[]> ListQuotaAttachmentsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/attachments".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/attachments".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
 
     /// <summary>List the packages affecting the organization&apos;s quota</summary>
     /// <param name="org">name of the organization</param>
@@ -573,7 +573,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedPackageList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/packages", "List the packages affecting the organization's quota")]
     public Task<QuotaUsedPackage[]> ListQuotaPackagesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/packages".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/packages".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
 
     /// <summary>Get quota information for an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -592,7 +592,7 @@ public interface IOrganizationApi : IApiScope
     [ManualEdit("Swagger定義にsubjectが無かったので追加")]
     [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
     public Task<bool> CheckQuotaOverAsync(string org, string subject, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/check".WithQuery(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
     #endregion
 
 }

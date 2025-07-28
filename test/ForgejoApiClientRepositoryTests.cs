@@ -797,7 +797,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var jobs = await client.Repository.GetActionJobsAsync(repoOwner, repoName, "node");
 
         // 実行一覧取得
-        var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName);
+        var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName,
+            @event: ["workflow_dispatch"],
+            status: ["unknown", "waiting", "running", "success", "failure", "cancelled", "skipped", "blocked"]
+        );
         runs.total_count.Should().BeGreaterThanOrEqualTo(1);
         runs.workflow_runs.Should().NotBeEmpty();
 

@@ -432,12 +432,13 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     var first = true;
     foreach (var param in queryParams)
     {
-        if (first) apiPath.Append($".WithQuery({param.Variable})"); else apiPath.Append($".Param({param.Variable})");
-        first = false;
+        if (first) { apiPath.Append($".WithQuery()"); first = false; }
+        apiPath.Append($".Param({param.Variable})");
     }
     if (hasPaging)
     {
-        if (first) apiPath.Append($".WithQuery({GenerationConstants.PagingParamVariable})"); else apiPath.Append($".Param({GenerationConstants.PagingParamVariable})");
+        if (first) { apiPath.Append($".WithQuery()"); first = false; }
+        apiPath.Append($".Param({GenerationConstants.PagingParamVariable})");
     }
 
     // Body/FormDataパラメータ引数
