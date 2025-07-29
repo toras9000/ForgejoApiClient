@@ -177,7 +177,7 @@ public interface IOrganizationApi : IApiScope
         => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action
+    #region Actions
     /// <summary>Get an organization&apos;s actions runner registration token</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -197,7 +197,7 @@ public interface IOrganizationApi : IApiScope
         => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
-    #region Action Secret
+    #region Actions Secret
     /// <summary>List an organization&apos;s actions secrets</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
@@ -225,7 +225,7 @@ public interface IOrganizationApi : IApiScope
         => DeleteRequest($"orgs/{org}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action Variable
+    #region Actions Variable
     /// <summary>Get an org-level variables list</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>

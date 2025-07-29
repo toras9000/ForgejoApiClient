@@ -705,7 +705,7 @@ public interface IRepositoryApi : IApiScope
         => PostRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action
+    #region Actions
     /// <summary>Get a repository&apos;s actions runner registration token</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -772,7 +772,7 @@ public interface IRepositoryApi : IApiScope
         => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync<ActionRun>(cancelToken);
     #endregion
 
-    #region Action Secret
+    #region Actions Secret
     /// <summary>List an repo&apos;s actions secrets</summary>
     /// <param name="owner">owner of the repository</param>
     /// <param name="repo">name of the repository</param>
@@ -803,7 +803,7 @@ public interface IRepositoryApi : IApiScope
         => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action Variable
+    #region Actions Variable
     /// <summary>Get repo-level variables list</summary>
     /// <param name="owner">name of the owner</param>
     /// <param name="repo">name of the repository</param>

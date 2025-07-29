@@ -447,7 +447,7 @@ public interface IUserApi : IApiScope
         => DeleteRequest($"user/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action
+    #region Actions
     /// <summary>Get an user&apos;s actions runner registration token</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/user/actions/runners/registration-token", "Get an user's actions runner registration token")]
@@ -465,7 +465,7 @@ public interface IUserApi : IApiScope
         => GetRequest("user/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
-    #region Action Secret
+    #region Actions Secret
     /// <summary>Create or Update a secret value in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="options"></param>
@@ -482,7 +482,7 @@ public interface IUserApi : IApiScope
         => DeleteRequest($"user/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action Variable
+    #region Actions Variable
     /// <summary>Get the user-level list of variables which is created by current doer</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>

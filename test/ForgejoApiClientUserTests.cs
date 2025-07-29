@@ -569,7 +569,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionRunnerRegistrationTokenAsync()
+    public async Task GetActionsRunnerRegistrationTokenAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -578,7 +578,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionJobsAsync()
+    public async Task ListActionsJobsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -586,7 +586,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task ActionSecretScenario()
+    public async Task ActionsSecretScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -597,7 +597,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task ActionVariableScenario()
+    public async Task ActionsVariableScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 

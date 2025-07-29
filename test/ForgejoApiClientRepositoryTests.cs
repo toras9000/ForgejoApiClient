@@ -810,7 +810,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task ActionSecretSenario()
+    public async Task ActionsSecretSenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -833,7 +833,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task ActionVariableScenario()
+    public async Task ActionsVariableScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -1336,7 +1336,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task PullRequestReviewActionScenario()
+    public async Task PullRequestReviewActionsScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -2130,7 +2130,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetCodeLanguagesAsync()
+    public async Task ListCodeLanguagesAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -2161,7 +2161,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionRunnerRegistrationTokenAsync()
+    public async Task GetActionsRunnerRegistrationTokenAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 

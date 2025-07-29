@@ -23,7 +23,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionRunnerRegistrationTokenAsync()
+    public async Task GetActionsRunnerRegistrationTokenAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -32,7 +32,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionJobsAsync()
+    public async Task ListActionsJobsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 

@@ -3,7 +3,7 @@
 /// <summary>admin スコープのAPIインタフェース</summary>
 public interface IAdminApi : IApiScope
 {
-    #region Action
+    #region Actions
     /// <summary>List cron tasks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
