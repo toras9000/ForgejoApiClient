@@ -76,24 +76,11 @@ internal struct QueryBuilder
 /// <summary>QueryBuilder の拡張メソッド</summary>
 internal static class QueryBuilderExtensions
 {
-    /// <summary>ページングパラメータを追加したQueryBuilderを生成する</summary>
+    /// <summary>URL文字列をベースにQueryBuilderを生成する</summary>
     /// <param name="self">ベースとする文字列</param>
-    /// <param name="paging">ページングオプション</param>
     /// <returns>生成したQueryBuilderインスタンス</returns>
-    public static QueryBuilder WithQuery(this string self, PagingOptions paging)
-        => new QueryBuilder(self).Param(paging);
-
-    /// <summary>パラメータを追加したQueryBuilderを生成する</summary>
-    /// <typeparam name="T">追加するパラメータ値の型</typeparam>
-    /// <param name="self">ベースとする文字列</param>
-    /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>
-    /// <param name="name">valueパラメータに指定した式の文字列表現。パラメータ名として利用する。</param>
-    /// <returns>生成したQueryBuilderインスタンス</returns>
-    public static QueryBuilder WithQuery<T>(this string self, T? value, [CallerArgumentExpression(nameof(value))] string name = "")
-    {
-        var builder = new QueryBuilder(self);
-        return value == null ? builder : builder.Append(name, value);
-    }
+    public static QueryBuilder WithQuery(this string self)
+        => new QueryBuilder(self);
 
     /// <summary>QueryBuilderにページングパラメータを追加する</summary>
     /// <param name="self">対象QueryBuilder</param>
@@ -117,6 +104,41 @@ internal static class QueryBuilderExtensions
         return value == null ? self : self.Append(name, value);
     }
 
+    /// <summary>QueryBuilderにパラメータを追加する</summary>
+    /// <typeparam name="T">追加するパラメータ値の型</typeparam>
+    /// <param name="self">対象QueryBuilder</param>
+    /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>
+    /// <param name="name">valueパラメータに指定した式の文字列表現。パラメータ名として利用する。</param>
+    /// <returns>対象QueryBuilder自身</returns>
+    public static QueryBuilder Param<T>(this QueryBuilder self, ICollection<T>? value, [CallerArgumentExpression(nameof(value))] string name = "")
+    {
+        if (value != null)
+        {
+            foreach (var item in value)
+            {
+                self.Append(name, item);
+            }
+        }
+        return self;
+    }
+
+    /// <summary>QueryBuilderにパラメータを追加する</summary>
+    /// <typeparam name="T">追加するパラメータ値の型</typeparam>
+    /// <param name="self">対象QueryBuilder</param>
+    /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>
+    /// <param name="name">valueパラメータに指定した式の文字列表現。パラメータ名として利用する。</param>
+    /// <returns>対象QueryBuilder自身</returns>
+    public static QueryBuilder Param<T>(this QueryBuilder self, T[]? value, [CallerArgumentExpression(nameof(value))] string name = "")
+    {
+        if (value != null)
+        {
+            foreach (var item in value)
+            {
+                self.Append(name, item);
+            }
+        }
+        return self;
+    }
     /// <summary>QueryBuilderにパラメータを追加する</summary>
     /// <param name="self">対象QueryBuilder</param>
     /// <param name="value">追加するパラメータ値。この引数に指定した式表現がパラメータ名として扱われる。パラメータ名と同じ名前の変数を渡すことを想定している。</param>

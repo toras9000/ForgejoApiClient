@@ -10,7 +10,7 @@ public interface IAdminApi : IApiScope
     /// <returns>CronList</returns>
     [ForgejoEndpoint("GET", "/admin/cron", "List cron tasks")]
     public Task<Cron[]> ListCronsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/cron".WithQuery(paging), cancelToken).JsonResponseAsync<Cron[]>(cancelToken);
+        => GetRequest("admin/cron".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Cron[]>(cancelToken);
 
     /// <summary>Run cron task</summary>
     /// <param name="task">task to run</param>
@@ -33,7 +33,7 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("GET", "/admin/runners/jobs", "Search action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
     public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+        => GetRequest("admin/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Profile
@@ -43,7 +43,7 @@ public interface IAdminApi : IApiScope
     /// <returns>EmailList</returns>
     [ForgejoEndpoint("GET", "/admin/emails", "List all emails")]
     public Task<Email[]> ListEmailsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/emails".WithQuery(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+        => GetRequest("admin/emails".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
 
     /// <summary>Search all emails</summary>
     /// <param name="q">keyword</param>
@@ -52,7 +52,7 @@ public interface IAdminApi : IApiScope
     /// <returns>EmailList</returns>
     [ForgejoEndpoint("GET", "/admin/emails/search", "Search all emails")]
     public Task<Email[]> SearchEmailsAsync(string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/emails/search".WithQuery(q).Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+        => GetRequest("admin/emails/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
     #endregion
 
     #region Webhook
@@ -62,7 +62,7 @@ public interface IAdminApi : IApiScope
     /// <returns>HookList</returns>
     [ForgejoEndpoint("GET", "/admin/hooks", "List system's webhooks")]
     public Task<Hook[]> ListSystemWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/hooks".WithQuery(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest("admin/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="id">id of the hook to get</param>
@@ -105,7 +105,7 @@ public interface IAdminApi : IApiScope
     /// <returns>StringSlice</returns>
     [ForgejoEndpoint("GET", "/admin/unadopted", "List unadopted repositories")]
     public Task<string[]> ListUnadoptedReposAsync(string? pattern = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/unadopted".WithQuery(pattern).Param(paging), cancelToken).JsonResponseAsync<string[]>(cancelToken);
+        => GetRequest("admin/unadopted".WithQuery().Param(pattern).Param(paging), cancelToken).JsonResponseAsync<string[]>(cancelToken);
 
     /// <summary>Adopt unadopted files as a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -140,7 +140,7 @@ public interface IAdminApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/admin/orgs", "List all organizations")]
     public Task<Organization[]> ListOrganizationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/orgs".WithQuery(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("admin/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
 
     /// <summary>Create an organization</summary>
     /// <param name="username">username of the user that will own the created organization</param>
@@ -162,7 +162,7 @@ public interface IAdminApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/admin/users", "Search users according filter conditions")]
     public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/users".WithQuery(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Create a user</summary>
     /// <param name="options"></param>
@@ -195,7 +195,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/users/{username}", "Delete a user")]
     public Task DeleteUserAsync(string username, bool? purge = default, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/users/{username}".WithQuery(purge), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/users/{username}".WithQuery().Param(purge), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region Key

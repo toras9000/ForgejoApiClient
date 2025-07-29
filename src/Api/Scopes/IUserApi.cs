@@ -67,7 +67,7 @@ public interface IUserApi : IApiScope
     /// <returns>TeamList</returns>
     [ForgejoEndpoint("GET", "/user/teams", "List all the teams a user belongs to")]
     public Task<Team[]> ListTeamsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/teams".WithQuery(paging), cancelToken).JsonResponseAsync<Team[]>(cancelToken);
+        => GetRequest("user/teams".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Team[]>(cancelToken);
 
     /// <summary>List a user&apos;s activity feeds</summary>
     /// <param name="username">username of user</param>
@@ -78,7 +78,7 @@ public interface IUserApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/activities/feeds", "List a user's activity feeds")]
     public Task<Activity[]> ListUserActivitiesAsync(string username, bool? only_performed_by = default, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/activities/feeds".WithQuery(only_performed_by).Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"users/{username}/activities/feeds".WithQuery().Param(only_performed_by).Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
 
     /// <summary>Get a user&apos;s heatmap</summary>
     /// <param name="username">username of user to get</param>
@@ -96,7 +96,7 @@ public interface IUserApi : IApiScope
     /// <returns>BlockedUserList</returns>
     [ForgejoEndpoint("GET", "/user/list_blocked", "List the authenticated user's blocked users")]
     public Task<BlockedUser[]> ListBlockedUsersAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/list_blocked".WithQuery(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
+        => GetRequest("user/list_blocked".WithQuery().Param(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
 
     /// <summary>Blocks a user from the doer.</summary>
     /// <param name="username">username of the user</param>
@@ -118,7 +118,7 @@ public interface IUserApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/user/followers", "List the authenticated user's followers")]
     public Task<User[]> ListFollowerUsersAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/followers".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest("user/followers".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>List the users that the authenticated user is following</summary>
     /// <param name="paging">ページングオプション</param>
@@ -126,7 +126,7 @@ public interface IUserApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/user/following", "List the users that the authenticated user is following")]
     public Task<User[]> ListFollowingUsersAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/following".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest("user/following".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Check whether a user is followed by the authenticated user</summary>
     /// <param name="username">username of followed user</param>
@@ -156,7 +156,7 @@ public interface IUserApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/followers", "List the given user's followers")]
     public Task<User[]> ListUserFollowersAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/followers".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"users/{username}/followers".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>List the users that the given user is following</summary>
     /// <param name="username">username of user</param>
@@ -165,7 +165,7 @@ public interface IUserApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/following", "List the users that the given user is following")]
     public Task<User[]> ListUserFollowingsAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/following".WithQuery(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"users/{username}/following".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
     /// <summary>Check if one user is following another user</summary>
     /// <param name="username">username of following user</param>
@@ -181,7 +181,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/user/starred", "The repos that the authenticated user has starred")]
     public Task<Repository[]> ListStarredRepositoriesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/starred".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest("user/starred".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>Whether the authenticated is starring the repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -214,7 +214,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/starred", "The repos that the given user has starred")]
     public Task<Repository[]> ListUserStarredAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/starred".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"users/{username}/starred".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
     #endregion
 
     #region User
@@ -227,7 +227,7 @@ public interface IUserApi : IApiScope
     [ForgejoEndpoint("GET", "/users/search", "Search for users")]
     [ManualEdit("結果値に独自定義型を利用")]
     public Task<UserSearchResults> SearchAsync(string? q = default, long? uid = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("users/search".WithQuery(q).Param(uid).Param(paging), cancelToken).JsonResponseAsync<UserSearchResults>(cancelToken);
+        => GetRequest("users/search".WithQuery().Param(q).Param(uid).Param(paging), cancelToken).JsonResponseAsync<UserSearchResults>(cancelToken);
 
     /// <summary>Get a user</summary>
     /// <param name="username">username of user to get</param>
@@ -246,7 +246,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/user/repos", "List the repos that the authenticated user owns")]
     public Task<Repository[]> ListRepositoriesAsync(string? order_by = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/repos".WithQuery(order_by).Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest("user/repos".WithQuery().Param(order_by).Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>Create a repository</summary>
     /// <param name="options"></param>
@@ -263,7 +263,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/repos", "List the repos owned by the given user")]
     public Task<Repository[]> ListUserRepositoriesAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/repos".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"users/{username}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
     #endregion
 
     #region Subscription
@@ -273,7 +273,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/user/subscriptions", "List repositories watched by the authenticated user")]
     public Task<Repository[]> ListSubscriptionsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/subscriptions".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest("user/subscriptions".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
 
     /// <summary>List the repositories watched by a user</summary>
     /// <param name="username">username of the user</param>
@@ -282,7 +282,7 @@ public interface IUserApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/subscriptions", "List the repositories watched by a user")]
     public Task<Repository[]> ListUserSubscriptionsAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/subscriptions".WithQuery(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"users/{username}/subscriptions".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
     #endregion
 
     #region Issue
@@ -292,7 +292,7 @@ public interface IUserApi : IApiScope
     /// <returns>StopWatchList</returns>
     [ForgejoEndpoint("GET", "/user/stopwatches", "Get list of all existing stopwatches")]
     public Task<StopWatch[]> ListStopwatchesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/stopwatches".WithQuery(paging), cancelToken).JsonResponseAsync<StopWatch[]>(cancelToken);
+        => GetRequest("user/stopwatches".WithQuery().Param(paging), cancelToken).JsonResponseAsync<StopWatch[]>(cancelToken);
 
     /// <summary>List the current user&apos;s tracked times</summary>
     /// <param name="since">Only show times updated after the given time. This is a timestamp in RFC 3339 format</param>
@@ -302,7 +302,7 @@ public interface IUserApi : IApiScope
     /// <returns>TrackedTimeList</returns>
     [ForgejoEndpoint("GET", "/user/times", "List the current user's tracked times")]
     public Task<TrackedTime[]> ListTimesAsync(DateTimeOffset? since = default, DateTimeOffset? before = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/times".WithQuery(since).Param(before).Param(paging), cancelToken).JsonResponseAsync<TrackedTime[]>(cancelToken);
+        => GetRequest("user/times".WithQuery().Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync<TrackedTime[]>(cancelToken);
     #endregion
 
     #region Key
@@ -328,7 +328,7 @@ public interface IUserApi : IApiScope
     /// <returns>GPGKeyList</returns>
     [ForgejoEndpoint("GET", "/user/gpg_keys", "List the authenticated user's GPG keys")]
     public Task<GPGKey[]> ListGpgKeysAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/gpg_keys".WithQuery(paging), cancelToken).JsonResponseAsync<GPGKey[]>(cancelToken);
+        => GetRequest("user/gpg_keys".WithQuery().Param(paging), cancelToken).JsonResponseAsync<GPGKey[]>(cancelToken);
 
     /// <summary>Get a GPG key</summary>
     /// <param name="id">id of key to get</param>
@@ -360,7 +360,7 @@ public interface IUserApi : IApiScope
     /// <returns>GPGKeyList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/gpg_keys", "List the given user's GPG keys")]
     public Task<GPGKey[]> ListUserGpgKeysAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/gpg_keys".WithQuery(paging), cancelToken).JsonResponseAsync<GPGKey[]>(cancelToken);
+        => GetRequest($"users/{username}/gpg_keys".WithQuery().Param(paging), cancelToken).JsonResponseAsync<GPGKey[]>(cancelToken);
 
     /// <summary>List the authenticated user&apos;s public keys</summary>
     /// <param name="fingerprint">fingerprint of the key</param>
@@ -369,7 +369,7 @@ public interface IUserApi : IApiScope
     /// <returns>PublicKeyList</returns>
     [ForgejoEndpoint("GET", "/user/keys", "List the authenticated user's public keys")]
     public Task<PublicKey[]> ListPublicKeysAsync(string? fingerprint = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/keys".WithQuery(fingerprint).Param(paging), cancelToken).JsonResponseAsync<PublicKey[]>(cancelToken);
+        => GetRequest("user/keys".WithQuery().Param(fingerprint).Param(paging), cancelToken).JsonResponseAsync<PublicKey[]>(cancelToken);
 
     /// <summary>Get a public key</summary>
     /// <param name="id">id of key to get</param>
@@ -402,7 +402,7 @@ public interface IUserApi : IApiScope
     /// <returns>PublicKeyList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/keys", "List the given user's public keys")]
     public Task<PublicKey[]> ListUserPublicKeysAsync(string username, string? fingerprint = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/keys".WithQuery(fingerprint).Param(paging), cancelToken).JsonResponseAsync<PublicKey[]>(cancelToken);
+        => GetRequest($"users/{username}/keys".WithQuery().Param(fingerprint).Param(paging), cancelToken).JsonResponseAsync<PublicKey[]>(cancelToken);
     #endregion
 
     #region Webhook
@@ -412,7 +412,7 @@ public interface IUserApi : IApiScope
     /// <returns>HookList</returns>
     [ForgejoEndpoint("GET", "/user/hooks", "List the authenticated user's webhooks")]
     public Task<Hook[]> ListWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/hooks".WithQuery(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest("user/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="id">id of the hook to get</param>
@@ -462,7 +462,7 @@ public interface IUserApi : IApiScope
     [ForgejoEndpoint("GET", "/user/actions/runners/jobs", "Search for user's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
     public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest("user/actions/runners/jobs".WithQuery(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+        => GetRequest("user/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
     #region Action Secret
@@ -489,7 +489,7 @@ public interface IUserApi : IApiScope
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/user/actions/variables", "Get the user-level list of variables which is created by current doer")]
     public Task<ActionVariable[]> ListActionVariablesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/actions/variables".WithQuery(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+        => GetRequest("user/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
 
     /// <summary>Get a user-level variable which is created by current doer</summary>
     /// <param name="variablename">name of the variable</param>
@@ -530,7 +530,7 @@ public interface IUserApi : IApiScope
     /// <returns>OAuth2ApplicationList represents a list of OAuth2 applications.</returns>
     [ForgejoEndpoint("GET", "/user/applications/oauth2", "List the authenticated user's oauth2 applications")]
     public Task<OAuth2Application[]> ListOAuth2ApplicationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/applications/oauth2".WithQuery(paging), cancelToken).JsonResponseAsync<OAuth2Application[]>(cancelToken);
+        => GetRequest("user/applications/oauth2".WithQuery().Param(paging), cancelToken).JsonResponseAsync<OAuth2Application[]>(cancelToken);
 
     /// <summary>creates a new OAuth2 application</summary>
     /// <param name="options"></param>
@@ -574,7 +574,7 @@ public interface IUserApi : IApiScope
     /// <returns>AccessTokenList represents a list of API access token.</returns>
     [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
     public Task<AccessToken[]> ListUserApiTokensAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/tokens".WithQuery(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
+        => GetRequest($"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
     /// <summary>List the authenticated user&apos;s access tokens</summary>
     /// <param name="auth">BASIC認証情報</param>
@@ -585,7 +585,7 @@ public interface IUserApi : IApiScope
     [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
     [ManualEdit("以前のバージョンではこのAPIの利用にBasic認証情報が必要であった。過去バージョンサーバに対して使えるように残している。")]
     public Task<AccessToken[]> ListUserApiTokensAsync(BasicAuthCredential auth, string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest(auth, $"users/{username}/tokens".WithQuery(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
+        => GetRequest(auth, $"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
     /// <summary>Create an access token</summary>
     /// <param name="auth">BASIC認証情報</param>
@@ -616,7 +616,7 @@ public interface IUserApi : IApiScope
     /// <returns>QuotaUsedArtifactList</returns>
     [ForgejoEndpoint("GET", "/user/quota/artifacts", "List the artifacts affecting the authenticated user's quota")]
     public Task<QuotaUsedArtifact[]> ListQuotaArtifactsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/quota/artifacts".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
+        => GetRequest("user/quota/artifacts".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
 
     /// <summary>List the attachments affecting the authenticated user&apos;s quota</summary>
     /// <param name="paging">ページングオプション</param>
@@ -624,7 +624,7 @@ public interface IUserApi : IApiScope
     /// <returns>QuotaUsedAttachmentList</returns>
     [ForgejoEndpoint("GET", "/user/quota/attachments", "List the attachments affecting the authenticated user's quota")]
     public Task<QuotaUsedAttachment[]> ListQuotaAttachmentsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/quota/attachments".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
+        => GetRequest("user/quota/attachments".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
 
     /// <summary>List the packages affecting the authenticated user&apos;s quota</summary>
     /// <param name="paging">ページングオプション</param>
@@ -632,7 +632,7 @@ public interface IUserApi : IApiScope
     /// <returns>QuotaUsedPackageList</returns>
     [ForgejoEndpoint("GET", "/user/quota/packages", "List the packages affecting the authenticated user's quota")]
     public Task<QuotaUsedPackage[]> ListQuotaPackagesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/quota/packages".WithQuery(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
+        => GetRequest("user/quota/packages".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
 
     /// <summary>Get quota information for the authenticated user</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -649,7 +649,7 @@ public interface IUserApi : IApiScope
     [ManualEdit("Swagger定義にsubjectが無かったので追加")]
     [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
     public Task<bool> CheckQuotaOverAsync(string subject, CancellationToken cancelToken = default)
-        => GetRequest("user/quota/check".WithQuery(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
+        => GetRequest("user/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
     #endregion
 
 }
