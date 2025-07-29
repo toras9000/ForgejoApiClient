@@ -569,35 +569,35 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionRunnerRegistrationTokenAsync()
+    public async Task GetActionsRunnerRegistrationTokenAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var result = await client.User.GetActionRunnerRegistrationTokenAsync();
+        var result = await client.User.GetActionsRunnerRegistrationTokenAsync();
         result.token.Should().NotBeNullOrWhiteSpace();
     }
 
     [TestMethod]
-    public async Task GetActionJobsAsync()
+    public async Task ListActionsJobsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var jobs = await client.User.GetActionJobsAsync("node");
+        var jobs = await client.User.ListActionsJobsAsync("node");
     }
 
     [TestMethod]
-    public async Task ActionSecretScenario()
+    public async Task ActionsSecretScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
         var secretname = $"secret_{DateTime.Now.Ticks:X16}";
-        await client.User.SetActionSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data"));
-        await client.User.SetActionSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data-updated"));
-        await client.User.DeleteActionSecretAsync(secretname);
+        await client.User.SetActionsSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data"));
+        await client.User.SetActionsSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data-updated"));
+        await client.User.DeleteActionsSecretAsync(secretname);
     }
 
     [TestMethod]
-    public async Task ActionVariableScenario()
+    public async Task ActionsVariableScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
@@ -610,21 +610,21 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         var user = await resources.CreateTestUserAsync(userName);
 
         // variable作成
-        await client.User.CreateActionVariableAsync(varName, new(value: "AAA"));
+        await client.User.CreateActionsVariableAsync(varName, new(value: "AAA"));
 
         // variable取得
-        var variable = await client.User.GetActionVariableAsync(varName);
+        var variable = await client.User.GetActionsVariableAsync(varName);
         variable.data.Should().Be("AAA");
 
         // variable更新
-        await client.User.UpdateActionVariableAsync(varName, new(value: "BBB"));
+        await client.User.UpdateActionsVariableAsync(varName, new(value: "BBB"));
 
         // リリースリスト取得
-        var variable_list = await client.User.ListActionVariablesAsync();
+        var variable_list = await client.User.ListActionsVariablesAsync();
         variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
 
         // リリース情報削除
-        await client.User.DeleteActionVariableAsync(varName);
+        await client.User.DeleteActionsVariableAsync(varName);
     }
 
     [TestMethod]

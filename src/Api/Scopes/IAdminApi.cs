@@ -3,7 +3,7 @@
 /// <summary>admin スコープのAPIインタフェース</summary>
 public interface IAdminApi : IApiScope
 {
-    #region Action
+    #region Actions
     /// <summary>List cron tasks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -23,7 +23,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/admin/runners/registration-token", "Get an global actions runner registration token")]
     [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
+    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
         => GetRequest("admin/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
 
     /// <summary>Search action jobs according filter conditions</summary>
@@ -32,7 +32,7 @@ public interface IAdminApi : IApiScope
     /// <returns>RunJobList is a list of action run jobs</returns>
     [ForgejoEndpoint("GET", "/admin/runners/jobs", "Search action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
-    public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
+    public Task<ActionRunJob[]?> ListActionsJobsAsync(string? labels = default, CancellationToken cancelToken = default)
         => GetRequest("admin/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 

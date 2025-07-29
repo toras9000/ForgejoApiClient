@@ -447,12 +447,12 @@ public interface IUserApi : IApiScope
         => DeleteRequest($"user/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action
+    #region Actions
     /// <summary>Get an user&apos;s actions runner registration token</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/user/actions/runners/registration-token", "Get an user's actions runner registration token")]
     [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
+    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
         => GetRequest("user/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
 
     /// <summary>Search for user&apos;s action jobs according filter conditions</summary>
@@ -461,34 +461,34 @@ public interface IUserApi : IApiScope
     /// <returns>RunJobList is a list of action run jobs</returns>
     [ForgejoEndpoint("GET", "/user/actions/runners/jobs", "Search for user's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
-    public Task<ActionRunJob[]?> GetActionJobsAsync(string? labels = default, CancellationToken cancelToken = default)
+    public Task<ActionRunJob[]?> ListActionsJobsAsync(string? labels = default, CancellationToken cancelToken = default)
         => GetRequest("user/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
-    #region Action Secret
+    #region Actions Secret
     /// <summary>Create or Update a secret value in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/user/actions/secrets/{secretname}", "Create or Update a secret value in a user scope")]
-    public Task SetActionSecretAsync(string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
+    public Task SetActionsSecretAsync(string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
         => PutRequest($"user/actions/secrets/{secretname}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Delete a secret in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/user/actions/secrets/{secretname}", "Delete a secret in a user scope")]
-    public Task DeleteActionSecretAsync(string secretname, CancellationToken cancelToken = default)
+    public Task DeleteActionsSecretAsync(string secretname, CancellationToken cancelToken = default)
         => DeleteRequest($"user/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Action Variable
+    #region Actions Variable
     /// <summary>Get the user-level list of variables which is created by current doer</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/user/actions/variables", "Get the user-level list of variables which is created by current doer")]
-    public Task<ActionVariable[]> ListActionVariablesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<ActionVariable[]> ListActionsVariablesAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
 
     /// <summary>Get a user-level variable which is created by current doer</summary>
@@ -496,7 +496,7 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("GET", "/user/actions/variables/{variablename}", "Get a user-level variable which is created by current doer")]
-    public Task<ActionVariable> GetActionVariableAsync(string variablename, CancellationToken cancelToken = default)
+    public Task<ActionVariable> GetActionsVariableAsync(string variablename, CancellationToken cancelToken = default)
         => GetRequest($"user/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
 
     /// <summary>Create a user-level variable</summary>
@@ -504,7 +504,7 @@ public interface IUserApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/user/actions/variables/{variablename}", "Create a user-level variable")]
-    public Task CreateActionVariableAsync(string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
+    public Task CreateActionsVariableAsync(string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
         => PostRequest($"user/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Update a user-level variable which is created by current doer</summary>
@@ -512,14 +512,14 @@ public interface IUserApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/user/actions/variables/{variablename}", "Update a user-level variable which is created by current doer")]
-    public Task UpdateActionVariableAsync(string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
+    public Task UpdateActionsVariableAsync(string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
         => PutRequest($"user/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Delete a user-level variable which is created by current doer</summary>
     /// <param name="variablename">name of the variable</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/user/actions/variables/{variablename}", "Delete a user-level variable which is created by current doer")]
-    public Task DeleteActionVariableAsync(string variablename, CancellationToken cancelToken = default)
+    public Task DeleteActionsVariableAsync(string variablename, CancellationToken cancelToken = default)
         => DeleteRequest($"user/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 

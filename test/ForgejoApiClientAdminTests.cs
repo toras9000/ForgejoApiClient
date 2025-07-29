@@ -23,20 +23,20 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionRunnerRegistrationTokenAsync()
+    public async Task GetActionsRunnerRegistrationTokenAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var result = await client.Admin.GetActionRunnerRegistrationTokenAsync();
+        var result = await client.Admin.GetActionsRunnerRegistrationTokenAsync();
         result.token.Should().NotBeNullOrWhiteSpace();
     }
 
     [TestMethod]
-    public async Task GetActionJobsAsync()
+    public async Task ListActionsJobsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var jobs = await client.Admin.GetActionJobsAsync("node");
+        var jobs = await client.Admin.ListActionsJobsAsync("node");
     }
 
     [TestMethod]
