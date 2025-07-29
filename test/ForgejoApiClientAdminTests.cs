@@ -27,7 +27,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var result = await client.Admin.GetActionRunnerRegistrationTokenAsync();
+        var result = await client.Admin.GetActionsRunnerRegistrationTokenAsync();
         result.token.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -36,7 +36,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var jobs = await client.Admin.GetActionJobsAsync("node");
+        var jobs = await client.Admin.ListActionsJobsAsync("node");
     }
 
     [TestMethod]

@@ -175,7 +175,7 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // テスト対象呼び出し
-        var result = await client.Organization.GetActionRunnerRegistrationTokenAsync(orgName);
+        var result = await client.Organization.GetActionsRunnerRegistrationTokenAsync(orgName);
         result.token.Should().NotBeNullOrWhiteSpace();
     }
 
@@ -192,7 +192,7 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // テスト対象呼び出し
-        var jobs = await client.Organization.GetActionJobsAsync(orgName, "node");
+        var jobs = await client.Organization.ListActionsJobsAsync(orgName, "node");
     }
 
     [TestMethod]
@@ -260,27 +260,27 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // secretの設定
-        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new(data: "AAA"));
-        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new(data: "BBB"));
+        await client.Organization.SetActionsSecretAsync(orgName, secret1Name, new(data: "AAA"));
+        await client.Organization.SetActionsSecretAsync(orgName, secret2Name, new(data: "BBB"));
 
         // secretの取得
-        var secrets1 = await client.Organization.ListActionSecretsAsync(orgName);
+        var secrets1 = await client.Organization.ListActionsSecretsAsync(orgName);
         secrets1.Select(s => s.name).Should().BeEquivalentTo([secret1Name, secret2Name], config: c => c.Using(StringComparer.OrdinalIgnoreCase));
 
         // secretの更新
-        await client.Organization.SetActionSecretAsync(orgName, secret1Name, new(data: "CCC"));
-        await client.Organization.SetActionSecretAsync(orgName, secret2Name, new(data: "DDD"));
+        await client.Organization.SetActionsSecretAsync(orgName, secret1Name, new(data: "CCC"));
+        await client.Organization.SetActionsSecretAsync(orgName, secret2Name, new(data: "DDD"));
 
         // secretの取得
-        var secrets2 = await client.Organization.ListActionSecretsAsync(orgName);
+        var secrets2 = await client.Organization.ListActionsSecretsAsync(orgName);
         secrets2.Select(s => s.name).Should().BeEquivalentTo([secret1Name, secret2Name], config: c => c.Using(StringComparer.OrdinalIgnoreCase));
 
         // secretの削除
-        await client.Organization.DeleteActionSecretAsync(orgName, secret1Name);
-        await client.Organization.DeleteActionSecretAsync(orgName, secret2Name);
+        await client.Organization.DeleteActionsSecretAsync(orgName, secret1Name);
+        await client.Organization.DeleteActionsSecretAsync(orgName, secret2Name);
 
         // secretの取得
-        var secrets3 = await client.Organization.ListActionSecretsAsync(orgName);
+        var secrets3 = await client.Organization.ListActionsSecretsAsync(orgName);
         secrets3.Should().BeEmpty();
     }
 
@@ -298,21 +298,21 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
 
         // variable作成
-        await client.Organization.CreateActionVariableAsync(orgName, varName, new(value: "AAA"));
+        await client.Organization.CreateActionsVariableAsync(orgName, varName, new(value: "AAA"));
 
         // variable取得
-        var variable = await client.Organization.GetActionVariableAsync(orgName, varName);
+        var variable = await client.Organization.GetActionsVariableAsync(orgName, varName);
         variable.data.Should().Be("AAA");
 
         // variable更新
-        await client.Organization.UpdateActionVariableAsync(orgName, varName, new(value: "BBB"));
+        await client.Organization.UpdateActionsVariableAsync(orgName, varName, new(value: "BBB"));
 
         // リリースリスト取得
-        var variable_list = await client.Organization.ListActionVariablesAsync(orgName);
+        var variable_list = await client.Organization.ListActionsVariablesAsync(orgName);
         variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
 
         // リリース情報削除
-        await client.Organization.DeleteActionVariableAsync(orgName, varName);
+        await client.Organization.DeleteActionsVariableAsync(orgName, varName);
     }
 
     [TestMethod]

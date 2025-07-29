@@ -445,7 +445,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         content.path.Should().Be("aaa.cs");
 
         // BLOB一覧取得
-        var blobs = await client.Repository.GetBlobsAsync(ownerName, repoName, content_list.Select(c => c.sha).JoinString(","));
+        var blobs = await client.Repository.ListBlobsAsync(ownerName, repoName, content_list.Select(c => c.sha).JoinString(","));
         blobs.Should().NotBeEmpty();
 
         // BLOB取得
@@ -788,13 +788,13 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        await client.Repository.DispatchActionWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main"));
+        await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main"));
 
         // タスク取得
-        var tasks = await client.Repository.GetActionTasksAsync(repoOwner, repoName);
+        var tasks = await client.Repository.ListActionsTasksAsync(repoOwner, repoName);
 
         // ジョブ取得
-        var jobs = await client.Repository.GetActionJobsAsync(repoOwner, repoName, "node");
+        var jobs = await client.Repository.ListActionsJobsAsync(repoOwner, repoName, "node");
 
         // 実行一覧取得
         var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName,
@@ -822,14 +822,14 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // secret 設定
-        await client.Repository.SetActionSecretAsync(this.TestTokenUser, repoName, "secret1", new(data: "AAA"));
+        await client.Repository.SetActionsSecretAsync(this.TestTokenUser, repoName, "secret1", new(data: "AAA"));
 
         // secret リスト取得
-        var secrets = await client.Repository.ListActionSecretsAsync(this.TestTokenUser, repoName);
+        var secrets = await client.Repository.ListActionsSecretsAsync(this.TestTokenUser, repoName);
         secrets.Should().Contain(s => string.Equals(s.name, "secret1", StringComparison.OrdinalIgnoreCase));
 
         // secret 削除
-        await client.Repository.DeleteActionSecretAsync(this.TestTokenUser, repoName, "secret1");
+        await client.Repository.DeleteActionsSecretAsync(this.TestTokenUser, repoName, "secret1");
     }
 
     [TestMethod]
@@ -847,21 +847,21 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // variable作成
-        await client.Repository.CreateActionVariableAsync(repoOwner, repoName, varName, new(value: "AAA"));
+        await client.Repository.CreateActionsVariableAsync(repoOwner, repoName, varName, new(value: "AAA"));
 
         // variable取得
-        var variable = await client.Repository.GetActionVariableAsync(repoOwner, repoName, varName);
+        var variable = await client.Repository.GetActionsVariableAsync(repoOwner, repoName, varName);
         variable.data.Should().Be("AAA");
 
         // variable更新
-        await client.Repository.UpdateActionVariableAsync(repoOwner, repoName, varName, new(value: "BBB"));
+        await client.Repository.UpdateActionsVariableAsync(repoOwner, repoName, varName, new(value: "BBB"));
 
         // リリースリスト取得
-        var variable_list = await client.Repository.ListActionVariablesAsync(repoOwner, repoName);
+        var variable_list = await client.Repository.ListActionsVariablesAsync(repoOwner, repoName);
         variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase));
 
         // リリース情報削除
-        await client.Repository.DeleteActionVariableAsync(repoOwner, repoName, varName);
+        await client.Repository.DeleteActionsVariableAsync(repoOwner, repoName, varName);
 
         // 追加検証
         Assert.Inconclusive("ListActionVariablesAsync で変数値が得られない。バグ？");
@@ -1919,14 +1919,14 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await client.Repository.AddTopicAsync(repoOwner, repoName, "AAA");
 
         // トピック取得
-        var topic1 = await client.Repository.GetTopicsAsync(repoOwner, repoName);
+        var topic1 = await client.Repository.ListTopicsAsync(repoOwner, repoName);
         topic1.topics.Should().Contain(t => comparer.Equals(t, "AAA"));
 
         // トピック置換
         await client.Repository.ReplaceTopicsAsync(repoOwner, repoName, new(topics: ["BBB", "CCC"]));
 
         // トピック取得
-        var topic2 = await client.Repository.GetTopicsAsync(repoOwner, repoName);
+        var topic2 = await client.Repository.ListTopicsAsync(repoOwner, repoName);
         topic2.topics.Should().NotContain(t => comparer.Equals(t, "AAA")).And.Contain(t => comparer.Equals(t, "BBB")).And.Contain(t => comparer.Equals(t, "CCC"));
 
         // トピック検索
@@ -2021,7 +2021,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         wiki_list.Should().Contain(w => w.title == "DDD");
 
         // Wikiページ更新履歴取得
-        var wiki_revs = await client.Repository.GetWikiPageRevisionsAsync(repoOwner, repoName, "DDD");
+        var wiki_revs = await client.Repository.ListWikiPageRevisionsAsync(repoOwner, repoName, "DDD");
         wiki_revs.count.Should().BeGreaterThanOrEqualTo(1);
 
         // Wikiページ削除
@@ -2155,7 +2155,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
 
         // 言語情報取得。少し時間が経たないと情報が得られないようなのでしばらく繰り返して取得する。
         var languages = await TestCallHelper.Satisfy(
-            caller: breaker => client.Repository.GetCodeLanguagesAsync(this.TestTokenUser, repoName, cancelToken: breaker),
+            caller: breaker => client.Repository.ListCodeLanguagesAsync(this.TestTokenUser, repoName, cancelToken: breaker),
             condition: languages => 0 < languages.Count
         );
     }
@@ -2174,7 +2174,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // テスト対象呼び出し
-        var result = await client.Repository.GetActionRunnerRegistrationTokenAsync(ownerName, repoName);
+        var result = await client.Repository.GetActionsRunnerRegistrationTokenAsync(ownerName, repoName);
         result.token.Should().NotBeNullOrWhiteSpace();
     }
 

@@ -25,7 +25,7 @@ public class ForgejoApiClientPackageTests : ForgejoApiClientTestsBase
         var pkg_list = await client.Package.ListAsync(ownerName);
 
         // パッケージファイルリスト取得
-        var pkg_files = await client.Package.GetFilesAsync(ownerName, "nuget", pkgName, pkgVer);
+        var pkg_files = await client.Package.ListFilesAsync(ownerName, "nuget", pkgName, pkgVer);
 
         // テスト用のリポジトリを作成
         var repoName = $"repo-{DateTime.Now.Ticks:X16}";

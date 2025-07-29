@@ -43,7 +43,7 @@ public interface IPackageApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>PackageFileList</returns>
     [ForgejoEndpoint("GET", "/packages/{owner}/{type}/{name}/{version}/files", "Gets all files of a package")]
-    public Task<PackageFile[]> GetFilesAsync(string owner, string type, string name, string version, CancellationToken cancelToken = default)
+    public Task<PackageFile[]> ListFilesAsync(string owner, string type, string name, string version, CancellationToken cancelToken = default)
         => GetRequest($"packages/{owner}/{type}/{name}/{version}/files", cancelToken).JsonResponseAsync<PackageFile[]>(cancelToken);
 
     /// <summary>Link a package to a repository</summary>

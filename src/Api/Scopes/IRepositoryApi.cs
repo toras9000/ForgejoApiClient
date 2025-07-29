@@ -494,7 +494,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>GitBlobList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/blobs", "Gets multiplbe blobs of a repository.")]
-    public Task<GitBlob[]> GetBlobsAsync(string owner, string repo, string shas, CancellationToken cancelToken = default)
+    public Task<GitBlob[]> ListBlobsAsync(string owner, string repo, string shas, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/git/blobs".WithQuery().Param(shas), cancelToken).JsonResponseAsync<GitBlob[]>(cancelToken);
 
     /// <summary>Gets the blob of a repository.</summary>
@@ -712,7 +712,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/registration-token", "Get a repository's actions runner registration token")]
     [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
+    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
 
     /// <summary>List a repository&apos;s action tasks</summary>
@@ -722,7 +722,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>TasksList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/tasks", "List a repository's action tasks")]
-    public Task<ActionTaskResponse> GetActionTasksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<ActionTaskResponse> ListActionsTasksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
 
     /// <summary>Dispatches a workflow</summary>
@@ -733,7 +733,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", "Dispatches a workflow")]
     [ManualEdit("swagger 定義の戻り値が得られる状況が不明のため、戻り値無しにしている")]
-    public Task DispatchActionWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
+    public Task DispatchActionsWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Search for repository&apos;s action jobs according filter conditions</summary>
@@ -744,7 +744,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RunJobList is a list of action run jobs</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/jobs", "Search for repository's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
-    public Task<ActionRunJob[]?> GetActionJobsAsync(string owner, string repo, string? labels = default, CancellationToken cancelToken = default)
+    public Task<ActionRunJob[]?> ListActionsJobsAsync(string owner, string repo, string? labels = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
 
     /// <summary>List a repository&apos;s action runs</summary>
@@ -780,7 +780,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>SecretList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/secrets", "List an repo's actions secrets")]
-    public Task<Secret[]> ListActionSecretsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<Secret[]> ListActionsSecretsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
 
     /// <summary>Create or Update a secret value in a repository</summary>
@@ -790,7 +790,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Create or Update a secret value in a repository")]
-    public Task SetActionSecretAsync(string owner, string repo, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
+    public Task SetActionsSecretAsync(string owner, string repo, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Delete a secret in a repository</summary>
@@ -799,7 +799,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="secretname">name of the secret</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Delete a secret in a repository")]
-    public Task DeleteActionSecretAsync(string owner, string repo, string secretname, CancellationToken cancelToken = default)
+    public Task DeleteActionsSecretAsync(string owner, string repo, string secretname, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
@@ -811,7 +811,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables", "Get repo-level variables list")]
-    public Task<ActionVariable[]> ListActionVariablesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<ActionVariable[]> ListActionsVariablesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
 
     /// <summary>Get a repo-level variable</summary>
@@ -821,7 +821,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Get a repo-level variable")]
-    public Task<ActionVariable> GetActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
+    public Task<ActionVariable> GetActionsVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
 
     /// <summary>Create a repo-level variable</summary>
@@ -831,7 +831,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Create a repo-level variable")]
-    public Task CreateActionVariableAsync(string owner, string repo, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
+    public Task CreateActionsVariableAsync(string owner, string repo, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Update a repo-level variable</summary>
@@ -841,7 +841,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Update a repo-level variable")]
-    public Task UpdateActionVariableAsync(string owner, string repo, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
+    public Task UpdateActionsVariableAsync(string owner, string repo, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Delete a repo-level variable</summary>
@@ -852,7 +852,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Delete a repo-level variable")]
     [ManualEdit("Swaggerの戻り値定義誤りを訂正")]
-    public Task DeleteActionVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
+    public Task DeleteActionsVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     #endregion
@@ -1698,7 +1698,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>TopicNames</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/topics", "Get list of topics that a repository has")]
-    public Task<TopicName> GetTopicsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
+    public Task<TopicName> ListTopicsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/topics".WithQuery().Param(paging), cancelToken).JsonResponseAsync<TopicName>(cancelToken);
 
     /// <summary>search topics via keyword</summary>
@@ -1828,7 +1828,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>WikiCommitList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/wiki/revisions/{pageName}", "Get revisions of a wiki page")]
-    public Task<WikiCommitList> GetWikiPageRevisionsAsync(string owner, string repo, string pageName, int? page = default, CancellationToken cancelToken = default)
+    public Task<WikiCommitList> ListWikiPageRevisionsAsync(string owner, string repo, string pageName, int? page = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/wiki/revisions/{pageName}".WithQuery().Param(page), cancelToken).JsonResponseAsync<WikiCommitList>(cancelToken);
     #endregion
 
@@ -1887,7 +1887,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>LanguageStatistics</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/languages", "Get languages and number of bytes of code written")]
-    public Task<IDictionary<string, long>> GetCodeLanguagesAsync(string owner, string repo, CancellationToken cancelToken = default)
+    public Task<IDictionary<string, long>> ListCodeLanguagesAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/languages", cancelToken).JsonResponseAsync<IDictionary<string, long>>(cancelToken);
 
     /// <summary>List a repo&apos;s stargazers</summary>
