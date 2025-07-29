@@ -16,9 +16,6 @@ public interface IApiClient : IDisposable
     #endregion
 
     #region APIカテゴリ
-    /// <summary>activitypub スコープのAPIインタフェース</summary>
-    public IActivityPubApi ActivityPub { get; }
-
     /// <summary>admin スコープのAPIインタフェース</summary>
     public IAdminApi Admin { get; }
 

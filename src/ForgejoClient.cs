@@ -47,9 +47,6 @@ public class ForgejoClient : IApiClient, IDisposable
     #endregion
 
     #region APIカテゴリ
-    /// <summary>activitypub スコープのAPIインタフェース</summary>
-    public IActivityPubApi ActivityPub => this.core.ActivityPub;
-
     /// <summary>admin スコープのAPIインタフェース</summary>
     public IAdminApi Admin => this.core.Admin;
 
@@ -171,7 +168,6 @@ public class ForgejoClient : IApiClient, IDisposable
             }
 
             // スコープごとのAPIインタフェースオブジェクトを生成
-            this.ActivityPub = new ActivityPubApi(this);
             this.Admin = new AdminApi(this);
             this.Issue = new IssueApi(this);
             this.Miscellaneous = new MiscellaneousApi(this);
@@ -199,9 +195,6 @@ public class ForgejoClient : IApiClient, IDisposable
         #endregion
 
         #region APIカテゴリ
-        /// <summary>activitypub スコープのAPIインタフェース</summary>
-        public IActivityPubApi ActivityPub { get; }
-
         /// <summary>admin スコープのAPIインタフェース</summary>
         public IAdminApi Admin { get; }
 
@@ -249,9 +242,6 @@ public class ForgejoClient : IApiClient, IDisposable
             Uri IApiScope.BaseUrl => core.BaseUri;
             HttpClient IApiScope.Http => core.http;
         }
-
-        /// <summary>activitypub スコープのAPIインタフェース実装クラス</summary>
-        private class ActivityPubApi(ForgejoClientCore client) : ApiScopeBase(client), IActivityPubApi;
 
         /// <summary>admin スコープのAPIインタフェース実装クラス</summary>
         private class AdminApi(ForgejoClientCore client) : ApiScopeBase(client), IAdminApi;
