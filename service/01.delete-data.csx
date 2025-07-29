@@ -1,10 +1,10 @@
-#r "nuget: Lestaly, 0.84.0"
+#r "nuget: Lestaly.General, 0.100.0"
 #nullable enable
 using System.Text.Json;
 using Lestaly;
 using Lestaly.Cx;
 
-return await Paved.ProceedAsync(async () =>
+return await Paved.ProceedAsync(noPause: Args.RoughContains("--no-pause"), async () =>
 {
     // コンテナを停止
     WriteLine("Stop service ...");

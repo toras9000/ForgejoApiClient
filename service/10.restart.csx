@@ -1,11 +1,10 @@
-#r "nuget: Lestaly, 0.84.0"
+#r "nuget: Lestaly.General, 0.100.0"
 #r "nuget: AngleSharp, 1.3.0"
 #nullable enable
 using System.Threading;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using DocumentFormat.OpenXml.InkML;
 using Lestaly;
 using Lestaly.Cx;
 
@@ -60,7 +59,7 @@ var composes = new
 record TestUserCredential(string Username, string Password);
 record TestServiceInfo(string Url, TestUserCredential Admin, string Token);
 
-return await Paved.ProceedAsync(async () =>
+return await Paved.ProceedAsync(noPause: Args.RoughContains("--no-pause"), async () =>
 {
     using var signal = new SignalCancellationPeriod();
     using var outenc = ConsoleWig.OutputEncodingPeriod(Encoding.UTF8);

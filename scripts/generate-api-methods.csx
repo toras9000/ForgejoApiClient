@@ -1,6 +1,6 @@
 #r "nuget: NSwag.CodeGeneration.CSharp, 14.4.0"
 #r "nuget: Humanizer.Core, 2.14.1"
-#r "nuget: Lestaly, 0.84.0"
+#r "nuget: Lestaly.General, 0.100.0"
 #r "nuget: Kokuban, 0.2.0"
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
