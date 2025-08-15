@@ -1,6 +1,6 @@
-#r "nuget: NSwag.CodeGeneration.CSharp, 14.4.0"
+#r "nuget: NSwag.CodeGeneration.CSharp, 14.5.0"
 #r "nuget: Humanizer.Core, 2.14.1"
-#r "nuget: Lestaly.General, 0.100.0"
+#r "nuget: Lestaly.General, 0.102.0"
 #r "nuget: Kokuban, 0.2.0"
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
@@ -72,6 +72,15 @@ return await Paved.ProceedAsync(async () =>
     settings.CSharpGeneratorSettings.DictionaryBaseType = "Dictionary";
     settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
     settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes = true;
+    settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
+    settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes = true;
+    settings.CSharpGeneratorSettings.ClassStyle = CSharpClassStyle.Record;
+    settings.CSharpGeneratorSettings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
+    settings.CSharpGeneratorSettings.JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson;
+    settings.CSharpGeneratorSettings.GenerateDataAnnotations = false;
+    settings.CSharpGeneratorSettings.InlineNamedArrays = true;
+    settings.CSharpGeneratorSettings.InlineNamedDictionaries = true;
+    settings.CSharpGeneratorSettings.InlineNamedTuples = true;
     settings.ResponseArrayType = "ICollection";
     settings.ResponseDictionaryType = "IDictionary";
     settings.ParameterArrayType = "ICollection";
@@ -270,6 +279,13 @@ static ApiEndpoint InterpretApiEndpoint(this GenerationContext context, OpenApiO
         var elemType = arayMatch.Groups[1].Value;
         resultType = $"{elemType}[]";
     }
+
+    // レスポンスの有無が変化する場合、nullableに補正する
+    if (resultType != GenerationConstants.NothingResult && opModel.Responses.Any(r => r.StatusCode == "204"))
+    {
+        resultType = resultType.EnsureEnds("?");
+    }
+
     var result = new ApiResult(resultType, opModel.ResultDescription);
 
     return new ApiEndpoint(categories, description.Path, description.Method, opModel.IsDeprecated, opModel.Summary, parameters, result);

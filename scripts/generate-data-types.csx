@@ -1,6 +1,6 @@
-#r "nuget: NSwag.CodeGeneration.CSharp, 14.3.0"
+#r "nuget: NSwag.CodeGeneration.CSharp, 14.5.0"
 #r "nuget: Kokuban, 0.2.0"
-#r "nuget: Lestaly.General, 0.100.0"
+#r "nuget: Lestaly.General, 0.102.0"
 #nullable enable
 using System.Security;
 using Kokuban;
@@ -61,6 +61,13 @@ return await Paved.ProceedAsync(async () =>
     settings.DictionaryBaseType = "Dictionary";
     settings.GenerateOptionalPropertiesAsNullable = true;
     settings.GenerateNullableReferenceTypes = true;
+    settings.ClassStyle = CSharpClassStyle.Record;
+    settings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
+    settings.JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson;
+    settings.GenerateDataAnnotations = false;
+    settings.InlineNamedArrays = true;
+    settings.InlineNamedDictionaries = true;
+    settings.InlineNamedTuples = true;
 
     // 型リゾルバに定義された型と、プロパティで利用されている列挙型を登録する
     var resolver = new CSharpTypeResolver(settings);
