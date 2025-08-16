@@ -765,7 +765,6 @@ public record CreateGPGKeyOption(
 /// <param name="authorization_header"></param>
 /// <param name="branch_filter"></param>
 /// <param name="events"></param>
-[ManualEdit("config プロパティの型を変更")]
 public record CreateHookOption(
     IDictionary<string, string> config,
     CreateHookOptionType type,
@@ -2027,13 +2026,12 @@ public record IssueMeta(
 /// <param name="name"></param>
 /// <param name="ref"></param>
 /// <param name="title"></param>
-[ManualEdit("labels プロパティの型を変更")]
 public record IssueTemplate(
     string? about = default,
     ICollection<IssueFormField>? body = default,
     string? content = default,
     string? file_name = default,
-    string[]? labels = default,
+    ICollection<string>? labels = default,
     string? name = default,
     string? @ref = default,
     string? title = default
@@ -2773,9 +2771,8 @@ public record QuotaGroup(
 /// <summary>QuotaInfo represents information about a user&apos;s quota</summary>
 /// <param name="groups"></param>
 /// <param name="used"></param>
-[ManualEdit("groups プロパティの型を変更")]
 public record QuotaInfo(
-    CreateQuotaGroupOptions[]? groups = default,
+    ICollection<QuotaGroup>? groups = default,
     QuotaUsed? used = default
 );
 
