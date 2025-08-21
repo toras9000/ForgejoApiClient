@@ -731,10 +731,10 @@ public interface IRepositoryApi : IApiScope
     /// <param name="workflowname">name of the workflow</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>DispatchWorkflowRun is a Workflow Run after dispatching</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", "Dispatches a workflow")]
-    [ManualEdit("swagger 定義の戻り値が得られる状況が不明のため、戻り値無しにしている")]
-    public Task DispatchActionsWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    public Task<DispatchWorkflowRun?> DispatchActionsWorkflowAsync(string owner, string repo, string workflowname, DispatchWorkflowOption options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowname}/dispatches", options, cancelToken).JsonResponseAsync<DispatchWorkflowRun?>(cancelToken);
 
     /// <summary>Search for repository&apos;s action jobs according filter conditions</summary>
     /// <param name="owner">owner of the repo</param>

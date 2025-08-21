@@ -787,8 +787,9 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         """.ReplaceLineEndings("\n");
         var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
 
-        // ワークフロー実行
-        await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main"));
+        // ワークフロー実行 (戻り情報無し)
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: false));
+        runInfo.Should().BeNull();
 
         // タスク取得
         var tasks = await client.Repository.ListActionsTasksAsync(repoOwner, repoName);
@@ -807,6 +808,37 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // 実行単独取得
         var run = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runs.workflow_runs.First().id!.Value);
         run.id.Should().Be(runs.workflow_runs.First().id!.Value);
+    }
+
+
+    [TestMethod]
+    public async Task DispatchActionWorkflowAsync_ReturnInfo()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: node
+            steps:
+              - run: echo All Good
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行 (戻り情報無し)
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        Assert.IsNotNull(runInfo);
     }
 
     [TestMethod]

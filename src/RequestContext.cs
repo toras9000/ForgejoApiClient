@@ -30,6 +30,9 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
             // 空の応答の場合もある。空応答を期待する場合はデコードせずに。
             if (typeof(EmptyResult).Equals(typeof(TResult))) return default!;
 
+            // リクエストのオプションによって結果の有無が変化するAPIもある。コンテンツ無し応答の場合はデコードしない。
+            if (rsp.StatusCode == System.Net.HttpStatusCode.NoContent) return default!;
+
             // JSON応答を取得
             var json = await rsp.Content.ReadFromJsonAsync<TResult>(options: JsonResponseOptions, cancelToken).ConfigureAwait(false);
             return json!;
