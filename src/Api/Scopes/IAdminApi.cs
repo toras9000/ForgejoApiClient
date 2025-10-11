@@ -21,10 +21,10 @@ public interface IAdminApi : IApiScope
 
     /// <summary>Get an global actions runner registration token</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
     [ForgejoEndpoint("GET", "/admin/runners/registration-token", "Get an global actions runner registration token")]
-    [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
-        => GetRequest("admin/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
+        => GetRequest("admin/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
 
     /// <summary>Search action jobs according filter conditions</summary>
     /// <param name="labels">a comma separated list of run job labels to search for</param>
@@ -37,30 +37,30 @@ public interface IAdminApi : IApiScope
     #endregion
 
     #region Profile
-    /// <summary>List all emails</summary>
+    /// <summary>List all users&apos; email addresses</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>EmailList</returns>
-    [ForgejoEndpoint("GET", "/admin/emails", "List all emails")]
+    [ForgejoEndpoint("GET", "/admin/emails", "List all users' email addresses")]
     public Task<Email[]> ListEmailsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("admin/emails".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
 
-    /// <summary>Search all emails</summary>
+    /// <summary>Search users&apos; email addresses</summary>
     /// <param name="q">keyword</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>EmailList</returns>
-    [ForgejoEndpoint("GET", "/admin/emails/search", "Search all emails")]
+    [ForgejoEndpoint("GET", "/admin/emails/search", "Search users' email addresses")]
     public Task<Email[]> SearchEmailsAsync(string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("admin/emails/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
     #endregion
 
     #region Webhook
-    /// <summary>List system&apos;s webhooks</summary>
+    /// <summary>List global (system) webhooks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>HookList</returns>
-    [ForgejoEndpoint("GET", "/admin/hooks", "List system's webhooks")]
+    [ForgejoEndpoint("GET", "/admin/hooks", "List global (system) webhooks")]
     public Task<Hook[]> ListSystemWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("admin/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
 
@@ -164,11 +164,11 @@ public interface IAdminApi : IApiScope
     public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
 
-    /// <summary>Create a user</summary>
+    /// <summary>Create a user account</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>User</returns>
-    [ForgejoEndpoint("POST", "/admin/users", "Create a user")]
+    [ForgejoEndpoint("POST", "/admin/users", "Create a user account")]
     public Task<User> CreateUserAsync(CreateUserOption options, CancellationToken cancelToken = default)
         => PostRequest("admin/users", options, cancelToken).JsonResponseAsync<User>(cancelToken);
 
@@ -189,30 +189,30 @@ public interface IAdminApi : IApiScope
     public Task RenameUserAsync(string username, RenameUserOption options, CancellationToken cancelToken = default)
         => PostRequest($"admin/users/{username}/rename", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Delete a user</summary>
+    /// <summary>Delete user account</summary>
     /// <param name="username">username of user to delete</param>
     /// <param name="purge">purge the user from the system completely</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/admin/users/{username}", "Delete a user")]
+    [ForgejoEndpoint("DELETE", "/admin/users/{username}", "Delete user account")]
     public Task DeleteUserAsync(string username, bool? purge = default, CancellationToken cancelToken = default)
         => DeleteRequest($"admin/users/{username}".WithQuery().Param(purge), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region Key
-    /// <summary>Add a public key on behalf of a user</summary>
+    /// <summary>Add an SSH public key to user&apos;s account</summary>
     /// <param name="username">username of the user</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>PublicKey</returns>
-    [ForgejoEndpoint("POST", "/admin/users/{username}/keys", "Add a public key on behalf of a user")]
+    [ForgejoEndpoint("POST", "/admin/users/{username}/keys", "Add an SSH public key to user's account")]
     public Task<PublicKey> AddUserPublicKeyAsync(string username, CreateKeyOption options, CancellationToken cancelToken = default)
         => PostRequest($"admin/users/{username}/keys", options, cancelToken).JsonResponseAsync<PublicKey>(cancelToken);
 
-    /// <summary>Delete a user&apos;s public key</summary>
+    /// <summary>Remove a public key from user&apos;s account</summary>
     /// <param name="username">username of user</param>
     /// <param name="id">id of the key to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/admin/users/{username}/keys/{id}", "Delete a user's public key")]
+    [ForgejoEndpoint("DELETE", "/admin/users/{username}/keys/{id}", "Remove a public key from user's account")]
     public Task DeleteUserPublicKeyAsync(string username, long id, CancellationToken cancelToken = default)
         => DeleteRequest($"admin/users/{username}/keys/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion

@@ -11,53 +11,53 @@ public interface IUserApi : IApiScope
     public Task<User> GetMeAsync(CancellationToken cancelToken = default)
         => GetRequest("user", cancelToken).JsonResponseAsync<User>(cancelToken);
 
-    /// <summary>List the authenticated user&apos;s email addresses</summary>
+    /// <summary>List all email addresses of the current user</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>EmailList</returns>
-    [ForgejoEndpoint("GET", "/user/emails", "List the authenticated user's email addresses")]
+    [ForgejoEndpoint("GET", "/user/emails", "List all email addresses of the current user")]
     public Task<Email[]> ListEmailsAsync(CancellationToken cancelToken = default)
         => GetRequest("user/emails", cancelToken).JsonResponseAsync<Email[]>(cancelToken);
 
-    /// <summary>Add email addresses</summary>
+    /// <summary>Add an email addresses to the current user&apos;s account</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>EmailList</returns>
-    [ForgejoEndpoint("POST", "/user/emails", "Add email addresses")]
+    [ForgejoEndpoint("POST", "/user/emails", "Add an email addresses to the current user's account")]
     public Task<Email[]> AddEmailAsync(CreateEmailOption options, CancellationToken cancelToken = default)
         => PostRequest("user/emails", options, cancelToken).JsonResponseAsync<Email[]>(cancelToken);
 
-    /// <summary>Delete email addresses</summary>
+    /// <summary>Delete email addresses from the current user&apos;s account</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/user/emails", "Delete email addresses")]
+    [ForgejoEndpoint("DELETE", "/user/emails", "Delete email addresses from the current user's account")]
     public Task DeleteEmailAsync(DeleteEmailOption options, CancellationToken cancelToken = default)
         => DeleteRequest("user/emails", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Update Avatar</summary>
+    /// <summary>Update avatar of the current user</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("POST", "/user/avatar", "Update Avatar")]
+    [ForgejoEndpoint("POST", "/user/avatar", "Update avatar of the current user")]
     public Task UpdateAvatarAsync(UpdateUserAvatarOption options, CancellationToken cancelToken = default)
         => PostRequest("user/avatar", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Delete Avatar</summary>
+    /// <summary>Delete avatar of the current user. It will be replaced by a default one</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/user/avatar", "Delete Avatar")]
+    [ForgejoEndpoint("DELETE", "/user/avatar", "Delete avatar of the current user. It will be replaced by a default one")]
     public Task DeleteAvatarAsync(CancellationToken cancelToken = default)
         => DeleteRequest("user/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Get user settings</summary>
+    /// <summary>Get current user&apos;s account settings</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserSettings</returns>
-    [ForgejoEndpoint("GET", "/user/settings", "Get user settings")]
+    [ForgejoEndpoint("GET", "/user/settings", "Get current user's account settings")]
     public Task<UserSettings> GetSettingsAsync(CancellationToken cancelToken = default)
         => GetRequest("user/settings", cancelToken).JsonResponseAsync<UserSettings>(cancelToken);
 
-    /// <summary>Update user settings</summary>
+    /// <summary>Update settings in current user&apos;s account</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserSettings</returns>
-    [ForgejoEndpoint("PATCH", "/user/settings", "Update user settings")]
+    [ForgejoEndpoint("PATCH", "/user/settings", "Update settings in current user's account")]
     public Task<UserSettings> UpdateSettingsAsync(UserSettingsOptions options, CancellationToken cancelToken = default)
         => PatchRequest("user/settings", options, cancelToken).JsonResponseAsync<UserSettings>(cancelToken);
 
@@ -98,17 +98,17 @@ public interface IUserApi : IApiScope
     public Task<BlockedUser[]> ListBlockedUsersAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/list_blocked".WithQuery().Param(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
 
-    /// <summary>Blocks a user from the doer.</summary>
+    /// <summary>Blocks a user from the doer</summary>
     /// <param name="username">username of the user</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("PUT", "/user/block/{username}", "Blocks a user from the doer.")]
+    [ForgejoEndpoint("PUT", "/user/block/{username}", "Blocks a user from the doer")]
     public Task BlockUserAsync(string username, CancellationToken cancelToken = default)
         => PutRequest($"user/block/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Unblocks a user from the doer.</summary>
+    /// <summary>Unblocks a user from the doer</summary>
     /// <param name="username">username of the user</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("PUT", "/user/unblock/{username}", "Unblocks a user from the doer.")]
+    [ForgejoEndpoint("PUT", "/user/unblock/{username}", "Unblocks a user from the doer")]
     public Task UnblockUserAsync(string username, CancellationToken cancelToken = default)
         => PutRequest($"user/unblock/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
@@ -221,13 +221,13 @@ public interface IUserApi : IApiScope
     /// <summary>Search for users</summary>
     /// <param name="q">keyword</param>
     /// <param name="uid">ID of the user to search for</param>
+    /// <param name="sort">sort order of results</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>SearchResults of a successful search</returns>
     [ForgejoEndpoint("GET", "/users/search", "Search for users")]
-    [ManualEdit("結果値に独自定義型を利用")]
-    public Task<UserSearchResults> SearchAsync(string? q = default, long? uid = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("users/search".WithQuery().Param(q).Param(uid).Param(paging), cancelToken).JsonResponseAsync<UserSearchResults>(cancelToken);
+    public Task<UserSearchResults> SearchAsync(string? q = default, long? uid = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("users/search".WithQuery().Param(q).Param(uid).Param(sort).Param(paging), cancelToken).JsonResponseAsync<UserSearchResults>(cancelToken);
 
     /// <summary>Get a user</summary>
     /// <param name="username">username of user to get</param>
@@ -318,7 +318,6 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>GPGKey</returns>
     [ForgejoEndpoint("POST", "/user/gpg_key_verify", "Verify a GPG key")]
-    [ManualEdit("Swagger定義に options が無かったので追加")]
     public Task<GPGKey> VerifyGpgKeyTokenAsync(VerifyGPGKeyOption options, CancellationToken cancelToken = default)
         => PostRequest("user/gpg_key_verify", options, cancelToken).JsonResponseAsync<GPGKey>(cancelToken);
 
@@ -338,18 +337,18 @@ public interface IUserApi : IApiScope
     public Task<GPGKey> GetGpgKeyAsync(long id, CancellationToken cancelToken = default)
         => GetRequest($"user/gpg_keys/{id}", cancelToken).JsonResponseAsync<GPGKey>(cancelToken);
 
-    /// <summary>Create a GPG key</summary>
+    /// <summary>Add a GPG public key to current user&apos;s account</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>GPGKey</returns>
-    [ForgejoEndpoint("POST", "/user/gpg_keys", "Create a GPG key")]
+    [ForgejoEndpoint("POST", "/user/gpg_keys", "Add a GPG public key to current user's account")]
     public Task<GPGKey> CreateGpgKeyAsync(CreateGPGKeyOption options, CancellationToken cancelToken = default)
         => PostRequest("user/gpg_keys", options, cancelToken).JsonResponseAsync<GPGKey>(cancelToken);
 
-    /// <summary>Remove a GPG key</summary>
+    /// <summary>Remove a GPG public key from current user&apos;s account</summary>
     /// <param name="id">id of key to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/user/gpg_keys/{id}", "Remove a GPG key")]
+    [ForgejoEndpoint("DELETE", "/user/gpg_keys/{id}", "Remove a GPG public key from current user's account")]
     public Task DeleteGpgKeyAsync(long id, CancellationToken cancelToken = default)
         => DeleteRequest($"user/gpg_keys/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
@@ -450,10 +449,10 @@ public interface IUserApi : IApiScope
     #region Actions
     /// <summary>Get an user&apos;s actions runner registration token</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
     [ForgejoEndpoint("GET", "/user/actions/runners/registration-token", "Get an user's actions runner registration token")]
-    [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
-        => GetRequest("user/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
+        => GetRequest("user/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
 
     /// <summary>Search for user&apos;s action jobs according filter conditions</summary>
     /// <param name="labels">a comma separated list of run job labels to search for</param>
@@ -532,35 +531,35 @@ public interface IUserApi : IApiScope
     public Task<OAuth2Application[]> ListOAuth2ApplicationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/applications/oauth2".WithQuery().Param(paging), cancelToken).JsonResponseAsync<OAuth2Application[]>(cancelToken);
 
-    /// <summary>creates a new OAuth2 application</summary>
+    /// <summary>Creates a new OAuth2 application</summary>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
-    [ForgejoEndpoint("POST", "/user/applications/oauth2", "creates a new OAuth2 application")]
+    [ForgejoEndpoint("POST", "/user/applications/oauth2", "Creates a new OAuth2 application")]
     public Task<OAuth2Application> CreateOAuth2ApplicationAsync(CreateOAuth2ApplicationOptions options, CancellationToken cancelToken = default)
         => PostRequest("user/applications/oauth2", options, cancelToken).JsonResponseAsync<OAuth2Application>(cancelToken);
 
-    /// <summary>get an OAuth2 Application</summary>
+    /// <summary>Get an OAuth2 application</summary>
     /// <param name="id">Application ID to be found</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
-    [ForgejoEndpoint("GET", "/user/applications/oauth2/{id}", "get an OAuth2 Application")]
+    [ForgejoEndpoint("GET", "/user/applications/oauth2/{id}", "Get an OAuth2 application")]
     public Task<OAuth2Application> GetOAuth2ApplicationAsync(long id, CancellationToken cancelToken = default)
         => GetRequest($"user/applications/oauth2/{id}", cancelToken).JsonResponseAsync<OAuth2Application>(cancelToken);
 
-    /// <summary>update an OAuth2 Application, this includes regenerating the client secret</summary>
+    /// <summary>Update an OAuth2 application, this includes regenerating the client secret</summary>
     /// <param name="id">application to be updated</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
-    [ForgejoEndpoint("PATCH", "/user/applications/oauth2/{id}", "update an OAuth2 Application, this includes regenerating the client secret")]
+    [ForgejoEndpoint("PATCH", "/user/applications/oauth2/{id}", "Update an OAuth2 application, this includes regenerating the client secret")]
     public Task<OAuth2Application> UpdateOAuth2ApplicationAsync(long id, CreateOAuth2ApplicationOptions options, CancellationToken cancelToken = default)
         => PatchRequest($"user/applications/oauth2/{id}", options, cancelToken).JsonResponseAsync<OAuth2Application>(cancelToken);
 
-    /// <summary>delete an OAuth2 Application</summary>
+    /// <summary>Delete an OAuth2 application</summary>
     /// <param name="id">token to be deleted</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/user/applications/oauth2/{id}", "delete an OAuth2 Application")]
+    [ForgejoEndpoint("DELETE", "/user/applications/oauth2/{id}", "Delete an OAuth2 application")]
     public Task DeleteOAuth2ApplicationAsync(long id, CancellationToken cancelToken = default)
         => DeleteRequest($"user/applications/oauth2/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
@@ -587,23 +586,23 @@ public interface IUserApi : IApiScope
     public Task<AccessToken[]> ListUserApiTokensAsync(BasicAuthCredential auth, string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest(auth, $"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
-    /// <summary>Create an access token</summary>
+    /// <summary>Generate an access token for the current user</summary>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>AccessToken represents an API access token.</returns>
-    [ForgejoEndpoint("POST", "/users/{username}/tokens", "Create an access token")]
+    [ForgejoEndpoint("POST", "/users/{username}/tokens", "Generate an access token for the current user")]
     [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
     public Task<AccessToken> CreateUserApiTokenAsync(BasicAuthCredential auth, string username, CreateAccessTokenOption options, CancellationToken cancelToken = default)
         => PostRequest(auth, $"users/{username}/tokens", options, cancelToken).JsonResponseAsync<AccessToken>(cancelToken);
 
-    /// <summary>delete an access token</summary>
+    /// <summary>Delete an access token from current user&apos;s account</summary>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="token">token to be deleted, identified by ID and if not available by name</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/users/{username}/tokens/{token}", "delete an access token")]
+    [ForgejoEndpoint("DELETE", "/users/{username}/tokens/{token}", "Delete an access token from current user's account")]
     [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
     public Task DeleteUserApiTokenAsync(BasicAuthCredential auth, string username, string token, CancellationToken cancelToken = default)
         => DeleteRequest(auth, $"users/{username}/tokens/{token}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
@@ -642,12 +641,10 @@ public interface IUserApi : IApiScope
         => GetRequest("user/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
 
     /// <summary>Check if the authenticated user is over quota for a given subject</summary>
+    /// <param name="subject">subject of the quota</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <param name="subject">quota limit subject</param>
-    /// <returns>quota compliance</returns>
+    /// <returns>Returns true if the action is accepted.</returns>
     [ForgejoEndpoint("GET", "/user/quota/check", "Check if the authenticated user is over quota for a given subject")]
-    [ManualEdit("Swagger定義にsubjectが無かったので追加")]
-    [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
     public Task<bool> CheckQuotaOverAsync(string subject, CancellationToken cancelToken = default)
         => GetRequest("user/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
     #endregion

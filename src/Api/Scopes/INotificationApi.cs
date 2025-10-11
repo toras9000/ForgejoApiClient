@@ -31,7 +31,6 @@ public interface INotificationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>NotificationThreadList</returns>
     [ForgejoEndpoint("PUT", "/notifications", "Mark notification threads as read, pinned or unread")]
-    [ManualEdit("all パラメータの型を変更")]
     public Task<NotificationThread[]> MarkAsync(DateTimeOffset? last_read_at = default, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, CancellationToken cancelToken = default)
         => PutRequest("notifications".WithQuery().Param(last_read_at).Param(all).Param(status_types).Param(to_status), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
 
@@ -40,7 +39,6 @@ public interface INotificationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>NotificationThread</returns>
     [ForgejoEndpoint("GET", "/notifications/threads/{id}", "Get notification thread by ID")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task<NotificationThread> GetThreadAsync(long id, CancellationToken cancelToken = default)
         => GetRequest($"notifications/threads/{id}", cancelToken).JsonResponseAsync<NotificationThread>(cancelToken);
 
@@ -50,7 +48,6 @@ public interface INotificationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>NotificationThread</returns>
     [ForgejoEndpoint("PATCH", "/notifications/threads/{id}", "Mark notification thread as read by ID")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task<NotificationThread> MarkThreadAsync(long id, string? to_status = default, CancellationToken cancelToken = default)
         => PatchRequest($"notifications/threads/{id}".WithQuery().Param(to_status), cancelToken).JsonResponseAsync<NotificationThread>(cancelToken);
 
@@ -79,7 +76,6 @@ public interface INotificationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>NotificationThreadList</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/notifications", "Mark notification threads as read, pinned or unread on a specific repo")]
-    [ManualEdit("all パラメータの型を変更")]
     public Task<NotificationThread[]> MarkRepositoryThreadsAsync(string owner, string repo, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, DateTimeOffset? last_read_at = default, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(to_status).Param(last_read_at), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
 

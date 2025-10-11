@@ -4,11 +4,11 @@
 public interface IOrganizationApi : IApiScope
 {
     #region Organization
-    /// <summary>Get list of organizations</summary>
+    /// <summary>List all organizations</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OrganizationList</returns>
-    [ForgejoEndpoint("GET", "/orgs", "Get list of organizations")]
+    [ForgejoEndpoint("GET", "/orgs", "List all organizations")]
     public Task<Organization[]> ListAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
 
@@ -161,18 +161,18 @@ public interface IOrganizationApi : IApiScope
     public Task<Activity[]> ListActivitiesAsync(string org, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
 
-    /// <summary>Update Avatar</summary>
+    /// <summary>Update an organization&apos;s avatar</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("POST", "/orgs/{org}/avatar", "Update Avatar")]
+    [ForgejoEndpoint("POST", "/orgs/{org}/avatar", "Update an organization's avatar")]
     public Task UpdateAvatarAsync(string org, UpdateUserAvatarOption options, CancellationToken cancelToken = default)
         => PostRequest($"orgs/{org}/avatar", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Delete Avatar</summary>
+    /// <summary>Delete an organization&apos;s avatar. It will be replaced by a default one</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/orgs/{org}/avatar", "Delete Avatar")]
+    [ForgejoEndpoint("DELETE", "/orgs/{org}/avatar", "Delete an organization's avatar. It will be replaced by a default one")]
     public Task DeleteAvatarAsync(string org, CancellationToken cancelToken = default)
         => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
@@ -181,10 +181,10 @@ public interface IOrganizationApi : IApiScope
     /// <summary>Get an organization&apos;s actions runner registration token</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/registration-token", "Get an organization's actions runner registration token")]
-    [ManualEdit("結果値が得られるため独自型を定義して利用")]
-    public Task<RegistrationTokenResult> GetActionsRunnerRegistrationTokenAsync(string org, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationTokenResult>(cancelToken);
+    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(string org, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
 
     /// <summary>Search for organization&apos;s action jobs according filter conditions</summary>
     /// <param name="org">name of the organization</param>
@@ -198,12 +198,12 @@ public interface IOrganizationApi : IApiScope
     #endregion
 
     #region Actions Secret
-    /// <summary>List an organization&apos;s actions secrets</summary>
+    /// <summary>List actions secrets of an organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>SecretList</returns>
-    [ForgejoEndpoint("GET", "/orgs/{org}/actions/secrets", "List an organization's actions secrets")]
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/secrets", "List actions secrets of an organization")]
     public Task<Secret[]> ListActionsSecretsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
 
@@ -226,49 +226,47 @@ public interface IOrganizationApi : IApiScope
     #endregion
 
     #region Actions Variable
-    /// <summary>Get an org-level variables list</summary>
+    /// <summary>List variables of an organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>VariableList</returns>
-    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables", "Get an org-level variables list")]
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables", "List variables of an organization")]
     public Task<ActionVariable[]> ListActionsVariablesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
 
-    /// <summary>Get an org-level variable</summary>
+    /// <summary>Get organization&apos;s variable by name</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="variablename">name of the variable</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ActionVariable</returns>
-    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables/{variablename}", "Get an org-level variable")]
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables/{variablename}", "Get organization's variable by name")]
     public Task<ActionVariable> GetActionsVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
 
-    /// <summary>Create an org-level variable</summary>
+    /// <summary>Create a new variable in organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="variablename">name of the variable</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("POST", "/orgs/{org}/actions/variables/{variablename}", "Create an org-level variable")]
+    [ForgejoEndpoint("POST", "/orgs/{org}/actions/variables/{variablename}", "Create a new variable in organization")]
     public Task CreateActionsVariableAsync(string org, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
         => PostRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Update an org-level variable</summary>
+    /// <summary>Update variable in organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="variablename">name of the variable</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("PUT", "/orgs/{org}/actions/variables/{variablename}", "Update an org-level variable")]
+    [ForgejoEndpoint("PUT", "/orgs/{org}/actions/variables/{variablename}", "Update variable in organization")]
     public Task UpdateActionsVariableAsync(string org, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
         => PutRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
-    /// <summary>Delete an org-level variable</summary>
+    /// <summary>Delete organization&apos;s variable by name</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="variablename">name of the variable</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>ActionVariable</returns>
-    [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/variables/{variablename}", "Delete an org-level variable")]
-    [ManualEdit("Swaggerの戻り値定義誤りを訂正")]
+    [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/variables/{variablename}", "Delete organization's variable by name")]
     public Task DeleteActionsVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
         => DeleteRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
@@ -350,12 +348,13 @@ public interface IOrganizationApi : IApiScope
     #region Lable
     /// <summary>List an organization&apos;s labels</summary>
     /// <param name="org">name of the organization</param>
+    /// <param name="sort">Specifies the sorting method: mostissues, leastissues, or reversealphabetically.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>LabelList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/labels", "List an organization's labels")]
-    public Task<Label[]> ListLabelsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/labels".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
+    public Task<Label[]> ListLabelsAsync(string org, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/labels".WithQuery().Param(sort).Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
 
     /// <summary>Get a single label</summary>
     /// <param name="org">name of the organization</param>
@@ -412,7 +411,6 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>SearchResults of a successful search</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/teams/search", "Search for teams within an organization")]
-    [ManualEdit("結果値に独自定義型を利用")]
     public Task<TeamSearchResults> SearchTeamsAsync(string org, string? q = default, bool? include_desc = default, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/teams/search".WithQuery().Param(q).Param(include_desc).Param(paging), cancelToken).JsonResponseAsync<TeamSearchResults>(cancelToken);
 
@@ -439,7 +437,6 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Team</returns>
     [ForgejoEndpoint("PATCH", "/teams/{id}", "Edit a team")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task<Team> UpdateTeamAsync(long id, EditTeamOption options, CancellationToken cancelToken = default)
         => PatchRequest($"teams/{id}", options, cancelToken).JsonResponseAsync<Team>(cancelToken);
 
@@ -585,12 +582,10 @@ public interface IOrganizationApi : IApiScope
 
     /// <summary>Check if the organization is over quota for a given subject</summary>
     /// <param name="org">name of the organization</param>
-    /// <param name="subject">quota limit subject</param>
+    /// <param name="subject">subject of the quota</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>quota compliance</returns>
+    /// <returns>Returns true if the action is accepted.</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/check", "Check if the organization is over quota for a given subject")]
-    [ManualEdit("Swagger定義にsubjectが無かったので追加")]
-    [ManualEdit("このAPIはbodyでbooleanを返すように見受けられるのでそれに合わせた戻り値定義")]
     public Task<bool> CheckQuotaOverAsync(string org, string subject, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
     #endregion

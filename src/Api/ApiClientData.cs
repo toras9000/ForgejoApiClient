@@ -115,14 +115,6 @@ public record UserSearchResults(bool ok, User[] data);
 /// <param name="token">トークン</param>
 public record RegistrationTokenResult(string token);
 
-/// <summary>PGP検証パラメータ型</summary>
-/// <param name="key_id">GPGキーID</param>
-/// <param name="armored_signature">Armor形式のGPG署名</param>
-public record VerifyGPGKeyOption(
-    string key_id,
-    string? armored_signature = default
-);
-
 /// <summary>トピック検索結果型</summary>
 /// <param name="topics">検索結果</param>
 public record TopicSearchResults(TopicResponse[] topics);

@@ -74,6 +74,18 @@ public record APIValidationError(
 );
 
 /// <summary></summary>
+/// <param name="actor_id"></param>
+/// <param name="note"></param>
+/// <param name="original_item"></param>
+/// <param name="original_url"></param>
+public record APPersonFollowItem(
+    string? actor_id = default,
+    string? note = default,
+    string? original_item = default,
+    string? original_url = default
+);
+
+/// <summary></summary>
 /// <param name="id"></param>
 /// <param name="name"></param>
 /// <param name="scopes"></param>
@@ -923,6 +935,7 @@ public record CreatePullReviewOptions(
 );
 
 /// <summary></summary>
+/// <param name="branch_filter"></param>
 /// <param name="interval"></param>
 /// <param name="remote_address"></param>
 /// <param name="remote_password"></param>
@@ -930,6 +943,7 @@ public record CreatePullReviewOptions(
 /// <param name="sync_on_commit"></param>
 /// <param name="use_ssh"></param>
 public record CreatePushMirrorOption(
+    string? branch_filter = default,
     string? interval = default,
     string? remote_address = default,
     string? remote_password = default,
@@ -2739,6 +2753,7 @@ public record PullReviewRequestOptions(
 );
 
 /// <summary>PushMirror represents information of a push mirror</summary>
+/// <param name="branch_filter"></param>
 /// <param name="created"></param>
 /// <param name="interval"></param>
 /// <param name="last_error"></param>
@@ -2749,6 +2764,7 @@ public record PullReviewRequestOptions(
 /// <param name="repo_name"></param>
 /// <param name="sync_on_commit"></param>
 public record PushMirror(
+    string? branch_filter = default,
     DateTimeOffset? created = default,
     string? interval = default,
     string? last_error = default,
@@ -2894,6 +2910,12 @@ public record Reference(
     GitObject? @object = default,
     string? @ref = default,
     string? url = default
+);
+
+/// <summary>RegistrationToken is a string used to register a runner with a server</summary>
+/// <param name="token"></param>
+public record RegistrationToken(
+    string? token = default
 );
 
 /// <summary>Release represents a repository release</summary>
@@ -3541,6 +3563,14 @@ public record UserSettingsOptions(
     string? pronouns = default,
     string? theme = default,
     string? website = default
+);
+
+/// <summary>VerifyGPGKeyOption options verifies user GPG key</summary>
+/// <param name="key_id">An Signature for a GPG key token</param>
+/// <param name="armored_signature"></param>
+public record VerifyGPGKeyOption(
+    string key_id,
+    string? armored_signature = default
 );
 
 /// <summary>WatchInfo represents an API watch status of one repository</summary>

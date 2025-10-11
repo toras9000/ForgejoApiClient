@@ -45,6 +45,43 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task ConvertMirroredAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo1-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = await client.Repository.CreateFileAsync(repoOwner, repoName, "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
+
+        // リポジトリのマイグレーション
+        var migrate_addr = $"http://localhost:3000/{repoOwner}/{repoName}";
+        var migrate_name = $"repo2-{DateTime.Now.Ticks:X16}";
+        var migrate_options = new MigrateRepoOptions(
+            clone_addr: migrate_addr,
+            repo_owner: repoOwner,
+            repo_name: migrate_name,
+            auth_token: this.TestToken,
+            mirror: true
+        );
+        var migrated = await client.Repository.MigrateAsync(migrate_options);
+        migrated.mirror.Should().BeTrue();
+
+        // ミラーの同期
+        var converted = await client.Repository.ConvertUnmirrorAsync(repoOwner, migrate_name);
+        converted.mirror.Should().BeFalse();
+
+        // 後始末
+        await client.Repository.DeleteAsync(repoOwner, migrate_name);
+    }
+
+    [TestMethod]
     public async Task RepositorySenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -810,7 +847,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         run.id.Should().Be(runs.workflow_runs.First().id!.Value);
     }
 
-
     [TestMethod]
     public async Task DispatchActionWorkflowAsync_ReturnInfo()
     {
@@ -839,6 +875,24 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // ワークフロー実行 (戻り情報無し)
         var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
         Assert.IsNotNull(runInfo);
+    }
+
+    [TestMethod]
+    public async Task ListActionsJobsAsync_Nothing()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // ジョブ取得
+        var jobs = await client.Repository.ListActionsJobsAsync(repoOwner, repoName);
+        jobs.Should().BeNull(); // 取得対象が無い場合に null が返る動作に変更があれば検出できるようにこれをチェックしている。
     }
 
     [TestMethod]

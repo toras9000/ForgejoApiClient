@@ -20,12 +20,13 @@ public interface IIssueApi : IApiScope
     /// <param name="reviewed">Filter pull requests reviewed by the authenticated user</param>
     /// <param name="owner">Filter by repository owner</param>
     /// <param name="team">Filter by team (requires organization owner parameter)</param>
+    /// <param name="sort">Type of sort</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>IssueList</returns>
     [ForgejoEndpoint("GET", "/repos/issues/search", "Search for issues across the repositories that the user has access to")]
-    public Task<Issue[]> SearchAsync(string? state = default, string? labels = default, string? milestones = default, string? q = default, long? priority_repo_id = default, string? type = default, DateTimeOffset? since = default, DateTimeOffset? before = default, bool? assigned = default, bool? created = default, bool? mentioned = default, bool? review_requested = default, bool? reviewed = default, string? owner = default, string? team = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("repos/issues/search".WithQuery().Param(state).Param(labels).Param(milestones).Param(q).Param(priority_repo_id).Param(type).Param(since).Param(before).Param(assigned).Param(created).Param(mentioned).Param(review_requested).Param(reviewed).Param(owner).Param(team).Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
+    public Task<Issue[]> SearchAsync(string? state = default, string? labels = default, string? milestones = default, string? q = default, long? priority_repo_id = default, string? type = default, DateTimeOffset? since = default, DateTimeOffset? before = default, bool? assigned = default, bool? created = default, bool? mentioned = default, bool? review_requested = default, bool? reviewed = default, string? owner = default, string? team = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("repos/issues/search".WithQuery().Param(state).Param(labels).Param(milestones).Param(q).Param(priority_repo_id).Param(type).Param(since).Param(before).Param(assigned).Param(created).Param(mentioned).Param(review_requested).Param(reviewed).Param(owner).Param(team).Param(sort).Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
 
     /// <summary>List a repository&apos;s issues</summary>
     /// <param name="owner">owner of the repo</param>
@@ -213,8 +214,8 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Comment</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/comments/{id}", "Get a comment")]
-    public Task<Comment> GetCommentAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issues/comments/{id}", cancelToken).JsonResponseAsync<Comment>(cancelToken);
+    public Task<Comment?> GetCommentAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/issues/comments/{id}", cancelToken).JsonResponseAsync<Comment?>(cancelToken);
 
     /// <summary>Add a comment to an issue</summary>
     /// <param name="owner">owner of the repo</param>
@@ -235,8 +236,8 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Comment</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/issues/comments/{id}", "Edit a comment")]
-    public Task<Comment> UpdateCommentAsync(string owner, string repo, long id, EditIssueCommentOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/issues/comments/{id}", options, cancelToken).JsonResponseAsync<Comment>(cancelToken);
+    public Task<Comment?> UpdateCommentAsync(string owner, string repo, long id, EditIssueCommentOption options, CancellationToken cancelToken = default)
+        => PatchRequest($"repos/{owner}/{repo}/issues/comments/{id}", options, cancelToken).JsonResponseAsync<Comment?>(cancelToken);
 
     /// <summary>Delete a comment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -348,7 +349,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>IssueList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/{index}/blocks", "List issues that are blocked by this issue")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue[]> ListBlockedAsync(string owner, string repo, long index, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/{index}/blocks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
 
@@ -360,7 +360,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Issue</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/issues/{index}/blocks", "Block the issue given in the body by the issue in path")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue> BlockAsync(string owner, string repo, long index, IssueMeta options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/issues/{index}/blocks", options, cancelToken).JsonResponseAsync<Issue>(cancelToken);
 
@@ -372,7 +371,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Issue</returns>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/issues/{index}/blocks", "Unblock the issue given in the body by the issue in path")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue> UnblockAsync(string owner, string repo, long index, IssueMeta options, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/blocks", options, cancelToken).JsonResponseAsync<Issue>(cancelToken);
     #endregion
@@ -386,7 +384,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>IssueList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/{index}/dependencies", "List an issue's dependencies, i.e all issues that block this issue.")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue[]> ListDependenciesAsync(string owner, string repo, long index, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/{index}/dependencies".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
 
@@ -398,7 +395,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Issue</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/issues/{index}/dependencies", "Make the issue in the url depend on the issue in the form.")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue> MakeDependencyAsync(string owner, string repo, long index, IssueMeta options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/issues/{index}/dependencies", options, cancelToken).JsonResponseAsync<Issue>(cancelToken);
 
@@ -410,7 +406,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Issue</returns>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/issues/{index}/dependencies", "Remove an issue dependency")]
-    [ManualEdit("index パラメータの型を変更")]
     public Task<Issue> RemoveDependencyAsync(string owner, string repo, long index, IssueMeta options, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/dependencies", options, cancelToken).JsonResponseAsync<Issue>(cancelToken);
     #endregion
@@ -432,12 +427,13 @@ public interface IIssueApi : IApiScope
     /// <summary>Get all of a repository&apos;s labels</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
+    /// <param name="sort">Specifies the sorting method: mostissues, leastissues, or reversealphabetically.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>LabelList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/labels", "Get all of a repository's labels")]
-    public Task<Label[]> ListRepositoryLabelsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/labels".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
+    public Task<Label[]> ListRepositoryLabelsAsync(string owner, string repo, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/labels".WithQuery().Param(sort).Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
 
     /// <summary>Get a single label</summary>
     /// <param name="owner">owner of the repo</param>
@@ -517,12 +513,12 @@ public interface IIssueApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="index">index of the issue</param>
-    /// <param name="id">id of the label to remove</param>
+    /// <param name="identifier">name or id of the label to remove</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/issues/{index}/labels/{id}", "Remove a label from an issue")]
-    public Task RemoveIssueLabelAsync(string owner, string repo, long index, long id, DeleteLabelsOption options, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/labels/{id}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/issues/{index}/labels/{identifier}", "Remove a label from an issue")]
+    public Task RemoveIssueLabelAsync(string owner, string repo, long index, string identifier, DeleteLabelsOption options, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/labels/{identifier}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
 
     /// <summary>Remove all labels from an issue</summary>
     /// <param name="owner">owner of the repo</param>
@@ -718,7 +714,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Milestone</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/milestones/{id}", "Get a milestone")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task<Milestone> GetMilestoneAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/milestones/{id}", cancelToken).JsonResponseAsync<Milestone>(cancelToken);
 
@@ -740,7 +735,6 @@ public interface IIssueApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Milestone</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/milestones/{id}", "Update a milestone")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task<Milestone> UpdateMilestoneAsync(string owner, string repo, long id, EditMilestoneOption options, CancellationToken cancelToken = default)
         => PatchRequest($"repos/{owner}/{repo}/milestones/{id}", options, cancelToken).JsonResponseAsync<Milestone>(cancelToken);
 
@@ -750,7 +744,6 @@ public interface IIssueApi : IApiScope
     /// <param name="id">the milestone to delete, identified by ID and if not available by name</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/milestones/{id}", "Delete a milestone")]
-    [ManualEdit("id パラメータの型を変更")]
     public Task DeleteMilestoneAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/milestones/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion

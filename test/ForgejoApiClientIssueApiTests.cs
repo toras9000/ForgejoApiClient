@@ -203,10 +203,12 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
 
         // 検証
         comment_created.body.Should().Be("comment");
+        comment_created_get.Should().NotBeNull();
         comment_created_get.body.Should().Be("comment");
         comment_created_list.Should().Contain(i => i.body == "comment");
         comment_created_list_repo.Should().Contain(i => i.body == "comment");
 
+        comment_updated.Should().NotBeNull();
         comment_updated.body.Should().Be("comment-updated");
         comment_updated_list.Should().Contain(i => i.body == "comment-updated");
 
@@ -501,7 +503,7 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
         var lavel_replaced = await client.Issue.ReplaceIssueLabelsAsync(repoOwner, repoName, issue.number!.Value, new(labels: [label1.id!.Value]));
 
         // ラベル除去
-        await client.Issue.RemoveIssueLabelAsync(repoOwner, repoName, issue.number!.Value, label1.id!.Value, new());
+        await client.Issue.RemoveIssueLabelAsync(repoOwner, repoName, issue.number!.Value, $"{label1.id}", new());
 
         // ラベル作成
         var label_removed = await client.Issue.ListIssueLabelsAsync(repoOwner, repoName, issue.number!.Value);
