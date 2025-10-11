@@ -72,8 +72,6 @@ return await Paved.ProceedAsync(async () =>
     settings.CSharpGeneratorSettings.DictionaryBaseType = "Dictionary";
     settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
     settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes = true;
-    settings.CSharpGeneratorSettings.GenerateOptionalPropertiesAsNullable = true;
-    settings.CSharpGeneratorSettings.GenerateNullableReferenceTypes = true;
     settings.CSharpGeneratorSettings.ClassStyle = CSharpClassStyle.Record;
     settings.CSharpGeneratorSettings.JsonLibrary = CSharpJsonLibrary.SystemTextJson;
     settings.CSharpGeneratorSettings.JsonPolymorphicSerializationStyle = CSharpJsonPolymorphicSerializationStyle.SystemTextJson;
@@ -168,7 +166,8 @@ record ApiParameter(OpenApiParameterKind Kind, string Name, string Variable, str
 /// <summary>API結果値情報</summary>
 /// <param name="Type">結果値の型</param>
 /// <param name="Description">結果値の説明</param>
-record ApiResult(string Type, string Description);
+/// <param name="Download">ダウンロードレスポンスか否か</param>
+record ApiResult(string Type, string Description, bool Download = false);
 
 /// <summary>APIエンドポイント情報</summary>
 /// <param name="Categories">APIカテゴリ(スコープ)</param>
@@ -274,19 +273,24 @@ static ApiEndpoint InterpretApiEndpoint(this GenerationContext context, OpenApiO
 
     // 戻り値の配列型を具体型に置き換え
     var resultType = opModel.SyncResultType;
+    var rspDownload = false;
     if (resultType.Match("ICollection<(.*)>") is var arayMatch && arayMatch.Success)
     {
         var elemType = arayMatch.Groups[1].Value;
         resultType = $"{elemType}[]";
     }
 
+    // レスポンスを nullable として扱うべき状態を判定
+    var isNullable = opModel.SuccessResponse?.ActualResponseSchema?.IsNullableRaw == true;
+    if (resultType != GenerationConstants.NothingResult && opModel.Responses.Any(r => r.StatusCode == "204")) isNullable = true;
+
     // レスポンスの有無が変化する場合、nullableに補正する
-    if (resultType != GenerationConstants.NothingResult && opModel.Responses.Any(r => r.StatusCode == "204"))
+    if (isNullable)
     {
         resultType = resultType.EnsureEnds("?");
     }
 
-    var result = new ApiResult(resultType, opModel.ResultDescription);
+    var result = new ApiResult(resultType, opModel.ResultDescription, rspDownload);
 
     return new ApiEndpoint(categories, description.Path, description.Method, opModel.IsDeprecated, opModel.Summary, parameters, result);
 }
@@ -423,11 +427,12 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     }
 
     // メソッドシグネチャコードを生成
-    var retType = ep.Result.Type switch
-    {
-        GenerationConstants.NothingResult => ep.IsGET() ? "Task<StatusCodeResult>" : "Task",
-        _ => $"Task<{ep.Result.Type}>",
-    };
+    var retType = ep.Result.Download ? "Task<ResponseResult<DownloadResult>>"
+                : ep.Result.Type switch
+                {
+                    GenerationConstants.NothingResult => ep.IsGET() ? "Task<StatusCodeResult>" : "Task",
+                    _ => $"Task<{ep.Result.Type}>",
+                };
     yield return $"""public {retType} {methodName}({paramsBuilder}CancellationToken cancelToken = default)""";
 
     // APIエンドポイントパスを作成
@@ -478,12 +483,13 @@ IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
     }
 
     // 結果取得コード
-    var resultTaker = ep.Result.Type switch
-    {
-        GenerationConstants.NothingResult => ep.IsGET() ? ".StatusResponseAsync(cancelToken)" : ".JsonResponseAsync<EmptyResult>(cancelToken)",
-        GenerationConstants.StringResult => ".TextResponseAsync(cancelToken)",
-        _ => $".JsonResponseAsync<{ep.Result.Type}>(cancelToken)",
-    };
+    var resultTaker = ep.Result.Download ? ".DownloadResponseAsync(cancelToken)"
+                    : ep.Result.Type switch
+                    {
+                        GenerationConstants.NothingResult => ep.IsGET() ? ".StatusResponseAsync(cancelToken)" : ".JsonResponseAsync<EmptyResult>(cancelToken)",
+                        GenerationConstants.StringResult => ".TextResponseAsync(cancelToken)",
+                        _ => $".JsonResponseAsync<{ep.Result.Type}>(cancelToken)",
+                    };
 
     // API呼び出し処理コードを生成
     yield return $"""    => {ep.Method.Pascalize()}Request({apiPath}{bodyArg}, cancelToken){resultTaker};""";
