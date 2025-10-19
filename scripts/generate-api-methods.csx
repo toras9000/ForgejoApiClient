@@ -271,9 +271,12 @@ static ApiEndpoint InterpretApiEndpoint(this GenerationContext context, OpenApiO
     var opModel = new CSharpOperationModel(description.Operation, context.Generator.Settings, context.Generator, context.Resolver);
     var parameters = opModel.Parameters.Select(p => context.InterpretParameter(p)).OrderBy(p => p.Kind).ToArray();
 
+    // ダウンロードレスポンスであるか判定
+    var rspDownload = description.Operation.Responses.Where(r => r.Key == "200").Any(r => r.Value.Schema?.Type == NJsonSchema.JsonObjectType.File)
+        || description.Operation.Produces?.Any(p => p == "application/octet-stream") == true;
+
     // 戻り値の配列型を具体型に置き換え
     var resultType = opModel.SyncResultType;
-    var rspDownload = false;
     if (resultType.Match("ICollection<(.*)>") is var arayMatch && arayMatch.Success)
     {
         var elemType = arayMatch.Groups[1].Value;

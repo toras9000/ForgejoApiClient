@@ -521,7 +521,6 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/media/{filepath}", "Get a file or it's LFS object from a repository")]
-    [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
     public Task<ResponseResult<DownloadResult>> GetObjectAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/media/{filepath}".WithQuery().Param(@ref), cancelToken).DownloadResponseAsync(cancelToken);
 
@@ -533,7 +532,6 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/raw/{filepath}", "Get a file from a repository")]
-    [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
     public Task<ResponseResult<DownloadResult>> GetFileAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/raw/{filepath}".WithQuery().Param(@ref), cancelToken).DownloadResponseAsync(cancelToken);
 
@@ -1852,7 +1850,6 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>success</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/archive/{archive}", "Get an archive of a repository")]
-    [ManualEdit("応答本文のデータを利用するため独自定義の結果型を使用")]
     public Task<ResponseResult<DownloadResult>> GetArchiveAsync(string owner, string repo, string archive, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/archive/{archive}", cancelToken).DownloadResponseAsync(cancelToken);
 
