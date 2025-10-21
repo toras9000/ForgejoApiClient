@@ -1,7 +1,7 @@
 name: forgejo-for-library-test
 services:
   app:
-    image: codeberg.org/forgejo/forgejo:13.0.0
+    image: codeberg.org/forgejo/forgejo:13.0.3
     restart: unless-stopped
     healthcheck:
       test: curl -f -s http://localhost:3000 || exit 1
