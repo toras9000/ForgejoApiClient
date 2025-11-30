@@ -1,0 +1,7 @@
+{
+    "dotnet.projects.enableFileBasedPrograms": true,
+    "dotnet.server.useOmnisharp": false,
+    "files.associations": {
+        "*.cs1": "csharp"
+    }
+}

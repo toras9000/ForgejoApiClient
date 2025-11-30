@@ -1,0 +1,6 @@
+#!/usr/bin/env -S dotnet run --file
+#:package Lestaly.General@0.114.0
+using Lestaly;
+using Lestaly.Cx;
+
+await "dotnet".args("run", "--file", ThisSource.RelativeFile("10.restart.cs1"), "--", "--bind-mount").interactive();

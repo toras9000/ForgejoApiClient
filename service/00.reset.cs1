@@ -1,0 +1,11 @@
+#!/usr/bin/env -S dotnet run --file
+#:package Lestaly.General@0.114.0
+using Lestaly;
+using Lestaly.Cx;
+
+return await Paved.ProceedAsync(async () =>
+{
+    await "dotnet".args("run", "--file", ThisSource.RelativeFile("01.delete-data.cs1"), "--no-pause").echo();
+    await "dotnet".args("run", "--file", ThisSource.RelativeFile("10.restart.cs1"), "--no-pause").echo();
+    await "dotnet".args("run", "--file", ThisSource.RelativeFile("@show-service.cs1"), "--no-pause").echo();
+});

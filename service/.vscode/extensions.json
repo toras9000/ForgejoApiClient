@@ -1,0 +1,8 @@
+{
+    "unwantedRecommendations": [
+        "ms-dotnettools.csdevkit"
+    ],
+    "recommendations": [
+        "ms-dotnettools.csharp"
+    ]
+}

@@ -1,21 +1,21 @@
-#r "nuget: Lestaly.General, 0.105.0"
-#nullable enable
+#!/usr/bin/env -S dotnet run --file
+#:package Lestaly.General@0.114.0
 using System.Text.Json;
 using Lestaly;
 using Lestaly.Cx;
 
-return await Paved.ProceedAsync(noPause: Args.RoughContains("--no-pause"), async () =>
+return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async () =>
 {
     // コンテナを停止
-    WriteLine("Stop service ...");
+    Console.WriteLine("Stop service ...");
     var composeFile = ThisSource.RelativeFile("./docker/compose.yml");
     var mountVolumeFile = ThisSource.RelativeFile("./docker/mount-volume.yml");
     await "docker".args("compose", "--file", composeFile, "--file", mountVolumeFile, "down", "--remove-orphans", "--volumes").result().success();
-    WriteLine();
+    Console.WriteLine();
 
     // データディレクトリを削除
-    WriteLine("Delete data directory ...");
+    Console.WriteLine("Delete data directory ...");
     var volumesDir = ThisSource.RelativeDirectory("./docker/volumes");
     volumesDir.DeleteRecurse();
-    WriteLine();
+    Console.WriteLine();
 });
