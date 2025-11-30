@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/ForgejoApiClient.csproj" />
+  <Project Path="test/ForgejoApiClientTests.csproj" />
+</Solution>
