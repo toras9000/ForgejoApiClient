@@ -26,7 +26,7 @@ public static class TestPackageHelperExtensions
         var nugetFeed = new Uri(self.TestService, $"/api/packages/{owner}/nuget/index.json");
         var nugetRepo = NuGet.Protocol.Core.Types.Repository.Factory.GetCoreV3(nugetFeed.AbsoluteUri);
         var nugetUpdater = await nugetRepo.GetResourceAsync<PackageUpdateResource>();
-        await nugetUpdater.Push(
+        await nugetUpdater.PushAsync(
             packagePaths: [pkgFile.FullName],
             symbolSource: default,
             timeoutInSecond: 60,
@@ -35,7 +35,8 @@ public static class TestPackageHelperExtensions
             getSymbolApiKey: _ => self.TestToken,
             noServiceEndpoint: false,
             skipDuplicate: true,
-            symbolPackageUpdateResource: default,
+            allowSnupkg: true,
+            allowInsecureConnections: true,
             log: NullLogger.Instance
         );
 
