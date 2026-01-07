@@ -1,7 +1,7 @@
 #!/usr/bin/env -S dotnet run --file
 #:package NSwag.CodeGeneration.CSharp@14.6.3
 #:package Kokuban@0.2.0
-#:package Lestaly.General@0.114.0
+#:package Lestaly.General@0.115.0
 #:property PublishAot=false
 using System.Security;
 using System.Text;

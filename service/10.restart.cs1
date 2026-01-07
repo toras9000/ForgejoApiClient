@@ -1,5 +1,5 @@
 #!/usr/bin/env -S dotnet run --file
-#:package Lestaly.General@0.114.0
+#:package Lestaly.General@0.115.0
 #:package AngleSharp@1.4.0
 #:property PublishAot=false
 using System.Net;
@@ -38,11 +38,6 @@ var settings = new
 
         // サービスのURL
         ForgejoInstance = "http://forgejo-app-container:3000",
-
-        Labels = new[]
-        {
-            new { Name = "node",        URI = "docker://node:20-bookworm",                  },
-        },
     },
 };
 
@@ -120,9 +115,13 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
         Console.WriteLine("Perform initial setup ...");
         var forms = container.Descendants<IHtmlFormElement>().ToArray();
         if (forms.Length != 1) throw new PavedMessageException("Unexpected setup form");
+        var setupForm = forms[0];
+        var inputUpdateChecker = setupForm.QuerySelectorAll<IHtmlInputElement>("*").FirstOrDefault(e => e.Type == "checkbox" && e.Name == "enable_update_checker");
+        if (inputUpdateChecker == null) throw new PavedMessageException("Unexpected setup form");
+        inputUpdateChecker.IsChecked = false;
 
         // セットアップパラメータを指定して送信
-        using var setupResult = await forms[0].SubmitAsync(new
+        using var setupResult = await setupForm.SubmitAsync(new
         {
             admin_name = settings.Setup.AdminUser,
             admin_email = settings.Setup.AdminMail,
@@ -212,8 +211,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
             "--no-interactive",
             "--name", settings.Runner.Name,
             "--instance", settings.Runner.ForgejoInstance,
-            "--token", runnerToken,
-            "--labels", settings.Runner.Labels.Select(l => $"{l.Name}:{l.URI}").JoinString(",")
+            "--token", runnerToken
     ).silent().cancelby(signal.Token).result().success();
     Console.WriteLine($"  Completed");
     Console.WriteLine();
