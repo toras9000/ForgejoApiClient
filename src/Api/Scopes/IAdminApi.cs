@@ -196,6 +196,22 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("DELETE", "/admin/users/{username}", "Delete user account")]
     public Task DeleteUserAsync(string username, bool? purge = default, CancellationToken cancelToken = default)
         => DeleteRequest($"admin/users/{username}".WithQuery().Param(purge), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+
+    /// <summary>List all email addresses for a user</summary>
+    /// <param name="username">username of user to get email addresses of</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>EmailList</returns>
+    [ForgejoEndpoint("GET", "/admin/users/{username}/emails", "List all email addresses for a user")]
+    public Task<Email[]> ListUserEmailsAsync(string username, CancellationToken cancelToken = default)
+        => GetRequest($"admin/users/{username}/emails", cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+
+    /// <summary>Delete email addresses from a user&apos;s account</summary>
+    /// <param name="username">username of user to delete email addresses from</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/users/{username}/emails", "Delete email addresses from a user's account")]
+    public Task DeleteUserEmailsAsync(string username, DeleteEmailOption options, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/users/{username}/emails", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
     #region Key

@@ -74,18 +74,6 @@ public record APIValidationError(
 );
 
 /// <summary></summary>
-/// <param name="actor_id"></param>
-/// <param name="note"></param>
-/// <param name="original_item"></param>
-/// <param name="original_url"></param>
-public record APPersonFollowItem(
-    string? actor_id = default,
-    string? note = default,
-    string? original_item = default,
-    string? original_url = default
-);
-
-/// <summary></summary>
 /// <param name="id"></param>
 /// <param name="name"></param>
 /// <param name="scopes"></param>
@@ -1545,6 +1533,7 @@ public record EditTeamOption(
 /// <param name="description"></param>
 /// <param name="email"></param>
 /// <param name="full_name"></param>
+/// <param name="hide_email"></param>
 /// <param name="location"></param>
 /// <param name="login_name"></param>
 /// <param name="max_repo_creation"></param>
@@ -1565,6 +1554,7 @@ public record EditUserOption(
     string? description = default,
     string? email = default,
     string? full_name = default,
+    bool? hide_email = default,
     string? location = default,
     string? login_name = default,
     long? max_repo_creation = default,

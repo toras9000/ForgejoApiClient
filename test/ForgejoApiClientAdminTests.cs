@@ -271,10 +271,25 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var user_updated = await client.Admin.UpdateUserAsync(userName, new(login_name: userName, source_id: 0, full_name: "edited-user"));
 
         // ユーザリネーム
-        await client.Admin.RenameUserAsync(userName, new(new_username: $"new-{userName}"));
+        var newName = $"new-{userName}";
+        await client.Admin.RenameUserAsync(userName, new(new_username: newName));
 
         // ユーザリスト取得
         var user_list_renamed = await client.Admin.ListUsersAsync();
+
+        // メールアドレス追加
+        using var userClient = client.Sudo(newName);
+        var newMail = $"new-{userName}@example.com";
+        var mail_added = await userClient.User.AddEmailAsync(new([newMail]));
+
+        // メールアドレス取得
+        var mail_list = await client.Admin.ListUserEmailsAsync(newName);
+
+        // メールアドレス削除
+        await client.Admin.DeleteUserEmailsAsync(newName, new([newMail]));
+
+        // メールアドレス取得(削除後)
+        var mail_list_deleted = await client.Admin.ListUserEmailsAsync(newName);
 
         // ユーザ削除
         await client.Admin.DeleteUserAsync($"new-{userName}");
@@ -293,6 +308,10 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
 
         user_list_renamed.Should().NotContain(u => u.login == userName);
         user_list_renamed.Should().Contain(u => u.login == $"new-{userName}");
+
+        mail_added.Select(m => m.email).Should().BeEquivalentTo([userMail, newMail]);
+        mail_list.Select(m => m.email).Should().BeEquivalentTo([userMail, newMail]);
+        mail_list_deleted.Select(m => m.email).Should().BeEquivalentTo([userMail]);
 
         user_list_deleted.Should().NotContain(u => u.login == $"new-{userName}");
 

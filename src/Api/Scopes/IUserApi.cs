@@ -566,12 +566,12 @@ public interface IUserApi : IApiScope
 
     #region Token
 
-    /// <summary>List the authenticated user&apos;s access tokens</summary>
+    /// <summary>List the specified user&apos;s access tokens</summary>
     /// <param name="username">username of user</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>AccessTokenList represents a list of API access token.</returns>
-    [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
+    [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the specified user's access tokens")]
     public Task<AccessToken[]> ListUserApiTokensAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
@@ -586,23 +586,23 @@ public interface IUserApi : IApiScope
     public Task<AccessToken[]> ListUserApiTokensAsync(BasicAuthCredential auth, string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest(auth, $"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
-    /// <summary>Generate an access token for the current user</summary>
+    /// <summary>Generate an access token for the specified user</summary>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>AccessToken represents an API access token.</returns>
-    [ForgejoEndpoint("POST", "/users/{username}/tokens", "Generate an access token for the current user")]
+    [ForgejoEndpoint("POST", "/users/{username}/tokens", "Generate an access token for the specified user")]
     [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
     public Task<AccessToken> CreateUserApiTokenAsync(BasicAuthCredential auth, string username, CreateAccessTokenOption options, CancellationToken cancelToken = default)
         => PostRequest(auth, $"users/{username}/tokens", options, cancelToken).JsonResponseAsync<AccessToken>(cancelToken);
 
-    /// <summary>Delete an access token from current user&apos;s account</summary>
+    /// <summary>Delete an access token from the specified user&apos;s account</summary>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="username">username of user</param>
     /// <param name="token">token to be deleted, identified by ID and if not available by name</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    [ForgejoEndpoint("DELETE", "/users/{username}/tokens/{token}", "Delete an access token from current user's account")]
+    [ForgejoEndpoint("DELETE", "/users/{username}/tokens/{token}", "Delete an access token from the specified user's account")]
     [ManualEdit("このAPIはトークン認証では通らない。Basic認証情報を利用。")]
     public Task DeleteUserApiTokenAsync(BasicAuthCredential auth, string username, string token, CancellationToken cancelToken = default)
         => DeleteRequest(auth, $"users/{username}/tokens/{token}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);

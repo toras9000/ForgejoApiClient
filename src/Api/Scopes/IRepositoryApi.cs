@@ -493,13 +493,13 @@ public interface IRepositoryApi : IApiScope
     public Task<ContentsResponse> GetContentAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/contents/{filepath}".WithQuery().Param(@ref), cancelToken).JsonResponseAsync<ContentsResponse>(cancelToken);
 
-    /// <summary>Gets multiplbe blobs of a repository.</summary>
+    /// <summary>Gets multiple blobs of a repository.</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="shas">a comma separated list of blob-sha (mind the overall URL-length limit of ~2,083 chars)</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>GitBlobList</returns>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/blobs", "Gets multiplbe blobs of a repository.")]
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/blobs", "Gets multiple blobs of a repository.")]
     public Task<GitBlob[]> ListBlobsAsync(string owner, string repo, string shas, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/git/blobs".WithQuery().Param(shas), cancelToken).JsonResponseAsync<GitBlob[]>(cancelToken);
 
