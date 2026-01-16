@@ -17,14 +17,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Lestaly" Version="0.114.0" />
+    <PackageReference Include="Lestaly" Version="0.115.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="4.0.2" />
     <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
     <PackageReference Include="NuGet.Protocol" Version="7.0.1" />
     <PackageReference Include="SkiaSharp" Version="3.119.1" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.1" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
