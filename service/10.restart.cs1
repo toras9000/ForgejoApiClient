@@ -1,5 +1,5 @@
 #!/usr/bin/env -S dotnet run --file
-#:package Lestaly.General@0.115.0
+#:package Lestaly.General@0.116.0
 #:package AngleSharp@1.4.0
 #:property PublishAot=false
 using System.Net;
