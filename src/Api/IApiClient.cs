@@ -10,6 +10,11 @@ public interface IApiClient : IDisposable
     public Uri BaseUri { get; }
     #endregion
 
+    #region 設定
+    /// <summary>タイムアウト</summary>
+    public TimeSpan Timeout { get; set; }
+    #endregion
+
     #region 状態
     /// <summary>破棄済フラグ</summary>
     public bool IsDisposed { get; }

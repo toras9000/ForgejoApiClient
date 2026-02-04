@@ -41,6 +41,15 @@ public class ForgejoClient : IApiClient, IDisposable
     public Uri BaseUri { get; }
     #endregion
 
+    #region 設定
+    /// <summary>要求のタイムアウト時間</summary>
+    public TimeSpan Timeout
+    {
+        get => this.core.Timeout;
+        set => this.core.Timeout = value;
+    }
+    #endregion
+
     #region 状態
     /// <summary>破棄済フラグ</summary>
     public bool IsDisposed { get; private set; }
@@ -187,6 +196,15 @@ public class ForgejoClient : IApiClient, IDisposable
 
         /// <summary>コンテキストユーザ</summary>
         public string SudoUser { get; }
+        #endregion
+
+        #region 設定
+        /// <summary>要求のタイムアウト時間</summary>
+        public TimeSpan Timeout
+        {
+            get => this.http.Timeout;
+            set => this.http.Timeout = value;
+        }
         #endregion
 
         #region 状態
