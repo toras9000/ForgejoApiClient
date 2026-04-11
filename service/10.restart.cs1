@@ -1,5 +1,5 @@
 #!/usr/bin/env -S dotnet run --file
-#:package Lestaly.General@0.116.0
+#:package Lestaly.General@0.123.0
 #:package AngleSharp@1.4.0
 #:property PublishAot=false
 using System.Net;
@@ -94,7 +94,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
                 break;
             }
             document?.Dispose();
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
+            await Task.Delay(TimeSpan.FromMilliseconds(500), timeout.Token);
         }
     }
     using (setupPage)
@@ -138,7 +138,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
     {
         while (true)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(1), timeout.Token);
             using var frontpage = await context.OpenAsync(settings.ServiceURL, timeout.Token);
             if (frontpage == null || frontpage.StatusCode != HttpStatusCode.OK || frontpage.Source.Length <= 0) continue;
             var loading = frontpage.GetElementById("goto-user-login");

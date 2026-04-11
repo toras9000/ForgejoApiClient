@@ -1,8 +1,8 @@
 #!/usr/bin/env -S dotnet run --file
-#:package NSwag.CodeGeneration.CSharp@14.6.3
-#:package Humanizer.Core@3.0.1
+#:package NSwag.CodeGeneration.CSharp@14.7.0
+#:package Humanizer.Core@3.0.10
 #:package Kokuban@0.2.0
-#:package Lestaly.General@0.116.0
+#:package Lestaly.General@0.123.0
 #:package RefFile@0.2.0
 #:property PublishAot=false
 using Lestaly;
