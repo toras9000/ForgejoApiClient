@@ -8,23 +8,24 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>ForgejoApiClient.Tests</RootNamespace>
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)/tests.runsettings</RunSettingsFilePath>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AwesomeAssertions" Version="9.3.0" />
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
     <PackageReference Include="BouncyCastle.OpenPGP" Version="2.0.0.1" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Lestaly" Version="0.115.0" />
+    <PackageReference Include="Lestaly" Version="0.123.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="4.0.2" />
-    <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
-    <PackageReference Include="NuGet.Protocol" Version="7.0.1" />
-    <PackageReference Include="SkiaSharp" Version="3.119.1" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.2" />
+    <PackageReference Include="MSTest" Version="4.2.1" />
+    <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
+    <PackageReference Include="SkiaSharp" Version="3.119.2" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.6" />
   </ItemGroup>
 
   <ItemGroup>
