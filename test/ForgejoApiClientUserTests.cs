@@ -569,12 +569,29 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionsRunnerRegistrationTokenAsync()
+    public async Task ActionsRunnersSenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
 
-        var result = await client.User.GetActionsRunnerRegistrationTokenAsync();
-        result.token.Should().NotBeNullOrWhiteSpace();
+        var options = new RegisterRunnerOptions("TestRunner", "TestDesc");
+        var reg_runner = await client.User.CreateActionsRunnerAsync(options);
+        try
+        {
+            var list = await client.User.ListActionsRunnersAsync();
+            list.Should().Contain(runner => runner.id == reg_runner.id && runner.uuid == reg_runner.uuid);
+
+            var get_runner = await client.User.GetActionsRunnerAsync(reg_runner.id!.Value);
+            get_runner.id.Should().Be(reg_runner.id!.Value);
+
+            await client.User.DeleteActionsRunnerAsync(reg_runner.id!.Value);
+
+            var deleted_list = await client.User.ListActionsRunnersAsync();
+            deleted_list.Should().NotContain(runner => runner.id == reg_runner.id);
+        }
+        catch
+        {
+            await client.User.DeleteActionsRunnerAsync(reg_runner.id!.Value);
+        }
     }
 
     [TestMethod]

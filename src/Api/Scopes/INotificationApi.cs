@@ -29,7 +29,7 @@ public interface INotificationApi : IApiScope
     /// <param name="status_types">Mark notifications with the provided status types. Options are: unread, read and/or pinned. Defaults to unread.</param>
     /// <param name="to_status">Status to mark notifications as, Defaults to read.</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>NotificationThreadList</returns>
+    /// <returns>NotificationThreadListWithoutPagination - Notification threads without pagination headers</returns>
     [ForgejoEndpoint("PUT", "/notifications", "Mark notification threads as read, pinned or unread")]
     public Task<NotificationThread[]> MarkAsync(DateTimeOffset? last_read_at = default, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, CancellationToken cancelToken = default)
         => PutRequest("notifications".WithQuery().Param(last_read_at).Param(all).Param(status_types).Param(to_status), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
@@ -74,7 +74,7 @@ public interface INotificationApi : IApiScope
     /// <param name="to_status">Status to mark notifications as. Defaults to read.</param>
     /// <param name="last_read_at">Describes the last point that notifications were checked. Anything updated since this time will not be updated.</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>NotificationThreadList</returns>
+    /// <returns>NotificationThreadListWithoutPagination - Notification threads without pagination headers</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/notifications", "Mark notification threads as read, pinned or unread on a specific repo")]
     public Task<NotificationThread[]> MarkRepositoryThreadsAsync(string owner, string repo, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, DateTimeOffset? last_read_at = default, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(to_status).Param(last_read_at), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);

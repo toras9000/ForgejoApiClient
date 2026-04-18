@@ -105,7 +105,7 @@ public class GenerateApiDataType
     // 型の概要コメント生成
     private IEnumerable<string> generateDescription(string? description, string beginTag, string endTag)
     {
-        static string? escape(string? text) => SecurityElement.Escape(text);
+        static string? escape(string? text) => SecurityElement.Escape(text)?.Replace("\r", "&#xD;").Replace("\n", "&#xA;");
 
         var descLines = description?.Split(['\r', '\n']) ?? [];
         if (descLines.Length < 2)

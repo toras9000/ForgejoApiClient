@@ -3,7 +3,7 @@
 /// <summary>admin スコープのAPIインタフェース</summary>
 public interface IAdminApi : IApiScope
 {
-    #region Actions
+    #region Crons
     /// <summary>List cron tasks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -18,22 +18,52 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("POST", "/admin/cron/{task}", "Run cron task")]
     public Task RunCronTaskAsync(string task, CancellationToken cancelToken = default)
         => PostRequest($"admin/cron/{task}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
 
-    /// <summary>Get an global actions runner registration token</summary>
+    #region Actions Runners
+    /// <summary>Get all runners, no matter whether they are global runners or scoped to an organization, user, or repository</summary>
+    /// <param name="visible">whether to include all visible runners (true) or only those that are directly owned by the instance (false)</param>
+    /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
-    [ForgejoEndpoint("GET", "/admin/runners/registration-token", "Get an global actions runner registration token")]
-    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
-        => GetRequest("admin/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
+    /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
+    [ForgejoEndpoint("GET", "/admin/actions/runners", "Get all runners, no matter whether they are global runners or scoped to an organization, user, or repository")]
+    public Task<ActionRunner[]> ListActionsRunnersAsync(bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("admin/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
 
-    /// <summary>Search action jobs according filter conditions</summary>
-    /// <param name="labels">a comma separated list of run job labels to search for</param>
+    /// <summary>Get a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository</summary>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunner represents a runner</returns>
+    [ForgejoEndpoint("GET", "/admin/actions/runners/{runner_id}", "Get a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task<ActionRunner> GetActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
+        => GetRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+
+    /// <summary>Register a new global runner</summary>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
+    [ForgejoEndpoint("POST", "/admin/actions/runners", "Register a new global runner")]
+    public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(RegisterRunnerOptions options, CancellationToken cancelToken = default)
+        => PostRequest("admin/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+
+    /// <summary>Delete a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository</summary>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/actions/runners/{runner_id}", "Delete a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task DeleteActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Actions Tasks
+    /// <summary>Get action run jobs</summary>
+    /// <param name="labels">a comma separated list of labels to search for</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>RunJobList is a list of action run jobs</returns>
-    [ForgejoEndpoint("GET", "/admin/runners/jobs", "Search action jobs according filter conditions")]
-    [ManualEdit("戻り値を nullable に変更")]
-    public Task<ActionRunJob[]?> ListActionsJobsAsync(string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+    [ForgejoEndpoint("GET", "/admin/actions/runners/jobs", "Get action run jobs")]
+    public Task<ActionRunJob[]> ListActionsJobsAsync(string? labels = default, CancellationToken cancelToken = default)
+        => GetRequest("admin/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]>(cancelToken);
     #endregion
 
     #region Profile
@@ -59,7 +89,7 @@ public interface IAdminApi : IApiScope
     /// <summary>List global (system) webhooks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>HookList</returns>
+    /// <returns>HookListWithoutPagination - Hooks without pagination headers</returns>
     [ForgejoEndpoint("GET", "/admin/hooks", "List global (system) webhooks")]
     public Task<Hook[]> ListSystemWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("admin/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);

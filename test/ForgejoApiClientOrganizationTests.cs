@@ -163,23 +163,6 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task GetActionsRunnerRegistrationTokenAsync()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var orgName = $"org-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var org = await resources.CreateTestOrgAsync(orgName);
-
-        // テスト対象呼び出し
-        var result = await client.Organization.GetActionsRunnerRegistrationTokenAsync(orgName);
-        result.token.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [TestMethod]
     public async Task ListActionsJobsAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -243,6 +226,39 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org_deleted = await client.Organization.GetAsync(orgName);
         var avatar2 = await http.GetByteArrayAsync(org_deleted.avatar_url);
         image.Should().NotEqual(avatar2);
+    }
+
+    [TestMethod]
+    public async Task ActionsRunnersSenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var orgName = $"org-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var org = await resources.CreateTestOrgAsync(orgName);
+
+        var options = new RegisterRunnerOptions("TestRunner", "TestDesc");
+        var reg_runner = await client.Organization.CreateActionsRunnerAsync(orgName, options);
+        try
+        {
+            var list = await client.Organization.ListActionsRunnersAsync(orgName);
+            list.Should().Contain(runner => runner.id == reg_runner.id && runner.uuid == reg_runner.uuid);
+
+            var get_runner = await client.Organization.GetActionsRunnerAsync(orgName, reg_runner.id!.Value);
+            get_runner.id.Should().Be(reg_runner.id!.Value);
+
+            await client.Organization.DeleteActionsRunnerAsync(orgName, reg_runner.id!.Value);
+
+            var deleted_list = await client.Organization.ListActionsRunnersAsync(orgName);
+            deleted_list.Should().NotContain(runner => runner.id == reg_runner.id);
+        }
+        catch
+        {
+            await client.Organization.DeleteActionsRunnerAsync(orgName, reg_runner.id!.Value);
+        }
     }
 
     [TestMethod]

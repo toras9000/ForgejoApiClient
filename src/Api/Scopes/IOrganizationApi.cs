@@ -55,7 +55,7 @@ public interface IOrganizationApi : IApiScope
     /// <summary>List the current user&apos;s organizations</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>OrganizationList</returns>
+    /// <returns>OrganizationListWithoutPagination - Organizations without pagination headers</returns>
     [ForgejoEndpoint("GET", "/user/orgs", "List the current user's organizations")]
     public Task<Organization[]> ListMyOrgsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
@@ -64,7 +64,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="username">username of user</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>OrganizationList</returns>
+    /// <returns>OrganizationListWithoutPagination - Organizations without pagination headers</returns>
     [ForgejoEndpoint("GET", "/users/{username}/orgs", "List a user's organizations")]
     public Task<Organization[]> ListUserOrgsAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"users/{username}/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
@@ -177,14 +177,47 @@ public interface IOrganizationApi : IApiScope
         => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions
-    /// <summary>Get an organization&apos;s actions runner registration token</summary>
+    #region Actions Runners
+    /// <summary>Get the organization&apos;s runners</summary>
     /// <param name="org">name of the organization</param>
+    /// <param name="visible">whether to include all visible runners (true) or only those that are directly owned by the organization (false)</param>
+    /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
-    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/registration-token", "Get an organization's actions runner registration token")]
-    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(string org, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
+    /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners", "Get the organization's runners")]
+    public Task<ActionRunner[]> ListActionsRunnersAsync(string org, bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
+
+    /// <summary>Get a particular runner that belongs to the organization</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunner represents a runner</returns>
+    [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/{runner_id}", "Get a particular runner that belongs to the organization")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task<ActionRunner> GetActionsRunnerAsync(string org, long runner_id, CancellationToken cancelToken = default)
+        => GetRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+
+    /// <summary>Register a new organization-level runner</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
+    [ForgejoEndpoint("POST", "/orgs/{org}/actions/runners", "Register a new organization-level runner")]
+    public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(string org, RegisterRunnerOptions options, CancellationToken cancelToken = default)
+        => PostRequest($"orgs/{org}/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+
+    /// <summary>Delete a particular runner that belongs to the organization</summary>
+    /// <param name="org">name of the organization</param>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/runners/{runner_id}", "Delete a particular runner that belongs to the organization")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task DeleteActionsRunnerAsync(string org, long runner_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Actions Tasks
 
     /// <summary>Search for organization&apos;s action jobs according filter conditions</summary>
     /// <param name="org">name of the organization</param>
@@ -197,7 +230,7 @@ public interface IOrganizationApi : IApiScope
         => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
-    #region Actions Secret
+    #region Actions Secrets
     /// <summary>List actions secrets of an organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
@@ -225,7 +258,7 @@ public interface IOrganizationApi : IApiScope
         => DeleteRequest($"orgs/{org}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions Variable
+    #region Actions Variables
     /// <summary>List variables of an organization</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
@@ -303,7 +336,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="org">name of the organization</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>HookList</returns>
+    /// <returns>HookListWithoutPagination - Hooks without pagination headers</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/hooks", "List an organization's webhooks")]
     public Task<Hook[]> ListWebhooksAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"orgs/{org}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);

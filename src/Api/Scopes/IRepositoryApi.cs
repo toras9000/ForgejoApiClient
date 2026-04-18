@@ -707,25 +707,61 @@ public interface IRepositoryApi : IApiScope
         => PostRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions
-    /// <summary>Get a repository&apos;s actions runner registration token</summary>
+    #region Actions Runners
+    /// <summary>Get runners belonging to the repository</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
+    /// <param name="visible">whether to include all visible runners (true) or only those that are directly owned by the repository (false)</param>
+    /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
-    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/registration-token", "Get a repository's actions runner registration token")]
-    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
+    /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners", "Get runners belonging to the repository")]
+    public Task<ActionRunner[]> ListActionsRunnersAsync(string owner, string repo, bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
 
+    /// <summary>Get a particular runner that belongs to the repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunner represents a runner</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/{runner_id}", "Get a particular runner that belongs to the repository")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task<ActionRunner> GetActionsRunnerAsync(string owner, string repo, long runner_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+
+    /// <summary>Register a new repository-level runner</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/runners", "Register a new repository-level runner")]
+    public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(string owner, string repo, RegisterRunnerOptions options, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+
+    /// <summary>Delete a particular runner that belongs to a repository</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/runners/{runner_id}", "Delete a particular runner that belongs to a repository")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task DeleteActionsRunnerAsync(string owner, string repo, long runner_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Actions Tasks
     /// <summary>List a repository&apos;s action tasks</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
+    /// <param name="status">Returns workflow tasks with the check run status or conclusion that is specified.&#xA; For example, a conclusion can be success or a status can be in_progress.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>TasksList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/tasks", "List a repository's action tasks")]
-    public Task<ActionTaskResponse> ListActionsTasksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
+    public Task<ActionTaskResponse> ListActionsTasksAsync(string owner, string repo, string[]? status = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery().Param(status).Param(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
 
     /// <summary>Dispatches a workflow</summary>
     /// <param name="owner">owner of the repo</param>
@@ -756,12 +792,14 @@ public interface IRepositoryApi : IApiScope
     /// <param name="status">Returns workflow runs with the check run status or conclusion that is specified. For example, a conclusion can be success or a status can be in_progress. Only Forgejo Actions can set a status of waiting, pending, or requested.</param>
     /// <param name="run_number">Returns the workflow run associated with the run number.</param>
     /// <param name="head_sha">Only returns workflow runs that are associated with the specified head_sha.</param>
+    /// <param name="ref">Only return workflow runs that involve the given Git reference, for example, `refs/heads/main`.</param>
+    /// <param name="workflow_id">Only return workflow runs that involve the given workflow ID.</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>ActionRunList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs", "List a repository's action runs")]
-    public Task<ListActionRunResponse> ListActionsRunsAsync(string owner, string repo, ICollection<string>? @event = default, string[]? status = default, long? run_number = default, string? head_sha = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runs".WithQuery().Param(@event).Param(status).Param(run_number).Param(head_sha).Param(paging), cancelToken).JsonResponseAsync<ListActionRunResponse>(cancelToken);
+    public Task<ListActionRunResponse> ListActionsRunsAsync(string owner, string repo, ICollection<string>? @event = default, string[]? status = default, long? run_number = default, string? head_sha = default, string? @ref = default, string? workflow_id = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runs".WithQuery().Param(@event).Param(status).Param(run_number).Param(head_sha).Param(@ref).Param(workflow_id).Param(paging), cancelToken).JsonResponseAsync<ListActionRunResponse>(cancelToken);
 
     /// <summary>Get an action run</summary>
     /// <param name="owner">owner of the repo</param>
@@ -774,7 +812,7 @@ public interface IRepositoryApi : IApiScope
         => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync<ActionRun>(cancelToken);
     #endregion
 
-    #region Actions Secret
+    #region Actions Secrets
     /// <summary>List an repo&apos;s actions secrets</summary>
     /// <param name="owner">owner of the repository</param>
     /// <param name="repo">name of the repository</param>
@@ -805,7 +843,7 @@ public interface IRepositoryApi : IApiScope
         => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions Variable
+    #region Actions Variables
     /// <summary>Get repo-level variables list</summary>
     /// <param name="owner">name of the owner</param>
     /// <param name="repo">name of the repository</param>
@@ -854,7 +892,6 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Delete a repo-level variable")]
     public Task DeleteActionsVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
-
     #endregion
 
     #region Flag
@@ -1094,7 +1131,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="whitespace">whitespace behavior</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>ChangedFileList</returns>
+    /// <returns>ChangedFileListWithPagination</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/files", "Get changed files for a pull request")]
     public Task<ChangedFile[]> ListPullRequestChangesAsync(string owner, string repo, long index, string? skip_to = default, string? whitespace = default, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/pulls/{index}/files".WithQuery().Param(skip_to).Param(whitespace).Param(paging), cancelToken).JsonResponseAsync<ChangedFile[]>(cancelToken);
@@ -1154,7 +1191,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="index">index of the pull request</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>PullReviewList</returns>
+    /// <returns>PullReviewListWithoutPagination - Review requests without pagination headers</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/requested_reviewers", "Create review requests for a pull request")]
     public Task<PullReview[]> CreatePullRequestReviewRequestsAsync(string owner, string repo, long index, PullReviewRequestOptions options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/pulls/{index}/requested_reviewers", options, cancelToken).JsonResponseAsync<PullReview[]>(cancelToken);
@@ -1308,7 +1345,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>IssueList</returns>
+    /// <returns>IssueListWithoutPagination - Issues without pagination headers (used for pinned issues, dependencies, etc.)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/pinned", "List a repo's pinned issues")]
     public Task<Issue[]> ListPinnedIssuesAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/pinned", cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
@@ -1656,7 +1693,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>TeamList</returns>
+    /// <returns>TeamListWithoutPagination - Teams without pagination headers</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/teams", "List a repository's teams")]
     public Task<Team[]> ListTeamsAsync(string owner, string repo, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/teams", cancelToken).JsonResponseAsync<Team[]>(cancelToken);

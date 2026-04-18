@@ -76,12 +76,17 @@ public record APIValidationError(
 /// <summary></summary>
 /// <param name="id"></param>
 /// <param name="name"></param>
+/// <param name="repositories">
+/// Indicates that an access token only has access to the specified repositories.  Will be null if the access token
+/// is not limited to a set of specified repositories.
+/// </param>
 /// <param name="scopes"></param>
 /// <param name="sha1"></param>
 /// <param name="token_last_eight"></param>
 public record AccessToken(
     long? id = default,
     string? name = default,
+    ICollection<RepositoryMeta>? repositories = default,
     ICollection<string>? scopes = default,
     string? sha1 = default,
     string? token_last_eight = default
@@ -138,7 +143,9 @@ public record ActionRun(
 );
 
 /// <summary>ActionRunJob represents a job of a run</summary>
-/// <param name="id">the action run job id</param>
+/// <param name="attempt">How many times the job has been attempted including the current attempt.</param>
+/// <param name="handle">Opaque identifier that uniquely identifies a single attempt of a job.</param>
+/// <param name="id">Identifier of this job.</param>
 /// <param name="name">the action run job name</param>
 /// <param name="needs">the action run job needed ids</param>
 /// <param name="owner_id">the owner id</param>
@@ -147,6 +154,8 @@ public record ActionRun(
 /// <param name="status">the action run job status</param>
 /// <param name="task_id">the action run job latest task id</param>
 public record ActionRunJob(
+    long? attempt = default,
+    string? handle = default,
     long? id = default,
     string? name = default,
     ICollection<string>? needs = default,
@@ -155,6 +164,36 @@ public record ActionRunJob(
     ICollection<string>? runs_on = default,
     string? status = default,
     long? task_id = default
+);
+
+/// <summary>ActionRunner represents a runner</summary>
+/// <param name="description">Description provides optional details about this runner.</param>
+/// <param name="ephemeral">Indicates if runner is ephemeral runner</param>
+/// <param name="id">ID uniquely identifies this runner.</param>
+/// <param name="labels">Labels is a list of labels attached to this runner.</param>
+/// <param name="name">Name of the runner; not unique.</param>
+/// <param name="owner_id">
+/// OwnerID is the identifier of the user or organization this runner belongs to. O if the runner is owned by a
+/// repository.
+/// </param>
+/// <param name="repo_id">
+/// RepoID is the identifier of the repository this runner belongs to. 0 if the runner belongs to a user or
+/// organization.
+/// </param>
+/// <param name="status">Status indicates whether this runner is offline, or active, for example.</param>
+/// <param name="uuid">UUID uniquely identifies this runner.</param>
+/// <param name="version">Version is the self-reported version string of Forgejo Runner.</param>
+public record ActionRunner(
+    string? description = default,
+    bool? ephemeral = default,
+    long? id = default,
+    ICollection<string>? labels = default,
+    string? name = default,
+    long? owner_id = default,
+    long? repo_id = default,
+    ActionRunnerStatus? status = default,
+    string? uuid = default,
+    string? version = default
 );
 
 /// <summary>ActionTask represents a ActionTask</summary>
@@ -475,16 +514,16 @@ public record CombinedStatus(
 );
 
 /// <summary>Comment represents a comment on a commit or issue</summary>
-/// <param name="assets"></param>
-/// <param name="body"></param>
-/// <param name="created_at"></param>
-/// <param name="html_url"></param>
-/// <param name="id"></param>
-/// <param name="issue_url"></param>
-/// <param name="original_author"></param>
-/// <param name="original_author_id"></param>
-/// <param name="pull_request_url"></param>
-/// <param name="updated_at"></param>
+/// <param name="assets">The attachments to the comment</param>
+/// <param name="body">The body of the comment</param>
+/// <param name="created_at">The time of the comment&apos;s creation</param>
+/// <param name="html_url">The HTML URL of the comment</param>
+/// <param name="id">The identifier of the comment</param>
+/// <param name="issue_url">The HTML URL of the issue if the comment is posted on an issue, else empty string</param>
+/// <param name="original_author">The original author that posted the comment if it was not posted locally, else empty string</param>
+/// <param name="original_author_id">The ID of the original author that posted the comment if it was not posted locally, else 0</param>
+/// <param name="pull_request_url">The HTML URL of the pull request if the comment is posted on a pull request, else empty string</param>
+/// <param name="updated_at">The time of the comment&apos;s update</param>
 /// <param name="user"></param>
 public record Comment(
     ICollection<Attachment>? assets = default,
@@ -640,9 +679,11 @@ public record ContentsResponse(
 
 /// <summary>CreateAccessTokenOption options when create access token</summary>
 /// <param name="name"></param>
+/// <param name="repositories">If provided and not-empty, creates an access token with access only to specified repositories.</param>
 /// <param name="scopes"></param>
 public record CreateAccessTokenOption(
     string name,
+    ICollection<RepoTargetOption>? repositories = default,
     ICollection<string>? scopes = default
 );
 
@@ -775,8 +816,8 @@ public record CreateHookOption(
 );
 
 /// <summary>CreateIssueCommentOption options for creating a comment on an issue</summary>
-/// <param name="body"></param>
-/// <param name="updated_at"></param>
+/// <param name="body">The body of the comment</param>
+/// <param name="updated_at">The time of the comment&apos;s update, needs admin or repository owner permission</param>
 public record CreateIssueCommentOption(
     string body,
     DateTimeOffset? updated_at = default
@@ -850,8 +891,11 @@ public record CreateOAuth2ApplicationOptions(
     ICollection<string>? redirect_uris = default
 );
 
-/// <summary>CreateOrUpdateSecretOption options when creating or updating secret</summary>
-/// <param name="data">Data of the secret to update</param>
+/// <summary></summary>
+/// <param name="data">
+/// Data of the secret. Special characters will be retained. Line endings will be normalized to LF to match the
+/// behaviour of browsers. Encode the data with Base64 if line endings should be retained.
+/// </param>
 public record CreateOrUpdateSecretOption(
     string data
 );
@@ -1087,8 +1131,11 @@ public record CreateUserOption(
     string? visibility = default
 );
 
-/// <summary>CreateVariableOption the option when creating variable</summary>
-/// <param name="value">Value of the variable to create</param>
+/// <summary></summary>
+/// <param name="value">
+/// Value of the variable to create. Special characters will be retained. Line endings will be normalized to LF to
+/// match the behaviour of browsers. Encode the data with Base64 if line endings should be retained.
+/// </param>
 public record CreateVariableOption(
     string value
 );
@@ -1287,8 +1334,8 @@ public record EditHookOption(
 );
 
 /// <summary>EditIssueCommentOption options for editing a comment</summary>
-/// <param name="body"></param>
-/// <param name="updated_at"></param>
+/// <param name="body">The body of the comment</param>
+/// <param name="updated_at">The time of the comment&apos;s update, needs admin or repository owner permission</param>
 public record EditIssueCommentOption(
     string body,
     DateTimeOffset? updated_at = default
@@ -2902,6 +2949,26 @@ public record Reference(
     string? url = default
 );
 
+/// <summary></summary>
+/// <param name="name">Name of the runner to register. The name of the runner does not have to be unique.</param>
+/// <param name="description">Description of the runner to register.</param>
+/// <param name="ephemeral">Register as ephemeral runner https://forgejo.org/docs/latest/admin/actions/security/#ephemeral-runner</param>
+public record RegisterRunnerOptions(
+    string name,
+    string? description = default,
+    bool? ephemeral = default
+);
+
+/// <summary></summary>
+/// <param name="id"></param>
+/// <param name="token"></param>
+/// <param name="uuid"></param>
+public record RegisterRunnerResponse(
+    long? id = default,
+    string? token = default,
+    string? uuid = default
+);
+
 /// <summary>RegistrationToken is a string used to register a runner with a server</summary>
 /// <param name="token"></param>
 public record RegistrationToken(
@@ -2992,6 +3059,14 @@ public record RepoCommit(
     PayloadCommitVerification? verification = default
 );
 
+/// <summary></summary>
+/// <param name="name">Name of repository</param>
+/// <param name="owner">Name of user or organisation that owns the repository</param>
+public record RepoTargetOption(
+    string name,
+    string owner
+);
+
 /// <summary>RepoTopicOptions a collection of repo topic names</summary>
 /// <param name="topics">list of topic names</param>
 public record RepoTopicOptions(
@@ -3039,7 +3114,8 @@ public record RepoTransfer(
 /// <param name="has_projects"></param>
 /// <param name="has_pull_requests"></param>
 /// <param name="has_releases"></param>
-/// <param name="has_wiki"></param>
+/// <param name="has_wiki">is the wiki enabled</param>
+/// <param name="has_wiki_contents">have wiki pages ever been created</param>
 /// <param name="html_url"></param>
 /// <param name="id"></param>
 /// <param name="ignore_whitespace_conflicts"></param>
@@ -3072,6 +3148,8 @@ public record RepoTransfer(
 /// <param name="watchers_count"></param>
 /// <param name="website"></param>
 /// <param name="wiki_branch"></param>
+/// <param name="wiki_clone_url"></param>
+/// <param name="wiki_ssh_url"></param>
 public record Repository(
     bool? allow_fast_forward_only_merge = default,
     bool? allow_merge_commits = default,
@@ -3104,6 +3182,7 @@ public record Repository(
     bool? has_pull_requests = default,
     bool? has_releases = default,
     bool? has_wiki = default,
+    bool? has_wiki_contents = default,
     string? html_url = default,
     long? id = default,
     bool? ignore_whitespace_conflicts = default,
@@ -3135,7 +3214,9 @@ public record Repository(
     string? url = default,
     long? watchers_count = default,
     string? website = default,
-    string? wiki_branch = default
+    string? wiki_branch = default,
+    string? wiki_clone_url = default,
+    string? wiki_ssh_url = default
 );
 
 /// <summary>RepositoryMeta basic repository information</summary>
@@ -3433,9 +3514,15 @@ public record UpdateUserAvatarOption(
     string? image = default
 );
 
-/// <summary>UpdateVariableOption the option when updating variable</summary>
-/// <param name="value">Value of the variable to update</param>
-/// <param name="name">New name for the variable. If the field is empty, the variable name won&apos;t be updated.</param>
+/// <summary></summary>
+/// <param name="value">
+/// Value of the variable to update. Special characters will be retained. Line endings will be normalized to LF to
+/// match the behaviour of browsers. Encode the data with Base64 if line endings should be retained.
+/// </param>
+/// <param name="name">
+/// New name for the variable. If the field is empty, the variable name won&apos;t be updated. Forgejo will convert it to
+/// uppercase.
+/// </param>
 public record UpdateVariableOption(
     string value,
     string? name = default
@@ -3630,6 +3717,20 @@ public record WikiPageMetaData(
     string? sub_url = default,
     string? title = default
 );
+
+/// <summary>Status indicates whether this runner is offline, or active, for example.</summary>
+public enum ActionRunnerStatus
+{
+    /// <summary>offline</summary>
+    [MapEnum("offline")]
+    Offline = 0,
+    /// <summary>idle</summary>
+    [MapEnum("idle")]
+    Idle = 1,
+    /// <summary>active</summary>
+    [MapEnum("active")]
+    Active = 2,
+};
 
 /// <summary>the type of action</summary>
 public enum ActivityOp_type

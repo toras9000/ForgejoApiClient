@@ -800,6 +800,40 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task ActionsRunnersSenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
+
+        var options = new RegisterRunnerOptions("TestRunner", "TestDesc");
+        var reg_runner = await client.Repository.CreateActionsRunnerAsync(repoOwner, repoName, options);
+        try
+        {
+            var list = await client.Repository.ListActionsRunnersAsync(repoOwner, repoName);
+            list.Should().Contain(runner => runner.id == reg_runner.id && runner.uuid == reg_runner.uuid);
+
+            var get_runner = await client.Repository.GetActionsRunnerAsync(repoOwner, repoName, reg_runner.id!.Value);
+            get_runner.id.Should().Be(reg_runner.id!.Value);
+
+            await client.Repository.DeleteActionsRunnerAsync(repoOwner, repoName, reg_runner.id!.Value);
+
+            var deleted_list = await client.Repository.ListActionsRunnersAsync(repoOwner, repoName);
+            deleted_list.Should().NotContain(runner => runner.id == reg_runner.id);
+        }
+        catch
+        {
+            await client.Repository.DeleteActionsRunnerAsync(repoOwner, repoName, reg_runner.id!.Value);
+        }
+    }
+
+    [TestMethod]
     public async Task DispatchActionWorkflowAsync_Taks_Jobs()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -2244,24 +2278,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             caller: breaker => client.Repository.ListCodeLanguagesAsync(this.TestTokenUser, repoName, cancelToken: breaker),
             condition: languages => 0 < languages.Count
         );
-    }
-
-    [TestMethod]
-    public async Task GetActionsRunnerRegistrationTokenAsync()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var ownerName = this.TestTokenUser;
-        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var repo = await resources.CreateTestRepoAsync(repoName);
-
-        // テスト対象呼び出し
-        var result = await client.Repository.GetActionsRunnerRegistrationTokenAsync(ownerName, repoName);
-        result.token.Should().NotBeNullOrWhiteSpace();
     }
 
     [TestMethod]

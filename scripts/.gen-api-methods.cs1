@@ -160,7 +160,7 @@ public class GenerateApiMethods
     /// <returns>メソッドドキュメントコメント</returns>
     private IEnumerable<string> makeApiMethodComments(ApiEndpoint ep)
     {
-        static string? escape(string? text) => SecurityElement.Escape(text);
+        static string? escape(string? text) => SecurityElement.Escape(text)?.Replace("\r", "&#xD;").Replace("\n", "&#xA;");
 
         // メソッド概要
         yield return $"/// <summary>{escape(ep.Summary)}</summary>";
@@ -209,7 +209,7 @@ public class GenerateApiMethods
         // 戻り値
         if (ep.Result.Type != GenerationConstants.NothingResult)
         {
-            yield return $"""/// <returns>{ep.Result.Description}</returns>""";
+            yield return $"""/// <returns>{escape(ep.Result.Description)}</returns>""";
         }
     }
 

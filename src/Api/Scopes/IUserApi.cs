@@ -408,7 +408,7 @@ public interface IUserApi : IApiScope
     /// <summary>List the authenticated user&apos;s webhooks</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>HookList</returns>
+    /// <returns>HookListWithoutPagination - Hooks without pagination headers</returns>
     [ForgejoEndpoint("GET", "/user/hooks", "List the authenticated user's webhooks")]
     public Task<Hook[]> ListWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
@@ -446,14 +446,43 @@ public interface IUserApi : IApiScope
         => DeleteRequest($"user/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions
-    /// <summary>Get an user&apos;s actions runner registration token</summary>
+    #region Actions Runnners
+    /// <summary>Get the user&apos;s runners</summary>
+    /// <param name="visible">whether to include all visible runners (true) or only those that are directly owned by the user (false)</param>
+    /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>RegistrationToken is a string used to register a runner with a server</returns>
-    [ForgejoEndpoint("GET", "/user/actions/runners/registration-token", "Get an user's actions runner registration token")]
-    public Task<RegistrationToken> GetActionsRunnerRegistrationTokenAsync(CancellationToken cancelToken = default)
-        => GetRequest("user/actions/runners/registration-token", cancelToken).JsonResponseAsync<RegistrationToken>(cancelToken);
+    /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
+    [ForgejoEndpoint("GET", "/user/actions/runners", "Get the user's runners")]
+    public Task<ActionRunner[]> ListActionsRunnersAsync(bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
 
+    /// <summary>Get a particular runner that belongs to the user</summary>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunner represents a runner</returns>
+    [ForgejoEndpoint("GET", "/user/actions/runners/{runner_id}", "Get a particular runner that belongs to the user")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task<ActionRunner> GetActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
+        => GetRequest($"user/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+
+    /// <summary>Register a new user-level runner</summary>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
+    [ForgejoEndpoint("POST", "/user/actions/runners", "Register a new user-level runner")]
+    public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(RegisterRunnerOptions options, CancellationToken cancelToken = default)
+        => PostRequest("user/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+
+    /// <summary>Delete a particular user-level runner</summary>
+    /// <param name="runner_id">ID of the runner</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/user/actions/runners/{runner_id}", "Delete a particular user-level runner")]
+    [ManualEdit("runner_id の型を変更")]
+    public Task DeleteActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"user/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+    #endregion
+
+    #region Actions Tasks
     /// <summary>Search for user&apos;s action jobs according filter conditions</summary>
     /// <param name="labels">a comma separated list of run job labels to search for</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -464,7 +493,7 @@ public interface IUserApi : IApiScope
         => GetRequest("user/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
     #endregion
 
-    #region Actions Secret
+    #region Actions Secrets
     /// <summary>Create or Update a secret value in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="options"></param>
@@ -481,7 +510,7 @@ public interface IUserApi : IApiScope
         => DeleteRequest($"user/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
     #endregion
 
-    #region Actions Variable
+    #region Actions Variables
     /// <summary>Get the user-level list of variables which is created by current doer</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
@@ -526,7 +555,7 @@ public interface IUserApi : IApiScope
     /// <summary>List the authenticated user&apos;s oauth2 applications</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>OAuth2ApplicationList represents a list of OAuth2 applications.</returns>
+    /// <returns>OAuth2ApplicationList</returns>
     [ForgejoEndpoint("GET", "/user/applications/oauth2", "List the authenticated user's oauth2 applications")]
     public Task<OAuth2Application[]> ListOAuth2ApplicationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/applications/oauth2".WithQuery().Param(paging), cancelToken).JsonResponseAsync<OAuth2Application[]>(cancelToken);
@@ -565,26 +594,14 @@ public interface IUserApi : IApiScope
     #endregion
 
     #region Token
-
     /// <summary>List the specified user&apos;s access tokens</summary>
     /// <param name="username">username of user</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>AccessTokenList represents a list of API access token.</returns>
+    /// <returns>AccessTokenList</returns>
     [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the specified user's access tokens")]
     public Task<AccessToken[]> ListUserApiTokensAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
-
-    /// <summary>List the authenticated user&apos;s access tokens</summary>
-    /// <param name="auth">BASIC認証情報</param>
-    /// <param name="username">username of user</param>
-    /// <param name="paging">ページングオプション</param>
-    /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>AccessTokenList represents a list of API access token.</returns>
-    [ForgejoEndpoint("GET", "/users/{username}/tokens", "List the authenticated user's access tokens")]
-    [ManualEdit("以前のバージョンではこのAPIの利用にBasic認証情報が必要であった。過去バージョンサーバに対して使えるように残している。")]
-    public Task<AccessToken[]> ListUserApiTokensAsync(BasicAuthCredential auth, string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest(auth, $"users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync<AccessToken[]>(cancelToken);
 
     /// <summary>Generate an access token for the specified user</summary>
     /// <param name="auth">BASIC認証情報</param>

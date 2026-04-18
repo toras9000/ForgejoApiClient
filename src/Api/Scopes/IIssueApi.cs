@@ -313,7 +313,7 @@ public interface IIssueApi : IApiScope
     /// <param name="repo">name of the repo</param>
     /// <param name="id">id of the comment to edit</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>ReactionList</returns>
+    /// <returns>ReactionListWithoutPagination - Reactions for a specific comment (no pagination headers)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/comments/{id}/reactions", "Get a list of reactions from a comment of an issue")]
     public Task<Reaction[]> ListCommentReactionsAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/comments/{id}/reactions", cancelToken).JsonResponseAsync<Reaction[]>(cancelToken);
@@ -347,7 +347,7 @@ public interface IIssueApi : IApiScope
     /// <param name="index">index of the issue</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>IssueList</returns>
+    /// <returns>IssueListWithoutPagination - Issues without pagination headers (used for pinned issues, dependencies, etc.)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/{index}/blocks", "List issues that are blocked by this issue")]
     public Task<Issue[]> ListBlockedAsync(string owner, string repo, long index, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/{index}/blocks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
@@ -382,7 +382,7 @@ public interface IIssueApi : IApiScope
     /// <param name="index">index of the issue</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>IssueList</returns>
+    /// <returns>IssueListWithoutPagination - Issues without pagination headers (used for pinned issues, dependencies, etc.)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/{index}/dependencies", "List an issue's dependencies, i.e all issues that block this issue.")]
     public Task<Issue[]> ListDependenciesAsync(string owner, string repo, long index, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/{index}/dependencies".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
@@ -482,7 +482,7 @@ public interface IIssueApi : IApiScope
     /// <param name="repo">name of the repo</param>
     /// <param name="index">index of the issue</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>LabelList</returns>
+    /// <returns>LabelListWithoutPagination - Labels for a specific issue (no pagination headers)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/{index}/labels", "Get an issue's labels")]
     public Task<Label[]> ListIssueLabelsAsync(string owner, string repo, long index, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/issues/{index}/labels", cancelToken).JsonResponseAsync<Label[]>(cancelToken);
@@ -493,7 +493,7 @@ public interface IIssueApi : IApiScope
     /// <param name="index">index of the issue</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>LabelList</returns>
+    /// <returns>LabelListWithoutPagination - Labels for a specific issue (no pagination headers)</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/issues/{index}/labels", "Add a label to an issue")]
     public Task<Label[]> AddIssueLabelAsync(string owner, string repo, long index, IssueLabelsOption options, CancellationToken cancelToken = default)
         => PostRequest($"repos/{owner}/{repo}/issues/{index}/labels", options, cancelToken).JsonResponseAsync<Label[]>(cancelToken);
@@ -504,7 +504,7 @@ public interface IIssueApi : IApiScope
     /// <param name="index">index of the issue</param>
     /// <param name="options"></param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>LabelList</returns>
+    /// <returns>LabelListWithoutPagination - Labels for a specific issue (no pagination headers)</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/issues/{index}/labels", "Replace an issue's labels")]
     public Task<Label[]> ReplaceIssueLabelsAsync(string owner, string repo, long index, IssueLabelsOption options, CancellationToken cancelToken = default)
         => PutRequest($"repos/{owner}/{repo}/issues/{index}/labels", options, cancelToken).JsonResponseAsync<Label[]>(cancelToken);
