@@ -1,11 +1,14 @@
 #!/usr/bin/env -S dotnet run --file
+#:package ForgejoApiClient@15.0.0-rev.1
 #:package Lestaly.General@0.123.0
 #:package AngleSharp@1.4.0
 #:property PublishAot=false
 using System.Net;
+using System.Text;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using ForgejoApiClient;
 using Lestaly;
 using Lestaly.Cx;
 
@@ -31,13 +34,17 @@ var settings = new
         InstanceInfoFile = ThisSource.RelativeFile("../test/test-forgejo-instance.json"),
     },
 
-
+    // ランナー関連設定
     Runner = new
     {
-        Name = "docker-runner",
+        // ランナー名
+        Name = "DefaultRunner",
 
         // サービスのURL
         ForgejoInstance = "http://forgejo-app-container:3000",
+
+        // ランナートークン保存ファイル
+        ServiceConfigFile = ThisSource.RelativeFile("./docker/assets/runner/services/service.yml"),
     },
 };
 
@@ -156,66 +163,46 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
             "--username", settings.Setup.AdminUser,
             "--token-name", "api-client-lib-test",
             "--scopes", "all"
-    ]).silent().result().success().output();
-    Console.WriteLine($"  API Token: {apiToken.Trim()}");
+    ]).silent().result().success().output(trim: true);
+    Console.WriteLine($"  API Token: {apiToken}");
     Console.WriteLine();
 
     // テスト用サービスインスタンスの情報をファイルに保存
     var credential = new TestUserCredential(settings.Setup.AdminUser, settings.Setup.AdminPass);
-    var instanceInfo = new TestServiceInfo(settings.ServiceURL, credential, apiToken.Trim());
+    var instanceInfo = new TestServiceInfo(settings.ServiceURL, credential, apiToken);
     await settings.Setup.InstanceInfoFile.WriteJsonAsync(instanceInfo, signal.Token);
 
-    // ランナーのセットアップ状態を取得
-    Console.WriteLine("Check runner setup state ...");
-    var runnerState = await "docker".args(
-        "compose", "--file", composes.ServiceFile.FullName, "exec", "runner",
-        "bash", "-c", "test -f /data/.runner"
-    ).silent().cancelby(signal.Token).result();
-    if (runnerState.ExitCode == 0)
+    // APIクライアント生成
+    Console.WriteLine("Create API client");
+    using var forgejo = new ForgejoClient(new Uri(settings.ServiceURL), apiToken);
+
+    // ランナーの登録状態確認
+    Console.WriteLine("Check runner registration");
+    var runners = await forgejo.Admin.ListActionsRunnersAsync(cancelToken: signal.Token);
+    if (runners.Any(r => r.name == settings.Runner.Name))
     {
-        Console.WriteLine("  Already runner setup.");
+        Console.WriteLine(".. Already registered.");
         return;
     }
-    else
-    {
-        Console.WriteLine("  No runner setup.");
-    }
 
-    // ランナーの登録トークンを取得
-    Console.WriteLine("Generate runner token ...");
-    var runnerToken = default(string);
-    for (var i = 0; i < 10; i++)
-    {
-        try
-        {
-            runnerToken = await "docker".args([
-                "compose", "--file", composes.ServiceFile, "exec", "-u", "1000", "app",
-            "forgejo", "forgejo-cli", "actions", "generate-runner-token"
-            ]).silent().result().success().output();
-            Console.WriteLine($"  Runner Token: {runnerToken}");
-            break;
-        }
-        catch
-        {
-            Console.WriteLine($"  .. retry");
-            await Task.Delay(1000);
-        }
-    }
-    if (runnerToken.IsWhite()) throw new PavedMessageException("Cannot generate token");
+    // ランナーの登録
+    Console.WriteLine("Create runner registration");
+    var runner = await forgejo.Admin.CreateActionsRunnerAsync(new(settings.Runner.Name), signal.Token);
+    Console.WriteLine($".. Created: uuid={runner.uuid}");
 
-    // ランナーをForgejoインスタンスに登録
-    Console.WriteLine("Register runner for forgejo ...");
-    await "docker".args(
-        "compose", "--file", composes.ServiceFile, "exec", "runner",
-        "forgejo-runner", "register",
-            "--no-interactive",
-            "--name", settings.Runner.Name,
-            "--instance", settings.Runner.ForgejoInstance,
-            "--token", runnerToken
-    ).silent().cancelby(signal.Token).result().success();
-    Console.WriteLine($"  Completed");
-    Console.WriteLine();
-
+    // ランナー接続情報を保存
+    Console.WriteLine("Create service config");
+    await settings.Runner.ServiceConfigFile.WithDirectoryCreate().WriteMultilineTextAsync(
+        lineBreak: "\n",
+        encoding: new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+        multiline: $"""
+            forgejo:
+              url: {settings.Runner.ForgejoInstance}
+              uuid: {runner.uuid}
+              token: {runner.token}
+        """.AsMemory(),
+        cancelToken: signal.Token
+    );
 });
 
 record TestUserCredential(string Username, string Password);

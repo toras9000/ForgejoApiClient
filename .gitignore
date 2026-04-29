@@ -365,3 +365,4 @@ FodyWeavers.xsd
 ## 追加の無視項目
 volumes
 test/test-forgejo-instance.json
+service/docker/assets/runner/services/service.yml

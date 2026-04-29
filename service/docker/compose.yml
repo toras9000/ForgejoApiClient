@@ -77,7 +77,7 @@ services:
         aliases:
           - forgejo-runner-container
     user: 1000:1000
-    command: '/bin/sh /assets/scripts/startup.sh --config /assets/configs/config.yml'
+    command: '/bin/sh /assets/scripts/startup.sh'
     volumes:
       - type: bind
         source: ./assets/runner

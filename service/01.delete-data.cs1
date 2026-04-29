@@ -15,7 +15,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
 
     // データディレクトリを削除
     Console.WriteLine("Delete data directory ...");
-    var volumesDir = ThisSource.RelativeDirectory("./docker/volumes");
-    volumesDir.DeleteRecurse();
+    ThisSource.RelativeDirectory("./docker/volumes").DeleteRecurse();
+    ThisSource.RelativeDirectory("./docker/assets/runner/services").DeleteRecurse();
     Console.WriteLine();
 });
