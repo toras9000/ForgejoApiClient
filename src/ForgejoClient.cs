@@ -1,12 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using ForgejoApiClient.Api;
 using ForgejoApiClient.Api.Scopes;
 
 namespace ForgejoApiClient;
 
 /// <summary>Forgejo APIクライアント</summary>
-[RequiresDynamicCode("Use dynamic creation converter.")]
 public class ForgejoClient : IApiClient, IDisposable
 {
     // 構築
