@@ -10,14 +10,14 @@ public interface IAdminApi : IApiScope
     /// <returns>CronList</returns>
     [ForgejoEndpoint("GET", "/admin/cron", "List cron tasks")]
     public Task<Cron[]> ListCronsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/cron".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Cron[]>(cancelToken);
+        => GetRequest("admin/cron".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CronArray, cancelToken);
 
     /// <summary>Run cron task</summary>
     /// <param name="task">task to run</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/admin/cron/{task}", "Run cron task")]
     public Task RunCronTaskAsync(string task, CancellationToken cancelToken = default)
-        => PostRequest($"admin/cron/{task}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"admin/cron/{task}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Runners
@@ -28,7 +28,7 @@ public interface IAdminApi : IApiScope
     /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
     [ForgejoEndpoint("GET", "/admin/actions/runners", "Get all runners, no matter whether they are global runners or scoped to an organization, user, or repository")]
     public Task<ActionRunner[]> ListActionsRunnersAsync(bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
+        => GetRequest("admin/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunnerArray, cancelToken);
 
     /// <summary>Get a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository</summary>
     /// <param name="runner_id">ID of the runner</param>
@@ -37,7 +37,7 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("GET", "/admin/actions/runners/{runner_id}", "Get a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository")]
     [ManualEdit("runner_id の型を変更")]
     public Task<ActionRunner> GetActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
-        => GetRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+        => GetRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunner, cancelToken);
 
     /// <summary>Register a new global runner</summary>
     /// <param name="options"></param>
@@ -45,7 +45,7 @@ public interface IAdminApi : IApiScope
     /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
     [ForgejoEndpoint("POST", "/admin/actions/runners", "Register a new global runner")]
     public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(RegisterRunnerOptions options, CancellationToken cancelToken = default)
-        => PostRequest("admin/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+        => PostRequest("admin/actions/runners", options, ApiDataSerializerContext.Default.RegisterRunnerOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RegisterRunnerResponse, cancelToken);
 
     /// <summary>Delete a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository</summary>
     /// <param name="runner_id">ID of the runner</param>
@@ -53,7 +53,7 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("DELETE", "/admin/actions/runners/{runner_id}", "Delete a particular runner, no matter whether it is a global runner or scoped to an organization, user, or repository")]
     [ManualEdit("runner_id の型を変更")]
     public Task DeleteActionsRunnerAsync(long runner_id, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Tasks
@@ -63,7 +63,7 @@ public interface IAdminApi : IApiScope
     /// <returns>RunJobList is a list of action run jobs</returns>
     [ForgejoEndpoint("GET", "/admin/actions/runners/jobs", "Get action run jobs")]
     public Task<ActionRunJob[]> ListActionsJobsAsync(string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]>(cancelToken);
+        => GetRequest("admin/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJobArray, cancelToken);
     #endregion
 
     #region Profile
@@ -73,7 +73,7 @@ public interface IAdminApi : IApiScope
     /// <returns>EmailList</returns>
     [ForgejoEndpoint("GET", "/admin/emails", "List all users' email addresses")]
     public Task<Email[]> ListEmailsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/emails".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+        => GetRequest("admin/emails".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmailArray, cancelToken);
 
     /// <summary>Search users&apos; email addresses</summary>
     /// <param name="q">keyword</param>
@@ -82,7 +82,7 @@ public interface IAdminApi : IApiScope
     /// <returns>EmailList</returns>
     [ForgejoEndpoint("GET", "/admin/emails/search", "Search users' email addresses")]
     public Task<Email[]> SearchEmailsAsync(string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/emails/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+        => GetRequest("admin/emails/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmailArray, cancelToken);
     #endregion
 
     #region Webhook
@@ -92,7 +92,7 @@ public interface IAdminApi : IApiScope
     /// <returns>HookListWithoutPagination - Hooks without pagination headers</returns>
     [ForgejoEndpoint("GET", "/admin/hooks", "List global (system) webhooks")]
     public Task<Hook[]> ListSystemWebhooksAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest("admin/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.HookArray, cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="id">id of the hook to get</param>
@@ -100,7 +100,7 @@ public interface IAdminApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("GET", "/admin/hooks/{id}", "Get a hook")]
     public Task<Hook> GetWebhookAsync(long id, CancellationToken cancelToken = default)
-        => GetRequest($"admin/hooks/{id}", cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => GetRequest($"admin/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Create a hook</summary>
     /// <param name="options"></param>
@@ -108,7 +108,7 @@ public interface IAdminApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("POST", "/admin/hooks", "Create a hook")]
     public Task<Hook> CreateWebhookAsync(CreateHookOption options, CancellationToken cancelToken = default)
-        => PostRequest("admin/hooks", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PostRequest("admin/hooks", options, ApiDataSerializerContext.Default.CreateHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Update a hook</summary>
     /// <param name="id">id of the hook to update</param>
@@ -117,14 +117,14 @@ public interface IAdminApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("PATCH", "/admin/hooks/{id}", "Update a hook")]
     public Task<Hook> UpdateWebhookAsync(long id, EditHookOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"admin/hooks/{id}", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PatchRequest($"admin/hooks/{id}", options, ApiDataSerializerContext.Default.EditHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Delete a hook</summary>
     /// <param name="id">id of the hook to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/hooks/{id}", "Delete a hook")]
     public Task DeleteWebhookAsync(long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Repository
@@ -135,7 +135,7 @@ public interface IAdminApi : IApiScope
     /// <returns>StringSlice</returns>
     [ForgejoEndpoint("GET", "/admin/unadopted", "List unadopted repositories")]
     public Task<string[]> ListUnadoptedReposAsync(string? pattern = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/unadopted".WithQuery().Param(pattern).Param(paging), cancelToken).JsonResponseAsync<string[]>(cancelToken);
+        => GetRequest("admin/unadopted".WithQuery().Param(pattern).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.StringArray, cancelToken);
 
     /// <summary>Adopt unadopted files as a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -143,7 +143,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/admin/unadopted/{owner}/{repo}", "Adopt unadopted files as a repository")]
     public Task AdoptUnadoptedRepositoryAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"admin/unadopted/{owner}/{repo}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"admin/unadopted/{owner}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete unadopted files</summary>
     /// <param name="owner">owner of the repo</param>
@@ -151,7 +151,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/unadopted/{owner}/{repo}", "Delete unadopted files")]
     public Task DeleteUnadoptedRepositoryAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/unadopted/{owner}/{repo}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/unadopted/{owner}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Create a repository on behalf of a user</summary>
     /// <param name="username">username of the user. This user will own the created repository</param>
@@ -160,7 +160,7 @@ public interface IAdminApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/admin/users/{username}/repos", "Create a repository on behalf of a user")]
     public Task<Repository> CreateUserRepoAsync(string username, CreateRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest($"admin/users/{username}/repos", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"admin/users/{username}/repos", options, ApiDataSerializerContext.Default.CreateRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
     #endregion
 
     #region Organization
@@ -170,7 +170,7 @@ public interface IAdminApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/admin/orgs", "List all organizations")]
     public Task<Organization[]> ListOrganizationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("admin/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OrganizationArray, cancelToken);
 
     /// <summary>Create an organization</summary>
     /// <param name="username">username of the user that will own the created organization</param>
@@ -179,7 +179,7 @@ public interface IAdminApi : IApiScope
     /// <returns>Organization</returns>
     [ForgejoEndpoint("POST", "/admin/users/{username}/orgs", "Create an organization")]
     public Task<Organization> CreateOrganizationAsync(string username, CreateOrgOption options, CancellationToken cancelToken = default)
-        => PostRequest($"admin/users/{username}/orgs", options, cancelToken).JsonResponseAsync<Organization>(cancelToken);
+        => PostRequest($"admin/users/{username}/orgs", options, ApiDataSerializerContext.Default.CreateOrgOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Organization, cancelToken);
     #endregion
 
     #region UserManage
@@ -192,7 +192,7 @@ public interface IAdminApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/admin/users", "Search users according filter conditions")]
     public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Create a user account</summary>
     /// <param name="options"></param>
@@ -200,7 +200,7 @@ public interface IAdminApi : IApiScope
     /// <returns>User</returns>
     [ForgejoEndpoint("POST", "/admin/users", "Create a user account")]
     public Task<User> CreateUserAsync(CreateUserOption options, CancellationToken cancelToken = default)
-        => PostRequest("admin/users", options, cancelToken).JsonResponseAsync<User>(cancelToken);
+        => PostRequest("admin/users", options, ApiDataSerializerContext.Default.CreateUserOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.User, cancelToken);
 
     /// <summary>Edit an existing user</summary>
     /// <param name="username">username of user to edit</param>
@@ -209,7 +209,7 @@ public interface IAdminApi : IApiScope
     /// <returns>User</returns>
     [ForgejoEndpoint("PATCH", "/admin/users/{username}", "Edit an existing user")]
     public Task<User> UpdateUserAsync(string username, EditUserOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"admin/users/{username}", options, cancelToken).JsonResponseAsync<User>(cancelToken);
+        => PatchRequest($"admin/users/{username}", options, ApiDataSerializerContext.Default.EditUserOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.User, cancelToken);
 
     /// <summary>Rename a user</summary>
     /// <param name="username">existing username of user</param>
@@ -217,7 +217,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/admin/users/{username}/rename", "Rename a user")]
     public Task RenameUserAsync(string username, RenameUserOption options, CancellationToken cancelToken = default)
-        => PostRequest($"admin/users/{username}/rename", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"admin/users/{username}/rename", options, ApiDataSerializerContext.Default.RenameUserOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete user account</summary>
     /// <param name="username">username of user to delete</param>
@@ -225,7 +225,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/users/{username}", "Delete user account")]
     public Task DeleteUserAsync(string username, bool? purge = default, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/users/{username}".WithQuery().Param(purge), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/users/{username}".WithQuery().Param(purge), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List all email addresses for a user</summary>
     /// <param name="username">username of user to get email addresses of</param>
@@ -233,7 +233,7 @@ public interface IAdminApi : IApiScope
     /// <returns>EmailList</returns>
     [ForgejoEndpoint("GET", "/admin/users/{username}/emails", "List all email addresses for a user")]
     public Task<Email[]> ListUserEmailsAsync(string username, CancellationToken cancelToken = default)
-        => GetRequest($"admin/users/{username}/emails", cancelToken).JsonResponseAsync<Email[]>(cancelToken);
+        => GetRequest($"admin/users/{username}/emails", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmailArray, cancelToken);
 
     /// <summary>Delete email addresses from a user&apos;s account</summary>
     /// <param name="username">username of user to delete email addresses from</param>
@@ -241,7 +241,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/users/{username}/emails", "Delete email addresses from a user's account")]
     public Task DeleteUserEmailsAsync(string username, DeleteEmailOption options, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/users/{username}/emails", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/users/{username}/emails", options, ApiDataSerializerContext.Default.DeleteEmailOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Key
@@ -252,7 +252,7 @@ public interface IAdminApi : IApiScope
     /// <returns>PublicKey</returns>
     [ForgejoEndpoint("POST", "/admin/users/{username}/keys", "Add an SSH public key to user's account")]
     public Task<PublicKey> AddUserPublicKeyAsync(string username, CreateKeyOption options, CancellationToken cancelToken = default)
-        => PostRequest($"admin/users/{username}/keys", options, cancelToken).JsonResponseAsync<PublicKey>(cancelToken);
+        => PostRequest($"admin/users/{username}/keys", options, ApiDataSerializerContext.Default.CreateKeyOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PublicKey, cancelToken);
 
     /// <summary>Remove a public key from user&apos;s account</summary>
     /// <param name="username">username of user</param>
@@ -260,7 +260,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/users/{username}/keys/{id}", "Remove a public key from user's account")]
     public Task DeleteUserPublicKeyAsync(string username, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/users/{username}/keys/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/users/{username}/keys/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Quota
@@ -269,7 +269,7 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaRuleInfoList</returns>
     [ForgejoEndpoint("GET", "/admin/quota/rules", "List the available quota rules")]
     public Task<QuotaRuleInfo[]> ListQuotaRulesAsync(CancellationToken cancelToken = default)
-        => GetRequest("admin/quota/rules", cancelToken).JsonResponseAsync<QuotaRuleInfo[]>(cancelToken);
+        => GetRequest("admin/quota/rules", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaRuleInfoArray, cancelToken);
 
     /// <summary>Get information about a quota rule</summary>
     /// <param name="quotarule">quota rule to query</param>
@@ -277,7 +277,7 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaRuleInfo</returns>
     [ForgejoEndpoint("GET", "/admin/quota/rules/{quotarule}", "Get information about a quota rule")]
     public Task<QuotaRuleInfo> GetQuotaRuleAsync(string quotarule, CancellationToken cancelToken = default)
-        => GetRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+        => GetRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaRuleInfo, cancelToken);
 
     /// <summary>Create a new quota rule</summary>
     /// <param name="options">Definition of the quota rule</param>
@@ -285,7 +285,7 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaRuleInfo</returns>
     [ForgejoEndpoint("POST", "/admin/quota/rules", "Create a new quota rule")]
     public Task<QuotaRuleInfo> CreateQuotaRuleAsync(CreateQuotaRuleOptions options, CancellationToken cancelToken = default)
-        => PostRequest("admin/quota/rules", options, cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+        => PostRequest("admin/quota/rules", options, ApiDataSerializerContext.Default.CreateQuotaRuleOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaRuleInfo, cancelToken);
 
     /// <summary>Change an existing quota rule</summary>
     /// <param name="quotarule">Quota rule to change</param>
@@ -294,14 +294,14 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaRuleInfo</returns>
     [ForgejoEndpoint("PATCH", "/admin/quota/rules/{quotarule}", "Change an existing quota rule")]
     public Task<QuotaRuleInfo> UpdateQuotaRuleAsync(string quotarule, EditQuotaRuleOptions options, CancellationToken cancelToken = default)
-        => PatchRequest($"admin/quota/rules/{quotarule}", options, cancelToken).JsonResponseAsync<QuotaRuleInfo>(cancelToken);
+        => PatchRequest($"admin/quota/rules/{quotarule}", options, ApiDataSerializerContext.Default.EditQuotaRuleOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaRuleInfo, cancelToken);
 
     /// <summary>Deletes a quota rule</summary>
     /// <param name="quotarule">quota rule to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/quota/rules/{quotarule}", "Deletes a quota rule")]
     public Task DeleteQuotaRuleAsync(string quotarule, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/quota/rules/{quotarule}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Get the user&apos;s quota info</summary>
     /// <param name="username">username of user to query</param>
@@ -309,7 +309,7 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaInfo</returns>
     [ForgejoEndpoint("GET", "/admin/users/{username}/quota", "Get the user's quota info")]
     public Task<QuotaInfo> GetUserQuotaRuleAsync(string username, CancellationToken cancelToken = default)
-        => GetRequest($"admin/users/{username}/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
+        => GetRequest($"admin/users/{username}/quota", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaInfo, cancelToken);
 
     /// <summary>Set the user&apos;s quota groups to a given list.</summary>
     /// <param name="username">username of the user to modify the quota groups from</param>
@@ -317,14 +317,14 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/admin/users/{username}/quota/groups", "Set the user's quota groups to a given list.")]
     public Task SetUserQuotaGroupAsync(string username, SetUserQuotaGroupsOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"admin/users/{username}/quota/groups", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"admin/users/{username}/quota/groups", options, ApiDataSerializerContext.Default.SetUserQuotaGroupsOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List the available quota groups</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>QuotaGroupList</returns>
     [ForgejoEndpoint("GET", "/admin/quota/groups", "List the available quota groups")]
     public Task<QuotaGroup[]> ListQuotaGroupsAsync(CancellationToken cancelToken = default)
-        => GetRequest("admin/quota/groups", cancelToken).JsonResponseAsync<QuotaGroup[]>(cancelToken);
+        => GetRequest("admin/quota/groups", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaGroupArray, cancelToken);
 
     /// <summary>Get information about the quota group</summary>
     /// <param name="quotagroup">quota group to query</param>
@@ -332,7 +332,7 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaGroup</returns>
     [ForgejoEndpoint("GET", "/admin/quota/groups/{quotagroup}", "Get information about the quota group")]
     public Task<QuotaGroup> GetQuotaGroupAsync(string quotagroup, CancellationToken cancelToken = default)
-        => GetRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync<QuotaGroup>(cancelToken);
+        => GetRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaGroup, cancelToken);
 
     /// <summary>Create a new quota group</summary>
     /// <param name="options">Definition of the quota group</param>
@@ -340,14 +340,14 @@ public interface IAdminApi : IApiScope
     /// <returns>QuotaGroup</returns>
     [ForgejoEndpoint("POST", "/admin/quota/groups", "Create a new quota group")]
     public Task<QuotaGroup> CreateQuotaGroupAsync(CreateQuotaGroupOptions options, CancellationToken cancelToken = default)
-        => PostRequest("admin/quota/groups", options, cancelToken).JsonResponseAsync<QuotaGroup>(cancelToken);
+        => PostRequest("admin/quota/groups", options, ApiDataSerializerContext.Default.CreateQuotaGroupOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaGroup, cancelToken);
 
     /// <summary>Delete a quota group</summary>
     /// <param name="quotagroup">quota group to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}", "Delete a quota group")]
     public Task DeleteQuotaGroupAsync(string quotagroup, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/quota/groups/{quotagroup}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Adds a rule to a quota group</summary>
     /// <param name="quotagroup">quota group to add a rule to</param>
@@ -355,7 +355,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/admin/quota/groups/{quotagroup}/rules/{quotarule}", "Adds a rule to a quota group")]
     public Task AddQuotaGroupRuleAsync(string quotagroup, string quotarule, CancellationToken cancelToken = default)
-        => PutRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Removes a rule from a quota group</summary>
     /// <param name="quotagroup">quota group to remove a rule from</param>
@@ -363,7 +363,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}/rules/{quotarule}", "Removes a rule from a quota group")]
     public Task RemoveQuotaGroupRuleAsync(string quotagroup, string quotarule, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/quota/groups/{quotagroup}/rules/{quotarule}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List users in a quota group</summary>
     /// <param name="quotagroup">quota group to list members of</param>
@@ -371,7 +371,7 @@ public interface IAdminApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/admin/quota/groups/{quotagroup}/users", "List users in a quota group")]
     public Task<User[]> ListQuotaGroupUsersAsync(string quotagroup, CancellationToken cancelToken = default)
-        => GetRequest($"admin/quota/groups/{quotagroup}/users", cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"admin/quota/groups/{quotagroup}/users", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Add a user to a quota group</summary>
     /// <param name="quotagroup">quota group to add the user to</param>
@@ -379,7 +379,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/admin/quota/groups/{quotagroup}/users/{username}", "Add a user to a quota group")]
     public Task AddQuotaGroupUserAsync(string quotagroup, string username, CancellationToken cancelToken = default)
-        => PutRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Remove a user from a quota group</summary>
     /// <param name="quotagroup">quota group to remove a user from</param>
@@ -387,7 +387,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/admin/quota/groups/{quotagroup}/users/{username}", "Remove a user from a quota group")]
     public Task RemoveQuotaGroupUserAsync(string quotagroup, string username, CancellationToken cancelToken = default)
-        => DeleteRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"admin/quota/groups/{quotagroup}/users/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
 }

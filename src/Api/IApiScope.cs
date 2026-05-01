@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace ForgejoApiClient.Api;
 
@@ -57,23 +58,25 @@ public interface IApiScope
     /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext PostRequest<TArg>(string endpoint, TArg args, CancellationToken cancelToken)
-        => new RequestContext(this.Http.PostAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, RequestContext.JsonRequestOptions, cancelToken));
+    internal RequestContext PostRequest<TArg>(string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
+        => new RequestContext(this.Http.PostAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, typeInfo, cancelToken));
 
     /// <summary>APIにJSON-BODYのPOSTメソッドアクセスを行う要求コンテキストを作成する</summary>
     /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="auth">BASIC認証情報</param>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext PostRequest<TArg>(BasicAuthCredential auth, string endpoint, TArg args, CancellationToken cancelToken)
+    internal RequestContext PostRequest<TArg>(BasicAuthCredential auth, string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
     {
         var uri = new Uri(this.BaseUrl, endpoint);
         var request = new HttpRequestMessage(HttpMethod.Post, uri).WithBasicAuth(auth);
-        request.Content = JsonContent.Create(args, options: RequestContext.JsonRequestOptions);
+        request.Content = JsonContent.Create(args, typeInfo);
         return new RequestContext(this.Http.SendAsync(request, cancelToken));
     }
 
@@ -88,10 +91,11 @@ public interface IApiScope
     /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext PutRequest<TArg>(string endpoint, TArg args, CancellationToken cancelToken)
-        => new RequestContext(this.Http.PutAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, RequestContext.JsonRequestOptions, cancelToken));
+    internal RequestContext PutRequest<TArg>(string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
+        => new RequestContext(this.Http.PutAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, typeInfo, cancelToken));
 
     /// <summary>APIにPATCHメソッドアクセスを行う要求コンテキストを作成する</summary>
     /// <param name="endpoint">APIエンドポイント</param>
@@ -104,10 +108,11 @@ public interface IApiScope
     /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext PatchRequest<TArg>(string endpoint, TArg args, CancellationToken cancelToken)
-        => new RequestContext(this.Http.PatchAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, RequestContext.JsonRequestOptions, cancelToken));
+    internal RequestContext PatchRequest<TArg>(string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
+        => new RequestContext(this.Http.PatchAsJsonAsync(new Uri(this.BaseUrl, endpoint), args, typeInfo, cancelToken));
 
     /// <summary>APIにDELETEメソッドアクセスを行う要求コンテキストを作成する</summary>
     /// <param name="endpoint">APIエンドポイント</param>
@@ -132,12 +137,13 @@ public interface IApiScope
     /// <typeparam name="TArg">要求データの型</typeparam>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext DeleteRequest<TArg>(string endpoint, TArg args, CancellationToken cancelToken)
+    internal RequestContext DeleteRequest<TArg>(string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
     {
         var uri = new Uri(this.BaseUrl, endpoint);
-        var request = new HttpRequestMessage(HttpMethod.Delete, uri) { Content = JsonContent.Create(args, options: RequestContext.JsonRequestOptions), };
+        var request = new HttpRequestMessage(HttpMethod.Delete, uri) { Content = JsonContent.Create(args, typeInfo), };
         return new RequestContext(this.Http.SendAsync(request, cancelToken));
     }
     #endregion

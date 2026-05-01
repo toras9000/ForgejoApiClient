@@ -10,7 +10,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/migrate", "Migrate a remote git repository")]
     public Task<Repository> MigrateAsync(MigrateRepoOptions options, CancellationToken cancelToken = default)
-        => PostRequest("repos/migrate", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest("repos/migrate", options, ApiDataSerializerContext.Default.MigrateRepoOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Sync a mirrored repository</summary>
     /// <param name="owner">owner of the repo to sync</param>
@@ -18,7 +18,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/mirror-sync", "Sync a mirrored repository")]
     public Task SyncMirroredAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/mirror-sync", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/mirror-sync", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Convert a mirror repo to a normal repo.</summary>
     /// <param name="owner">owner of the repo to convert</param>
@@ -27,7 +27,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/convert", "Convert a mirror repo to a normal repo.")]
     public Task<Repository> ConvertUnmirrorAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/convert", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/convert", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
     #endregion
 
     #region Repository
@@ -52,7 +52,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>SearchResults</returns>
     [ForgejoEndpoint("GET", "/repos/search", "Search for repositories")]
     public Task<SearchResults> SearchAsync(string? q = default, bool? topic = default, bool? includeDesc = default, long? uid = default, long? priority_owner_id = default, long? team_id = default, long? starredBy = default, bool? @private = default, bool? is_private = default, bool? template = default, bool? archived = default, string? mode = default, bool? exclusive = default, string? sort = default, string? order = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("repos/search".WithQuery().Param(q).Param(topic).Param(includeDesc).Param(uid).Param(priority_owner_id).Param(team_id).Param(starredBy).Param(@private).Param(is_private).Param(template).Param(archived).Param(mode).Param(exclusive).Param(sort).Param(order).Param(paging), cancelToken).JsonResponseAsync<SearchResults>(cancelToken);
+        => GetRequest("repos/search".WithQuery().Param(q).Param(topic).Param(includeDesc).Param(uid).Param(priority_owner_id).Param(team_id).Param(starredBy).Param(@private).Param(is_private).Param(template).Param(archived).Param(mode).Param(exclusive).Param(sort).Param(order).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SearchResults, cancelToken);
 
     /// <summary>Get a repository by id</summary>
     /// <param name="id">id of the repo to get</param>
@@ -60,7 +60,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("GET", "/repositories/{id}", "Get a repository by id")]
     public Task<Repository> GetAsync(long id, CancellationToken cancelToken = default)
-        => GetRequest($"repositories/{id}", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => GetRequest($"repositories/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Get a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -69,7 +69,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}", "Get a repository")]
     public Task<Repository> GetAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Create a repository</summary>
     /// <param name="options"></param>
@@ -77,7 +77,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/user/repos", "Create a repository")]
     public Task<Repository> CreateAsync(CreateRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest("user/repos", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest("user/repos", options, ApiDataSerializerContext.Default.CreateRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Create a repository using a template</summary>
     /// <param name="template_owner">name of the template repository owner</param>
@@ -87,7 +87,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{template_owner}/{template_repo}/generate", "Create a repository using a template")]
     public Task<Repository> CreateUsingTemplateAsync(string template_owner, string template_repo, GenerateRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{template_owner}/{template_repo}/generate", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{template_owner}/{template_repo}/generate", options, ApiDataSerializerContext.Default.GenerateRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Edit a repository&apos;s properties. Only fields that are set will be changed.</summary>
     /// <param name="owner">owner of the repo to edit</param>
@@ -97,7 +97,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}", "Edit a repository's properties. Only fields that are set will be changed.")]
     public Task<Repository> UpdateAsync(string owner, string repo, EditRepoOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}", options, ApiDataSerializerContext.Default.EditRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Delete a repository</summary>
     /// <param name="owner">owner of the repo to delete</param>
@@ -105,7 +105,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}", "Delete a repository")]
     public Task DeleteAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Branch
@@ -117,7 +117,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>BranchList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/branches", "List a repository's branches")]
     public Task<Branch[]> ListBranchesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/branches".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Branch[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/branches".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BranchArray, cancelToken);
 
     /// <summary>Retrieve a specific branch from a repository, including its effective branch protection</summary>
     /// <param name="owner">owner of the repo</param>
@@ -127,7 +127,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Branch</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/branches/{branch}", "Retrieve a specific branch from a repository, including its effective branch protection")]
     public Task<Branch> GetBranchAsync(string owner, string repo, string branch, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/branches/{branch}", cancelToken).JsonResponseAsync<Branch>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/branches/{branch}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Branch, cancelToken);
 
     /// <summary>Create a branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -137,7 +137,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Branch</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/branches", "Create a branch")]
     public Task<Branch> CreateBranchAsync(string owner, string repo, CreateBranchRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/branches", options, cancelToken).JsonResponseAsync<Branch>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/branches", options, ApiDataSerializerContext.Default.CreateBranchRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Branch, cancelToken);
 
     /// <summary>Update a branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -147,7 +147,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/branches/{branch}", "Update a branch")]
     public Task UpdateBranchAsync(string owner, string repo, string branch, UpdateBranchRepoOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/branches/{branch}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/branches/{branch}", options, ApiDataSerializerContext.Default.UpdateBranchRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a specific branch from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -156,7 +156,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/branches/{branch}", "Delete a specific branch from a repository")]
     public Task DeleteBranchAsync(string owner, string repo, string branch, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/branches/{branch}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/branches/{branch}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region BranchProtection
@@ -167,7 +167,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>BranchProtectionList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/branch_protections", "List branch protections for a repository")]
     public Task<BranchProtection[]> ListBranchProtectionsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/branch_protections", cancelToken).JsonResponseAsync<BranchProtection[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/branch_protections", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BranchProtectionArray, cancelToken);
 
     /// <summary>Get a specific branch protection for the repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -177,7 +177,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>BranchProtection</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/branch_protections/{name}", "Get a specific branch protection for the repository")]
     public Task<BranchProtection> GetBranchProtectionAsync(string owner, string repo, string name, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/branch_protections/{name}", cancelToken).JsonResponseAsync<BranchProtection>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/branch_protections/{name}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BranchProtection, cancelToken);
 
     /// <summary>Create a branch protections for a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -187,7 +187,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>BranchProtection</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/branch_protections", "Create a branch protections for a repository")]
     public Task<BranchProtection> CreateBranchProtectionAsync(string owner, string repo, CreateBranchProtectionOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/branch_protections", options, cancelToken).JsonResponseAsync<BranchProtection>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/branch_protections", options, ApiDataSerializerContext.Default.CreateBranchProtectionOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BranchProtection, cancelToken);
 
     /// <summary>Edit a branch protections for a repository. Only fields that are set will be changed</summary>
     /// <param name="owner">owner of the repo</param>
@@ -198,7 +198,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>BranchProtection</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/branch_protections/{name}", "Edit a branch protections for a repository. Only fields that are set will be changed")]
     public Task<BranchProtection> UpdateBranchProtectionAsync(string owner, string repo, string name, EditBranchProtectionOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/branch_protections/{name}", options, cancelToken).JsonResponseAsync<BranchProtection>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/branch_protections/{name}", options, ApiDataSerializerContext.Default.EditBranchProtectionOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BranchProtection, cancelToken);
 
     /// <summary>Delete a specific branch protection for the repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -207,7 +207,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/branch_protections/{name}", "Delete a specific branch protection for the repository")]
     public Task DeleteBranchProtectionAsync(string owner, string repo, string name, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/branch_protections/{name}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/branch_protections/{name}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Tag
@@ -219,7 +219,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TagList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags", "List a repository's tags")]
     public Task<Tag[]> ListTagsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tags".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Tag[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/tags".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TagArray, cancelToken);
 
     /// <summary>Get the tag of a repository by tag name</summary>
     /// <param name="owner">owner of the repo</param>
@@ -229,7 +229,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Tag</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tags/{tag}", "Get the tag of a repository by tag name")]
     public Task<Tag> GetTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<Tag>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Tag, cancelToken);
 
     /// <summary>Create a new git tag in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -239,7 +239,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Tag</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/tags", "Create a new git tag in a repository")]
     public Task<Tag> CreateTagAsync(string owner, string repo, CreateTagOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/tags", options, cancelToken).JsonResponseAsync<Tag>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/tags", options, ApiDataSerializerContext.Default.CreateTagOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Tag, cancelToken);
 
     /// <summary>Delete a repository&apos;s tag by name</summary>
     /// <param name="owner">owner of the repo</param>
@@ -248,7 +248,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/tags/{tag}", "Delete a repository's tag by name")]
     public Task DeleteTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/tags/{tag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region TagProtection
@@ -259,7 +259,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TagProtectionList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tag_protections", "List tag protections for a repository")]
     public Task<TagProtection[]> ListTagProtectionsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tag_protections", cancelToken).JsonResponseAsync<TagProtection[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/tag_protections", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TagProtectionArray, cancelToken);
 
     /// <summary>Get a specific tag protection for the repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -269,7 +269,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TagProtection</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/tag_protections/{id}", "Get a specific tag protection for the repository")]
     public Task<TagProtection> GetTagProtectionAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TagProtection, cancelToken);
 
     /// <summary>Create a tag protections for a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -279,7 +279,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TagProtection</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/tag_protections", "Create a tag protections for a repository")]
     public Task<TagProtection> CreateTagProtectionAsync(string owner, string repo, CreateTagProtectionOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/tag_protections", options, cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/tag_protections", options, ApiDataSerializerContext.Default.CreateTagProtectionOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TagProtection, cancelToken);
 
     /// <summary>Edit a tag protections for a repository. Only fields that are set will be changed</summary>
     /// <param name="owner">owner of the repo</param>
@@ -290,7 +290,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TagProtection</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/tag_protections/{id}", "Edit a tag protections for a repository. Only fields that are set will be changed")]
     public Task<TagProtection> UpdateTagProtectionAsync(string owner, string repo, long id, EditTagProtectionOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/tag_protections/{id}", options, cancelToken).JsonResponseAsync<TagProtection>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/tag_protections/{id}", options, ApiDataSerializerContext.Default.EditTagProtectionOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TagProtection, cancelToken);
 
     /// <summary>Delete a specific tag protection for the repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -299,7 +299,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/tag_protections/{id}", "Delete a specific tag protection for the repository")]
     public Task DeleteTagProtectionAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/tag_protections/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Commit
@@ -317,7 +317,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CommitList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/commits", "Get a list of all commits from a repository")]
     public Task<Commit[]> ListCommitsAsync(string owner, string repo, string? sha = default, string? path = default, bool? stat = default, bool? verification = default, bool? files = default, string? not = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/commits".WithQuery().Param(sha).Param(path).Param(stat).Param(verification).Param(files).Param(not).Param(paging), cancelToken).JsonResponseAsync<Commit[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/commits".WithQuery().Param(sha).Param(path).Param(stat).Param(verification).Param(files).Param(not).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CommitArray, cancelToken);
 
     /// <summary>Get a single commit from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -330,7 +330,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Commit</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/commits/{sha}", "Get a single commit from a repository")]
     public Task<Commit> GetCommitAsync(string owner, string repo, string sha, bool? stat = default, bool? verification = default, bool? files = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/commits/{sha}".WithQuery().Param(stat).Param(verification).Param(files), cancelToken).JsonResponseAsync<Commit>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/commits/{sha}".WithQuery().Param(stat).Param(verification).Param(files), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Commit, cancelToken);
 
     /// <summary>Get a commit&apos;s diff or patch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -351,7 +351,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns></returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/compare/{basehead}", "Get commit comparison information")]
     public Task<Compare> GetCommitCompareAsync(string owner, string repo, string basehead, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/compare/{basehead}", cancelToken).JsonResponseAsync<Compare>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/compare/{basehead}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Compare, cancelToken);
 
     /// <summary>Get the pull request of the commit</summary>
     /// <param name="owner">owner of the repo</param>
@@ -361,7 +361,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequest</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/commits/{sha}/pull", "Get the pull request of the commit")]
     public Task<PullRequest> GetCommitPullRequestAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/commits/{sha}/pull", cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/commits/{sha}/pull", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequest, cancelToken);
     #endregion
 
     #region CommitNote
@@ -375,7 +375,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Note</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/notes/{sha}", "Get a note corresponding to a single commit from a repository")]
     public Task<Note> GetCommitNoteAsync(string owner, string repo, string sha, bool? verification = default, bool? files = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/notes/{sha}".WithQuery().Param(verification).Param(files), cancelToken).JsonResponseAsync<Note>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/notes/{sha}".WithQuery().Param(verification).Param(files), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Note, cancelToken);
 
     /// <summary>Set a note corresponding to a single commit from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -386,7 +386,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Note</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/git/notes/{sha}", "Set a note corresponding to a single commit from a repository")]
     public Task<Note> SetCommitNoteAsync(string owner, string repo, string sha, NoteOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/git/notes/{sha}", options, cancelToken).JsonResponseAsync<Note>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/git/notes/{sha}", options, ApiDataSerializerContext.Default.NoteOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Note, cancelToken);
 
     /// <summary>Removes a note corresponding to a single commit from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -395,7 +395,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/git/notes/{sha}", "Removes a note corresponding to a single commit from a repository")]
     public Task DeleteCommitNoteAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/git/notes/{sha}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/git/notes/{sha}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region CommitStatus
@@ -410,7 +410,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CommitStatusList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/commits/{ref}/statuses", "Get a commit's statuses, by branch/tag/commit reference")]
     public Task<CommitStatus[]> ListCommitsStatusesAsync(string owner, string repo, string @ref, string? sort = default, string? state = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/commits/{@ref}/statuses".WithQuery().Param(sort).Param(state).Param(paging), cancelToken).JsonResponseAsync<CommitStatus[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/commits/{@ref}/statuses".WithQuery().Param(sort).Param(state).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CommitStatusArray, cancelToken);
 
     /// <summary>Get a commit&apos;s combined status, by branch/tag/commit reference</summary>
     /// <param name="owner">owner of the repo</param>
@@ -421,7 +421,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CombinedStatus</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/commits/{ref}/status", "Get a commit's combined status, by branch/tag/commit reference")]
     public Task<CombinedStatus> GetCommitsCombinedStatusAsync(string owner, string repo, string @ref, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/commits/{@ref}/status".WithQuery().Param(paging), cancelToken).JsonResponseAsync<CombinedStatus>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/commits/{@ref}/status".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CombinedStatus, cancelToken);
 
     /// <summary>Get a commit&apos;s statuses</summary>
     /// <param name="owner">owner of the repo</param>
@@ -434,7 +434,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CommitStatusList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/statuses/{sha}", "Get a commit's statuses")]
     public Task<CommitStatus[]> ListCommitStatusesAsync(string owner, string repo, string sha, string? sort = default, string? state = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/statuses/{sha}".WithQuery().Param(sort).Param(state).Param(paging), cancelToken).JsonResponseAsync<CommitStatus[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/statuses/{sha}".WithQuery().Param(sort).Param(state).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CommitStatusArray, cancelToken);
 
     /// <summary>Create a commit status</summary>
     /// <param name="owner">owner of the repo</param>
@@ -445,7 +445,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CommitStatus</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/statuses/{sha}", "Create a commit status")]
     public Task<CommitStatus> CreateCommitStatusAsync(string owner, string repo, string sha, CreateStatusOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/statuses/{sha}", options, cancelToken).JsonResponseAsync<CommitStatus>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/statuses/{sha}", options, ApiDataSerializerContext.Default.CreateStatusOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CommitStatus, cancelToken);
     #endregion
 
     #region Git
@@ -460,7 +460,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitTreeResponse</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/trees/{sha}", "Gets the tree of a repository.")]
     public Task<GitTreeResponse> GetTreeAsync(string owner, string repo, string sha, bool? recursive = default, int? page = default, int? per_page = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/trees/{sha}".WithQuery().Param(recursive).Param(page).Param(per_page), cancelToken).JsonResponseAsync<GitTreeResponse>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/trees/{sha}".WithQuery().Param(recursive).Param(page).Param(per_page), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitTreeResponse, cancelToken);
 
     /// <summary>Get specified ref or filtered repository&apos;s refs</summary>
     /// <param name="owner">owner of the repo</param>
@@ -470,7 +470,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ReferenceList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/refs/{ref}", "Get specified ref or filtered repository's refs")]
     public Task<Reference[]> ListRefsAsync(string owner, string repo, string @ref, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/refs/{@ref}", cancelToken).JsonResponseAsync<Reference[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/refs/{@ref}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ReferenceArray, cancelToken);
 
     /// <summary>Gets the metadata of all the entries of the root dir</summary>
     /// <param name="owner">owner of the repo</param>
@@ -480,7 +480,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ContentsListResponse</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/contents", "Gets the metadata of all the entries of the root dir")]
     public Task<ContentsResponse[]> ListContentsAsync(string owner, string repo, string? @ref = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/contents".WithQuery().Param(@ref), cancelToken).JsonResponseAsync<ContentsResponse[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/contents".WithQuery().Param(@ref), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ContentsResponseArray, cancelToken);
 
     /// <summary>Gets the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir</summary>
     /// <param name="owner">owner of the repo</param>
@@ -491,7 +491,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ContentsResponse</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/contents/{filepath}", "Gets the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir")]
     public Task<ContentsResponse> GetContentAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/contents/{filepath}".WithQuery().Param(@ref), cancelToken).JsonResponseAsync<ContentsResponse>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/contents/{filepath}".WithQuery().Param(@ref), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ContentsResponse, cancelToken);
 
     /// <summary>Gets multiple blobs of a repository.</summary>
     /// <param name="owner">owner of the repo</param>
@@ -501,7 +501,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitBlobList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/blobs", "Gets multiple blobs of a repository.")]
     public Task<GitBlob[]> ListBlobsAsync(string owner, string repo, string shas, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/blobs".WithQuery().Param(shas), cancelToken).JsonResponseAsync<GitBlob[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/blobs".WithQuery().Param(shas), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitBlobArray, cancelToken);
 
     /// <summary>Gets the blob of a repository.</summary>
     /// <param name="owner">owner of the repo</param>
@@ -511,7 +511,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitBlob</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/blobs/{sha}", "Gets the blob of a repository.")]
     public Task<GitBlob> GetBlobAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/blobs/{sha}", cancelToken).JsonResponseAsync<GitBlob>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/blobs/{sha}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitBlob, cancelToken);
 
     /// <summary>Get a file or it&apos;s LFS object from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -544,7 +544,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>FileResponse</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/contents/{filepath}", "Create a file in a repository")]
     public Task<FileResponse> CreateFileAsync(string owner, string repo, string filepath, CreateFileOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/contents/{filepath}", options, cancelToken).JsonResponseAsync<FileResponse>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/contents/{filepath}", options, ApiDataSerializerContext.Default.CreateFileOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.FileResponse, cancelToken);
 
     /// <summary>Update a file in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -555,7 +555,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>FileResponse</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/contents/{filepath}", "Update a file in a repository")]
     public Task<FileResponse> UpdateFileAsync(string owner, string repo, string filepath, UpdateFileOptions options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/contents/{filepath}", options, cancelToken).JsonResponseAsync<FileResponse>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/contents/{filepath}", options, ApiDataSerializerContext.Default.UpdateFileOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.FileResponse, cancelToken);
 
     /// <summary>Modify multiple files in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -565,7 +565,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>FilesResponse</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/contents", "Modify multiple files in a repository")]
     public Task<FilesResponse> UpdateFilesAsync(string owner, string repo, ChangeFilesOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/contents", options, cancelToken).JsonResponseAsync<FilesResponse>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/contents", options, ApiDataSerializerContext.Default.ChangeFilesOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.FilesResponse, cancelToken);
 
     /// <summary>Delete a file in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -576,7 +576,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>FileDeleteResponse</returns>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/contents/{filepath}", "Delete a file in a repository")]
     public Task<FileDeleteResponse> DeleteFileAsync(string owner, string repo, string filepath, DeleteFileOptions options, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/contents/{filepath}", options, cancelToken).JsonResponseAsync<FileDeleteResponse>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/contents/{filepath}", options, ApiDataSerializerContext.Default.DeleteFileOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.FileDeleteResponse, cancelToken);
 
     /// <summary>Apply diff patch to repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -586,7 +586,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>FileResponse</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/diffpatch", "Apply diff patch to repository")]
     public Task<FileResponse> ApplyPatchAsync(string owner, string repo, UpdateFileOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/diffpatch", options, cancelToken).JsonResponseAsync<FileResponse>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/diffpatch", options, ApiDataSerializerContext.Default.UpdateFileOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.FileResponse, cancelToken);
 
     /// <summary>Get specified ref or filtered repository&apos;s refs</summary>
     /// <param name="owner">owner of the repo</param>
@@ -595,7 +595,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ReferenceList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/refs", "Get specified ref or filtered repository's refs")]
     public Task<Reference[]> ListRefsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/refs", cancelToken).JsonResponseAsync<Reference[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/refs", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ReferenceArray, cancelToken);
 
     /// <summary>Gets the tag object of an annotated tag (not lightweight tags)</summary>
     /// <param name="owner">owner of the repo</param>
@@ -605,7 +605,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>AnnotatedTag</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/git/tags/{sha}", "Gets the tag object of an annotated tag (not lightweight tags)")]
     public Task<AnnotatedTag> GetAnnotatedTagAsync(string owner, string repo, string sha, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/git/tags/{sha}", cancelToken).JsonResponseAsync<AnnotatedTag>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/git/tags/{sha}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.AnnotatedTag, cancelToken);
     #endregion
 
     #region GitHook
@@ -616,7 +616,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitHookList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/hooks/git", "List the Git hooks in a repository")]
     public Task<GitHook[]> ListGitHooksAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/hooks/git", cancelToken).JsonResponseAsync<GitHook[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/hooks/git", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitHookArray, cancelToken);
 
     /// <summary>Get a Git hook</summary>
     /// <param name="owner">owner of the repo</param>
@@ -626,7 +626,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitHook</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/hooks/git/{id}", "Get a Git hook")]
     public Task<GitHook> GetGitHookAsync(string owner, string repo, string id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/hooks/git/{id}", cancelToken).JsonResponseAsync<GitHook>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/hooks/git/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitHook, cancelToken);
 
     /// <summary>Edit a Git hook in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -637,7 +637,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>GitHook</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/hooks/git/{id}", "Edit a Git hook in a repository")]
     public Task<GitHook> UpdateGitHookAsync(string owner, string repo, string id, EditGitHookOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/hooks/git/{id}", options, cancelToken).JsonResponseAsync<GitHook>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/hooks/git/{id}", options, ApiDataSerializerContext.Default.EditGitHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.GitHook, cancelToken);
 
     /// <summary>Delete a Git hook in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -646,7 +646,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/hooks/git/{id}", "Delete a Git hook in a repository")]
     public Task DeleteGitHookAsync(string owner, string repo, string id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/hooks/git/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/hooks/git/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Fork
@@ -658,7 +658,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/forks", "List a repository's forks")]
     public Task<Repository[]> ListForksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/forks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/forks".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RepositoryArray, cancelToken);
 
     /// <summary>Fork a repository</summary>
     /// <param name="owner">owner of the repo to fork</param>
@@ -668,7 +668,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/forks", "Fork a repository")]
     public Task<Repository> ForkAsync(string owner, string repo, CreateForkOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/forks", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/forks", options, ApiDataSerializerContext.Default.CreateForkOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Gets information about syncing the fork default branch with the base branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -677,7 +677,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>SyncForkInfo</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/sync_fork", "Gets information about syncing the fork default branch with the base branch")]
     public Task<SyncForkInfo> GetForkInfoAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/sync_fork", cancelToken).JsonResponseAsync<SyncForkInfo>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/sync_fork", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SyncForkInfo, cancelToken);
 
     /// <summary>Syncs the default branch of a fork with the base branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -685,7 +685,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/sync_fork", "Syncs the default branch of a fork with the base branch")]
     public Task SyncForkAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/sync_fork", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/sync_fork", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Gets information about syncing a fork branch with the base branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -695,7 +695,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>SyncForkInfo</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/sync_fork/{branch}", "Gets information about syncing a fork branch with the base branch")]
     public Task<SyncForkInfo> GetForkBranchInfoAsync(string owner, string repo, string branch, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync<SyncForkInfo>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SyncForkInfo, cancelToken);
 
     /// <summary>Syncs a fork branch with the base branch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -704,7 +704,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/sync_fork/{branch}", "Syncs a fork branch with the base branch")]
     public Task SyncForkBranchAsync(string owner, string repo, string branch, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/sync_fork/{branch}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Runners
@@ -717,7 +717,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners", "Get runners belonging to the repository")]
     public Task<ActionRunner[]> ListActionsRunnersAsync(string owner, string repo, bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunnerArray, cancelToken);
 
     /// <summary>Get a particular runner that belongs to the repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -728,7 +728,7 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/{runner_id}", "Get a particular runner that belongs to the repository")]
     [ManualEdit("runner_id の型を変更")]
     public Task<ActionRunner> GetActionsRunnerAsync(string owner, string repo, long runner_id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunner, cancelToken);
 
     /// <summary>Register a new repository-level runner</summary>
     /// <param name="owner">owner of the repo</param>
@@ -738,7 +738,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/runners", "Register a new repository-level runner")]
     public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(string owner, string repo, RegisterRunnerOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/actions/runners", options, ApiDataSerializerContext.Default.RegisterRunnerOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RegisterRunnerResponse, cancelToken);
 
     /// <summary>Delete a particular runner that belongs to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -748,7 +748,7 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/runners/{runner_id}", "Delete a particular runner that belongs to a repository")]
     [ManualEdit("runner_id の型を変更")]
     public Task DeleteActionsRunnerAsync(string owner, string repo, long runner_id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Tasks
@@ -761,7 +761,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TasksList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/tasks", "List a repository's action tasks")]
     public Task<ActionTaskResponse> ListActionsTasksAsync(string owner, string repo, string[]? status = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery().Param(status).Param(paging), cancelToken).JsonResponseAsync<ActionTaskResponse>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/tasks".WithQuery().Param(status).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionTaskResponse, cancelToken);
 
     /// <summary>Dispatches a workflow</summary>
     /// <param name="owner">owner of the repo</param>
@@ -772,7 +772,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>DispatchWorkflowRun is a Workflow Run after dispatching</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/workflows/{workflowfilename}/dispatches", "Dispatches a workflow")]
     public Task<DispatchWorkflowRun?> DispatchActionsWorkflowAsync(string owner, string repo, string workflowfilename, DispatchWorkflowOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowfilename}/dispatches", options, cancelToken).JsonResponseAsync<DispatchWorkflowRun?>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/actions/workflows/{workflowfilename}/dispatches", options, ApiDataSerializerContext.Default.DispatchWorkflowOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.DispatchWorkflowRun, cancelToken);
 
     /// <summary>Search for repository&apos;s action jobs according filter conditions</summary>
     /// <param name="owner">owner of the repo</param>
@@ -783,7 +783,7 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runners/jobs", "Search for repository's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
     public Task<ActionRunJob[]?> ListActionsJobsAsync(string owner, string repo, string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJobArray, cancelToken);
 
     /// <summary>List a repository&apos;s action runs</summary>
     /// <param name="owner">owner of the repo</param>
@@ -799,7 +799,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActionRunList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs", "List a repository's action runs")]
     public Task<ListActionRunResponse> ListActionsRunsAsync(string owner, string repo, ICollection<string>? @event = default, string[]? status = default, long? run_number = default, string? head_sha = default, string? @ref = default, string? workflow_id = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runs".WithQuery().Param(@event).Param(status).Param(run_number).Param(head_sha).Param(@ref).Param(workflow_id).Param(paging), cancelToken).JsonResponseAsync<ListActionRunResponse>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/runs".WithQuery().Param(@event).Param(status).Param(run_number).Param(head_sha).Param(@ref).Param(workflow_id).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ListActionRunResponse, cancelToken);
 
     /// <summary>Get an action run</summary>
     /// <param name="owner">owner of the repo</param>
@@ -809,7 +809,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActionRun</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs/{run_id}", "Get an action run")]
     public Task<ActionRun> GetActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync<ActionRun>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRun, cancelToken);
     #endregion
 
     #region Actions Secrets
@@ -821,7 +821,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>SecretList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/secrets", "List an repo's actions secrets")]
     public Task<Secret[]> ListActionsSecretsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SecretArray, cancelToken);
 
     /// <summary>Create or Update a secret value in a repository</summary>
     /// <param name="owner">owner of the repository</param>
@@ -831,7 +831,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Create or Update a secret value in a repository")]
     public Task SetActionsSecretAsync(string owner, string repo, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", options, ApiDataSerializerContext.Default.CreateOrUpdateSecretOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a secret in a repository</summary>
     /// <param name="owner">owner of the repository</param>
@@ -840,7 +840,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/secrets/{secretname}", "Delete a secret in a repository")]
     public Task DeleteActionsSecretAsync(string owner, string repo, string secretname, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Variables
@@ -852,7 +852,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables", "Get repo-level variables list")]
     public Task<ActionVariable[]> ListActionsVariablesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionVariableArray, cancelToken);
 
     /// <summary>Get a repo-level variable</summary>
     /// <param name="owner">name of the owner</param>
@@ -862,7 +862,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Get a repo-level variable")]
     public Task<ActionVariable> GetActionsVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionVariable, cancelToken);
 
     /// <summary>Create a repo-level variable</summary>
     /// <param name="owner">name of the owner</param>
@@ -872,7 +872,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Create a repo-level variable")]
     public Task CreateActionsVariableAsync(string owner, string repo, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, ApiDataSerializerContext.Default.CreateVariableOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Update a repo-level variable</summary>
     /// <param name="owner">name of the owner</param>
@@ -882,7 +882,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Update a repo-level variable")]
     public Task UpdateActionsVariableAsync(string owner, string repo, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", options, ApiDataSerializerContext.Default.UpdateVariableOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a repo-level variable</summary>
     /// <param name="owner">name of the owner</param>
@@ -891,7 +891,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/variables/{variablename}", "Delete a repo-level variable")]
     public Task DeleteActionsVariableAsync(string owner, string repo, string variablename, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/actions/variables/{variablename}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Flag
@@ -902,7 +902,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>StringSlice</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/flags", "List a repository's flags")]
     public Task<string[]> ListFlagsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/flags", cancelToken).JsonResponseAsync<string[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/flags", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.StringArray, cancelToken);
 
     /// <summary>Check if a repository has a given flag</summary>
     /// <param name="owner">owner of the repo</param>
@@ -920,7 +920,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/flags/{flag}", "Add a flag to a repository")]
     public Task AddFlagAsync(string owner, string repo, string flag, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/flags/{flag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/flags/{flag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Replace all flags of a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -929,7 +929,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/flags", "Replace all flags of a repository")]
     public Task ReplaceFlagsAsync(string owner, string repo, ReplaceFlagsOption options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/flags", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/flags", options, ApiDataSerializerContext.Default.ReplaceFlagsOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Remove a flag from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -938,7 +938,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/flags/{flag}", "Remove a flag from a repository")]
     public Task RemoveFlagAsync(string owner, string repo, string flag, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/flags/{flag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/flags/{flag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Remove all flags from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -946,7 +946,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/flags", "Remove all flags from a repository")]
     public Task ClearFlagsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/flags", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/flags", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Webhook
@@ -958,7 +958,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>HookList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/hooks", "List the hooks in a repository")]
     public Task<Hook[]> ListWebhooksAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.HookArray, cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="owner">owner of the repo</param>
@@ -968,7 +968,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/hooks/{id}", "Get a hook")]
     public Task<Hook> GetWebhookAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/hooks/{id}", cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Create a hook</summary>
     /// <param name="owner">owner of the repo</param>
@@ -978,7 +978,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/hooks", "Create a hook")]
     public Task<Hook> CreateWebhookAsync(string owner, string repo, CreateHookOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/hooks", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/hooks", options, ApiDataSerializerContext.Default.CreateHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Edit a hook in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -989,7 +989,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/hooks/{id}", "Edit a hook in a repository")]
     public Task<Hook> UpdateWebhookAsync(string owner, string repo, long id, EditHookOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/hooks/{id}", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/hooks/{id}", options, ApiDataSerializerContext.Default.EditHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Delete a hook in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -998,7 +998,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/hooks/{id}", "Delete a hook in a repository")]
     public Task DeleteWebhookAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Test a push webhook</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1008,7 +1008,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/hooks/{id}/tests", "Test a push webhook")]
     public Task TestWebhookAsync(string owner, string repo, long id, string? @ref = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/hooks/{id}/tests".WithQuery().Param(@ref), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/hooks/{id}/tests".WithQuery().Param(@ref), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Issue
@@ -1019,7 +1019,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RepoIssueConfig</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issue_config", "Returns the issue config for a repo")]
     public Task<IssueConfig> GetIssueConfigAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issue_config", cancelToken).JsonResponseAsync<IssueConfig>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/issue_config", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IssueConfig, cancelToken);
 
     /// <summary>Returns the validation information for a issue config</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1028,7 +1028,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RepoIssueConfigValidation</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issue_config/validate", "Returns the validation information for a issue config")]
     public Task<IssueConfigValidation> GetIssueConfigValidationAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issue_config/validate", cancelToken).JsonResponseAsync<IssueConfigValidation>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/issue_config/validate", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IssueConfigValidation, cancelToken);
 
     /// <summary>Get available issue templates for a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1037,7 +1037,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>IssueTemplates</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issue_templates", "Get available issue templates for a repository")]
     public Task<IssueTemplate[]> ListIssueTemplatesAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issue_templates", cancelToken).JsonResponseAsync<IssueTemplate[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/issue_templates", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IssueTemplateArray, cancelToken);
     #endregion
 
     #region PullRequest
@@ -1054,7 +1054,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequestList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls", "List a repo's pull requests. If a pull request is selected but fails to be retrieved for any reason, it will be a null value in the list of results.")]
     public Task<PullRequest[]> ListPullRequestsAsync(string owner, string repo, string? state = default, string? sort = default, long? milestone = default, ICollection<long>? labels = default, string? poster = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery().Param(state).Param(sort).Param(milestone).Param(labels).Param(poster).Param(paging), cancelToken).JsonResponseAsync<PullRequest[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery().Param(state).Param(sort).Param(milestone).Param(labels).Param(poster).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequestArray, cancelToken);
 
     /// <summary>Create a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1064,7 +1064,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequest</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls", "Create a pull request")]
     public Task<PullRequest> CreatePullRequestAsync(string owner, string repo, CreatePullRequestOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls", options, cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls", options, ApiDataSerializerContext.Default.CreatePullRequestOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequest, cancelToken);
 
     /// <summary>Update a pull request. If using deadline only the date will be taken into account, and time of day ignored.</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1075,7 +1075,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequest</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/pulls/{index}", "Update a pull request. If using deadline only the date will be taken into account, and time of day ignored.")]
     public Task<PullRequest> UpdatePullRequestAsync(string owner, string repo, long index, EditPullRequestOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/pulls/{index}", options, cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/pulls/{index}", options, ApiDataSerializerContext.Default.EditPullRequestOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequest, cancelToken);
 
     /// <summary>Get a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1085,7 +1085,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequest</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}", "Get a pull request")]
     public Task<PullRequest> GetPullRequestAsync(string owner, string repo, long index, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}", cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequest, cancelToken);
 
     /// <summary>Get a pull request by base and head</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1096,7 +1096,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequest</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{base}/{head}", "Get a pull request by base and head")]
     public Task<PullRequest> GetPullRequestAsync(string owner, string repo, string @base, string head, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{@base}/{head}", cancelToken).JsonResponseAsync<PullRequest>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{@base}/{head}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequest, cancelToken);
 
     /// <summary>Get a pull request diff or patch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1121,7 +1121,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>CommitList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/commits", "Get commits for a pull request")]
     public Task<Commit[]> ListPullRequestCommitsAsync(string owner, string repo, long index, bool? verification = default, bool? files = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/commits".WithQuery().Param(verification).Param(files).Param(paging), cancelToken).JsonResponseAsync<Commit[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/commits".WithQuery().Param(verification).Param(files).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.CommitArray, cancelToken);
 
     /// <summary>Get changed files for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1134,7 +1134,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ChangedFileListWithPagination</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/files", "Get changed files for a pull request")]
     public Task<ChangedFile[]> ListPullRequestChangesAsync(string owner, string repo, long index, string? skip_to = default, string? whitespace = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/files".WithQuery().Param(skip_to).Param(whitespace).Param(paging), cancelToken).JsonResponseAsync<ChangedFile[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/files".WithQuery().Param(skip_to).Param(whitespace).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ChangedFileArray, cancelToken);
 
     /// <summary>Check if a pull request has been merged</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1153,7 +1153,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/merge", "Merge a pull request")]
     public Task MergePullRequestAsync(string owner, string repo, long index, MergePullRequestOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/merge", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/merge", options, ApiDataSerializerContext.Default.MergePullRequestOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Merge PR&apos;s baseBranch into headBranch</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1163,7 +1163,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/update", "Merge PR's baseBranch into headBranch")]
     public Task UpdateMergePullRequestAsync(string owner, string repo, long index, string? style = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/update".WithQuery().Param(style), cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/update".WithQuery().Param(style), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Cancel the scheduled auto merge for the given pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1172,7 +1172,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/pulls/{index}/merge", "Cancel the scheduled auto merge for the given pull request")]
     public Task CancelPullRequestAutoMergeAsync(string owner, string repo, long index, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/merge", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/merge", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region PullRequest - review
@@ -1183,7 +1183,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/reviewers", "Return all users that can be requested to review in this repo")]
     public Task<User[]> ListReviewRequestedUsersAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/reviewers", cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/reviewers", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Create review requests for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1194,7 +1194,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReviewListWithoutPagination - Review requests without pagination headers</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/requested_reviewers", "Create review requests for a pull request")]
     public Task<PullReview[]> CreatePullRequestReviewRequestsAsync(string owner, string repo, long index, PullReviewRequestOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/requested_reviewers", options, cancelToken).JsonResponseAsync<PullReview[]>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/requested_reviewers", options, ApiDataSerializerContext.Default.PullReviewRequestOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReviewArray, cancelToken);
 
     /// <summary>Cancel review requests for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1204,7 +1204,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/pulls/{index}/requested_reviewers", "Cancel review requests for a pull request")]
     public Task CancelPullRequestReviewRequestsAsync(string owner, string repo, long index, PullReviewRequestOptions options, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/requested_reviewers", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/requested_reviewers", options, ApiDataSerializerContext.Default.PullReviewRequestOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List all reviews for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1215,7 +1215,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReviewList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/reviews", "List all reviews for a pull request")]
     public Task<PullReview[]> ListPullRequestReviewsAsync(string owner, string repo, long index, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews".WithQuery().Param(paging), cancelToken).JsonResponseAsync<PullReview[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReviewArray, cancelToken);
 
     /// <summary>Get a specific review for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1226,7 +1226,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReview</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}", "Get a specific review for a pull request")]
     public Task<PullReview> GetPullRequestReviewAsync(string owner, string repo, long index, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", cancelToken).JsonResponseAsync<PullReview>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReview, cancelToken);
 
     /// <summary>Create a review to an pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1237,7 +1237,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReview</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/reviews", "Create a review to an pull request")]
     public Task<PullReview> CreatePullRequestReviewAsync(string owner, string repo, long index, CreatePullReviewOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews", options, cancelToken).JsonResponseAsync<PullReview>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews", options, ApiDataSerializerContext.Default.CreatePullReviewOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReview, cancelToken);
 
     /// <summary>Delete a specific review from a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1247,7 +1247,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}", "Delete a specific review from a pull request")]
     public Task DeletePullRequestReviewAsync(string owner, string repo, long index, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Submit a pending review to an pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1259,7 +1259,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReview</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}", "Submit a pending review to an pull request")]
     public Task<PullReview> SubmitPullRequestPendingReviewAsync(string owner, string repo, long index, long id, SubmitPullReviewOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", options, cancelToken).JsonResponseAsync<PullReview>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}", options, ApiDataSerializerContext.Default.SubmitPullReviewOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReview, cancelToken);
 
     /// <summary>Dismiss a review for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1271,7 +1271,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReview</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/dismissals", "Dismiss a review for a pull request")]
     public Task<PullReview> DismissPullRequestReviewAsync(string owner, string repo, long index, long id, DismissPullReviewOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/dismissals", options, cancelToken).JsonResponseAsync<PullReview>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/dismissals", options, ApiDataSerializerContext.Default.DismissPullReviewOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReview, cancelToken);
 
     /// <summary>Cancel to dismiss a review for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1282,7 +1282,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullReview</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/undismissals", "Cancel to dismiss a review for a pull request")]
     public Task<PullReview> UndismissPullRequestReviewAsync(string owner, string repo, long index, long id, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/undismissals", cancelToken).JsonResponseAsync<PullReview>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/undismissals", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReview, cancelToken);
 
     /// <summary>Get a specific review for a pull request</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1293,7 +1293,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullCommentList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", "Get a specific review for a pull request")]
     public Task<PullReviewComment[]> ListPullRequestReviewCommentsAsync(string owner, string repo, long index, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", cancelToken).JsonResponseAsync<PullReviewComment[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReviewCommentArray, cancelToken);
 
     /// <summary>Get a pull review comment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1305,7 +1305,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullComment</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", "Get a pull review comment")]
     public Task<PullReviewComment> GetPullRequestReviewCommentAsync(string owner, string repo, long index, long id, long comment, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", cancelToken).JsonResponseAsync<PullReviewComment>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReviewComment, cancelToken);
 
     /// <summary>Add a new comment to a pull request review</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1317,7 +1317,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullComment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", "Add a new comment to a pull request review")]
     public Task<PullReviewComment> AddPullRequestReviewCommentAsync(string owner, string repo, long index, long id, CreatePullReviewComment options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", options, cancelToken).JsonResponseAsync<PullReviewComment>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments", options, ApiDataSerializerContext.Default.CreatePullReviewComment, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullReviewComment, cancelToken);
 
     /// <summary>Delete a pull review comment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1328,7 +1328,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", "Delete a pull review comment")]
     public Task DeletePullRequestReviewCommentAsync(string owner, string repo, long index, long id, long comment, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments/{comment}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Pin
@@ -1339,7 +1339,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RepoNewIssuePinsAllowed</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/new_pin_allowed", "Returns if new Issue Pins are allowed")]
     public Task<NewIssuePinsAllowed> GetPinsAllowdAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/new_pin_allowed", cancelToken).JsonResponseAsync<NewIssuePinsAllowed>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/new_pin_allowed", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NewIssuePinsAllowed, cancelToken);
 
     /// <summary>List a repo&apos;s pinned issues</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1348,7 +1348,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>IssueListWithoutPagination - Issues without pagination headers (used for pinned issues, dependencies, etc.)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/issues/pinned", "List a repo's pinned issues")]
     public Task<Issue[]> ListPinnedIssuesAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/issues/pinned", cancelToken).JsonResponseAsync<Issue[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/issues/pinned", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IssueArray, cancelToken);
 
     /// <summary>List a repo&apos;s pinned pull requests</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1357,7 +1357,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PullRequestList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls/pinned", "List a repo's pinned pull requests")]
     public Task<PullRequest[]> ListPinnedPullRequestsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls/pinned", cancelToken).JsonResponseAsync<PullRequest[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/pulls/pinned", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequestArray, cancelToken);
     #endregion
 
     #region Release
@@ -1372,7 +1372,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ReleaseList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases", "List a repo's releases")]
     public Task<Release[]> ListReleasesAsync(string owner, string repo, bool? draft = default, bool? pre_release = default, string? q = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases".WithQuery().Param(draft).Param(pre_release).Param(q).Param(paging), cancelToken).JsonResponseAsync<Release[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases".WithQuery().Param(draft).Param(pre_release).Param(q).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ReleaseArray, cancelToken);
 
     /// <summary>Get a release</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1382,7 +1382,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Release</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases/{id}", "Get a release")]
     public Task<Release> GetReleaseAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases/{id}", cancelToken).JsonResponseAsync<Release>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Release, cancelToken);
 
     /// <summary>Get a release by tag name</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1392,7 +1392,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Release</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases/tags/{tag}", "Get a release by tag name")]
     public Task<Release> GetReleaseTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases/tags/{tag}", cancelToken).JsonResponseAsync<Release>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases/tags/{tag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Release, cancelToken);
 
     /// <summary>Gets the most recent non-prerelease, non-draft release of a repository, sorted by created_at</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1401,7 +1401,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Release</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases/latest", "Gets the most recent non-prerelease, non-draft release of a repository, sorted by created_at")]
     public Task<Release> GetReleaseLatestAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases/latest", cancelToken).JsonResponseAsync<Release>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases/latest", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Release, cancelToken);
 
     /// <summary>Create a release</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1411,7 +1411,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Release</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases", "Create a release")]
     public Task<Release> CreateReleaseAsync(string owner, string repo, CreateReleaseOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases", options, cancelToken).JsonResponseAsync<Release>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/releases", options, ApiDataSerializerContext.Default.CreateReleaseOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Release, cancelToken);
 
     /// <summary>Update a release</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1422,7 +1422,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Release</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/releases/{id}", "Update a release")]
     public Task<Release> UpdateReleaseAsync(string owner, string repo, long id, EditReleaseOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/releases/{id}", options, cancelToken).JsonResponseAsync<Release>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/releases/{id}", options, ApiDataSerializerContext.Default.EditReleaseOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Release, cancelToken);
 
     /// <summary>Delete a release</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1431,7 +1431,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/releases/{id}", "Delete a release")]
     public Task DeleteReleaseAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/releases/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/releases/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a release by tag name</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1440,7 +1440,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/releases/tags/{tag}", "Delete a release by tag name")]
     public Task DeleteReleaseTagAsync(string owner, string repo, string tag, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/releases/tags/{tag}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/releases/tags/{tag}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List release&apos;s attachments</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1450,7 +1450,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>AttachmentList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases/{id}/assets", "List release's attachments")]
     public Task<Attachment[]> ListReleaseAttachmentsAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases/{id}/assets", cancelToken).JsonResponseAsync<Attachment[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases/{id}/assets", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.AttachmentArray, cancelToken);
 
     /// <summary>Get a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1461,7 +1461,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", "Get a release attachment")]
     public Task<Attachment> GetReleaseAttachmentAsync(string owner, string repo, long id, long attachment_id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Attachment, cancelToken);
 
     /// <summary>Create a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1474,7 +1474,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/releases/{id}/assets", "Create a release attachment")]
     public Task<Attachment> CreateReleaseAttachmentAsync(string owner, string repo, long id, Stream? attachment = default, string? external_url = default, string? name = default, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery().Param(name), new FormData().File(attachment).Scalar(external_url).AsContent(), cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/releases/{id}/assets".WithQuery().Param(name), new FormData().File(attachment).Scalar(external_url).AsContent(), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Attachment, cancelToken);
 
     /// <summary>Edit a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1486,7 +1486,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Attachment</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", "Edit a release attachment")]
     public Task<Attachment> UpdateReleaseAttachmentAsync(string owner, string repo, long id, long attachment_id, EditAttachmentOptions options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", options, cancelToken).JsonResponseAsync<Attachment>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", options, ApiDataSerializerContext.Default.EditAttachmentOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Attachment, cancelToken);
 
     /// <summary>Delete a release attachment</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1496,7 +1496,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", "Delete a release attachment")]
     public Task DeleteReleaseAttachmentAsync(string owner, string repo, long id, long attachment_id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/releases/{id}/assets/{attachment_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Key
@@ -1510,7 +1510,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>DeployKeyList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/keys", "List a repository's keys")]
     public Task<DeployKey[]> ListDeployKeysAsync(string owner, string repo, int? key_id = default, string? fingerprint = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/keys".WithQuery().Param(key_id).Param(fingerprint).Param(paging), cancelToken).JsonResponseAsync<DeployKey[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/keys".WithQuery().Param(key_id).Param(fingerprint).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.DeployKeyArray, cancelToken);
 
     /// <summary>Get a repository&apos;s key by id</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1520,7 +1520,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>DeployKey</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/keys/{id}", "Get a repository's key by id")]
     public Task<DeployKey> GetDeployKeyAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/keys/{id}", cancelToken).JsonResponseAsync<DeployKey>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/keys/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.DeployKey, cancelToken);
 
     /// <summary>Add a key to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1530,7 +1530,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>DeployKey</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/keys", "Add a key to a repository")]
     public Task<DeployKey> AddDeployKeyAsync(string owner, string repo, CreateKeyOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/keys", options, cancelToken).JsonResponseAsync<DeployKey>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/keys", options, ApiDataSerializerContext.Default.CreateKeyOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.DeployKey, cancelToken);
 
     /// <summary>Delete a key from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1539,7 +1539,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/keys/{id}", "Delete a key from a repository")]
     public Task DeleteDeployKeyAsync(string owner, string repo, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/keys/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/keys/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Get signing-key.gpg for given repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1560,7 +1560,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PushMirrorList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/push_mirrors", "Get all push mirrors of the repository")]
     public Task<PushMirror[]> ListAllPushMirrorsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/push_mirrors".WithQuery().Param(paging), cancelToken).JsonResponseAsync<PushMirror[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/push_mirrors".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PushMirrorArray, cancelToken);
 
     /// <summary>Get push mirror of the repository by remoteName</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1570,7 +1570,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PushMirror</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/push_mirrors/{name}", "Get push mirror of the repository by remoteName")]
     public Task<PushMirror> GetPushMirrorAsync(string owner, string repo, string name, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/push_mirrors/{name}", cancelToken).JsonResponseAsync<PushMirror>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/push_mirrors/{name}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PushMirror, cancelToken);
 
     /// <summary>Set up a new push mirror in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1580,7 +1580,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>PushMirror</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/push_mirrors", "Set up a new push mirror in a repository")]
     public Task<PushMirror> AddPushMirrorAsync(string owner, string repo, CreatePushMirrorOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/push_mirrors", options, cancelToken).JsonResponseAsync<PushMirror>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/push_mirrors", options, ApiDataSerializerContext.Default.CreatePushMirrorOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PushMirror, cancelToken);
 
     /// <summary>Remove a push mirror from a repository by remoteName</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1589,7 +1589,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/push_mirrors/{name}", "Remove a push mirror from a repository by remoteName")]
     public Task DeletePushMirrorAsync(string owner, string repo, string name, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/push_mirrors/{name}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/push_mirrors/{name}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Sync all push mirrored repository</summary>
     /// <param name="owner">owner of the repo to sync</param>
@@ -1597,7 +1597,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/push_mirrors-sync", "Sync all push mirrored repository")]
     public Task SyncPushMirrorsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/push_mirrors-sync", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/push_mirrors-sync", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Collaborator
@@ -1609,7 +1609,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/collaborators", "List a repository's collaborators")]
     public Task<User[]> ListCollaboratorsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/collaborators".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/collaborators".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Check if a user is a collaborator of a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1628,7 +1628,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>RepoCollaboratorPermission</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/collaborators/{collaborator}/permission", "Get repository permissions for a user")]
     public Task<RepoCollaboratorPermission> GetCollaboratorPermissionAsync(string owner, string repo, string collaborator, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/collaborators/{collaborator}/permission", cancelToken).JsonResponseAsync<RepoCollaboratorPermission>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/collaborators/{collaborator}/permission", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RepoCollaboratorPermission, cancelToken);
 
     /// <summary>Add a collaborator to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1638,7 +1638,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/collaborators/{collaborator}", "Add a collaborator to a repository")]
     public Task AddCollaboratorAsync(string owner, string repo, string collaborator, AddCollaboratorOption options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/collaborators/{collaborator}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/collaborators/{collaborator}", options, ApiDataSerializerContext.Default.AddCollaboratorOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a collaborator from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1647,7 +1647,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/collaborators/{collaborator}", "Delete a collaborator from a repository")]
     public Task DeleteCollaboratorAsync(string owner, string repo, string collaborator, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/collaborators/{collaborator}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/collaborators/{collaborator}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Subscription
@@ -1659,7 +1659,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/subscribers", "List a repo's watchers")]
     public Task<User[]> ListSubscribersAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/subscribers".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/subscribers".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Check if the current user is watching a repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1668,7 +1668,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WatchInfo</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/subscription", "Check if the current user is watching a repo")]
     public Task<WatchInfo> GetSubscriptionAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync<WatchInfo>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WatchInfo, cancelToken);
 
     /// <summary>Watch a repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1677,7 +1677,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WatchInfo</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/subscription", "Watch a repo")]
     public Task<WatchInfo> WatchAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync<WatchInfo>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WatchInfo, cancelToken);
 
     /// <summary>Unwatch a repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1685,7 +1685,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/subscription", "Unwatch a repo")]
     public Task UnwatchAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/subscription", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Team
@@ -1696,7 +1696,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TeamListWithoutPagination - Teams without pagination headers</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/teams", "List a repository's teams")]
     public Task<Team[]> ListTeamsAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/teams", cancelToken).JsonResponseAsync<Team[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/teams", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TeamArray, cancelToken);
 
     /// <summary>Check if a team is assigned to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1706,7 +1706,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Team</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/teams/{team}", "Check if a team is assigned to a repository")]
     public Task<Team> GetTeamAssignedAsync(string owner, string repo, string team, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync<Team>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Team, cancelToken);
 
     /// <summary>Add a team to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1715,7 +1715,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/teams/{team}", "Add a team to a repository")]
     public Task AddTeamAsync(string owner, string repo, string team, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a team from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1724,7 +1724,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/teams/{team}", "Delete a team from a repository")]
     public Task DeleteTeamAsync(string owner, string repo, string team, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/teams/{team}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Topic
@@ -1736,7 +1736,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TopicNames</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/topics", "Get list of topics that a repository has")]
     public Task<TopicName> ListTopicsAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/topics".WithQuery().Param(paging), cancelToken).JsonResponseAsync<TopicName>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/topics".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TopicName, cancelToken);
 
     /// <summary>Search for topics by keyword</summary>
     /// <param name="q">keyword to search for</param>
@@ -1745,7 +1745,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>SearchResults of a successful search</returns>
     [ForgejoEndpoint("GET", "/topics/search", "Search for topics by keyword")]
     public Task<TopicSearchResults> SearchTopicsAsync(string q, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("topics/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync<TopicSearchResults>(cancelToken);
+        => GetRequest("topics/search".WithQuery().Param(q).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TopicSearchResults, cancelToken);
 
     /// <summary>Add a topic to a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1754,7 +1754,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/topics/{topic}", "Add a topic to a repository")]
     public Task AddTopicAsync(string owner, string repo, string topic, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/topics/{topic}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/topics/{topic}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Replace list of topics for a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1763,7 +1763,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/topics", "Replace list of topics for a repository")]
     public Task ReplaceTopicsAsync(string owner, string repo, RepoTopicOptions options, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/topics", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/topics", options, ApiDataSerializerContext.Default.RepoTopicOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a topic from a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1772,7 +1772,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/topics/{topic}", "Delete a topic from a repository")]
     public Task DeleteTopicAsync(string owner, string repo, string topic, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/topics/{topic}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/topics/{topic}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Transfer
@@ -1784,7 +1784,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/transfer", "Transfer a repo ownership")]
     public Task<Repository> TransferOwnerAsync(string owner, string repo, TransferRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/transfer", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/transfer", options, ApiDataSerializerContext.Default.TransferRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Accept a repo transfer</summary>
     /// <param name="owner">owner of the repo to transfer</param>
@@ -1793,7 +1793,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/transfer/accept", "Accept a repo transfer")]
     public Task<Repository> AcceptTransferAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/transfer/accept", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/transfer/accept", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Reject a repo transfer</summary>
     /// <param name="owner">owner of the repo to transfer</param>
@@ -1802,7 +1802,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/transfer/reject", "Reject a repo transfer")]
     public Task<Repository> RejectTransferAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/transfer/reject", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/transfer/reject", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
     #endregion
 
     #region Wiki
@@ -1814,7 +1814,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WikiPageList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/wiki/pages", "Get all wiki pages")]
     public Task<WikiPageMetaData[]> ListWikiPagesAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/wiki/pages".WithQuery().Param(paging), cancelToken).JsonResponseAsync<WikiPageMetaData[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/wiki/pages".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WikiPageMetaDataArray, cancelToken);
 
     /// <summary>Get a wiki page</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1824,7 +1824,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WikiPage</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/wiki/page/{pageName}", "Get a wiki page")]
     public Task<WikiPage> GetWikiPageAsync(string owner, string repo, string pageName, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", cancelToken).JsonResponseAsync<WikiPage>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WikiPage, cancelToken);
 
     /// <summary>Create a wiki page</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1834,7 +1834,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WikiPage</returns>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/wiki/new", "Create a wiki page")]
     public Task<WikiPage> CreateWikiPageAsync(string owner, string repo, CreateWikiPageOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/wiki/new", options, cancelToken).JsonResponseAsync<WikiPage>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/wiki/new", options, ApiDataSerializerContext.Default.CreateWikiPageOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WikiPage, cancelToken);
 
     /// <summary>Edit a wiki page</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1845,7 +1845,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WikiPage</returns>
     [ForgejoEndpoint("PATCH", "/repos/{owner}/{repo}/wiki/page/{pageName}", "Edit a wiki page")]
     public Task<WikiPage> UpdateWikiPageAsync(string owner, string repo, string pageName, CreateWikiPageOptions options, CancellationToken cancelToken = default)
-        => PatchRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", options, cancelToken).JsonResponseAsync<WikiPage>(cancelToken);
+        => PatchRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", options, ApiDataSerializerContext.Default.CreateWikiPageOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WikiPage, cancelToken);
 
     /// <summary>Delete a wiki page</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1854,7 +1854,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/wiki/page/{pageName}", "Delete a wiki page")]
     public Task DeleteWikiPageAsync(string owner, string repo, string pageName, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/wiki/page/{pageName}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Get revisions of a wiki page</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1865,7 +1865,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>WikiCommitList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/wiki/revisions/{pageName}", "Get revisions of a wiki page")]
     public Task<WikiCommitList> ListWikiPageRevisionsAsync(string owner, string repo, string pageName, int? page = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/wiki/revisions/{pageName}".WithQuery().Param(page), cancelToken).JsonResponseAsync<WikiCommitList>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/wiki/revisions/{pageName}".WithQuery().Param(page), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.WikiCommitList, cancelToken);
     #endregion
 
     #region Misc
@@ -1878,7 +1878,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/activities/feeds", "List a repository's activity feeds")]
     public Task<Activity[]> ListActivitiesAsync(string owner, string repo, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActivityArray, cancelToken);
 
     /// <summary>Get an archive of a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1897,7 +1897,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/assignees", "Return all users that have write access and can be assigned to issues")]
     public Task<User[]> ListAssigneesAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/assignees", cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/assignees", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Update a repository&apos;s avatar</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1906,7 +1906,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/avatar", "Update a repository's avatar")]
     public Task UpdateAvatarAsync(string owner, string repo, UpdateRepoAvatarOption options, CancellationToken cancelToken = default)
-        => PostRequest($"repos/{owner}/{repo}/avatar", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"repos/{owner}/{repo}/avatar", options, ApiDataSerializerContext.Default.UpdateRepoAvatarOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a repository&apos;s avatar</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1914,7 +1914,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/avatar", "Delete a repository's avatar")]
     public Task DeleteAvatarAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"repos/{owner}/{repo}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"repos/{owner}/{repo}/avatar", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Get languages and number of bytes of code written</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1923,7 +1923,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>LanguageStatistics</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/languages", "Get languages and number of bytes of code written")]
     public Task<IDictionary<string, long>> ListCodeLanguagesAsync(string owner, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/languages", cancelToken).JsonResponseAsync<IDictionary<string, long>>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/languages", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IDictionaryStringInt64, cancelToken);
 
     /// <summary>List a repo&apos;s stargazers</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1933,7 +1933,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/stargazers", "List a repo's stargazers")]
     public Task<User[]> ListStargazersAsync(string owner, string repo, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/stargazers".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/stargazers".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>List a repo&apos;s tracked times</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1946,7 +1946,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>TrackedTimeList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/times", "List a repo's tracked times")]
     public Task<TrackedTime[]> ListTrackedTimesAsync(string owner, string repo, string? user = default, DateTimeOffset? since = default, DateTimeOffset? before = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/times".WithQuery().Param(user).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync<TrackedTime[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/times".WithQuery().Param(user).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TrackedTimeArray, cancelToken);
 
     /// <summary>Get the EditorConfig definitions of a file in a repository</summary>
     /// <param name="owner">owner of the repo</param>
@@ -1957,7 +1957,7 @@ public interface IRepositoryApi : IApiScope
     /// <returns>definitions</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/editorconfig/{filepath}", "Get the EditorConfig definitions of a file in a repository")]
     public Task<IDictionary<string, string>> GetEditorConfigDefinitionAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/editorconfig/{filepath}".WithQuery().Param(@ref), cancelToken).JsonResponseAsync<IDictionary<string, string>>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/editorconfig/{filepath}".WithQuery().Param(@ref), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.IDictionaryStringString, cancelToken);
     #endregion
 
 }

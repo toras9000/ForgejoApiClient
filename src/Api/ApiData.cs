@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using ForgejoApiClient.Converters;
+﻿using System.Text.Json.Serialization;
 
 #pragma warning disable IDE1006 // 命名スタイル
 
@@ -3722,13 +3719,13 @@ public record WikiPageMetaData(
 public enum ActionRunnerStatus
 {
     /// <summary>offline</summary>
-    [MapEnum("offline")]
+    [JsonStringEnumMemberName("offline")]
     Offline = 0,
     /// <summary>idle</summary>
-    [MapEnum("idle")]
+    [JsonStringEnumMemberName("idle")]
     Idle = 1,
     /// <summary>active</summary>
-    [MapEnum("active")]
+    [JsonStringEnumMemberName("active")]
     Active = 2,
 };
 
@@ -3736,85 +3733,85 @@ public enum ActionRunnerStatus
 public enum ActivityOp_type
 {
     /// <summary>create_repo</summary>
-    [MapEnum("create_repo")]
+    [JsonStringEnumMemberName("create_repo")]
     Create_repo = 0,
     /// <summary>rename_repo</summary>
-    [MapEnum("rename_repo")]
+    [JsonStringEnumMemberName("rename_repo")]
     Rename_repo = 1,
     /// <summary>star_repo</summary>
-    [MapEnum("star_repo")]
+    [JsonStringEnumMemberName("star_repo")]
     Star_repo = 2,
     /// <summary>watch_repo</summary>
-    [MapEnum("watch_repo")]
+    [JsonStringEnumMemberName("watch_repo")]
     Watch_repo = 3,
     /// <summary>commit_repo</summary>
-    [MapEnum("commit_repo")]
+    [JsonStringEnumMemberName("commit_repo")]
     Commit_repo = 4,
     /// <summary>create_issue</summary>
-    [MapEnum("create_issue")]
+    [JsonStringEnumMemberName("create_issue")]
     Create_issue = 5,
     /// <summary>create_pull_request</summary>
-    [MapEnum("create_pull_request")]
+    [JsonStringEnumMemberName("create_pull_request")]
     Create_pull_request = 6,
     /// <summary>transfer_repo</summary>
-    [MapEnum("transfer_repo")]
+    [JsonStringEnumMemberName("transfer_repo")]
     Transfer_repo = 7,
     /// <summary>push_tag</summary>
-    [MapEnum("push_tag")]
+    [JsonStringEnumMemberName("push_tag")]
     Push_tag = 8,
     /// <summary>comment_issue</summary>
-    [MapEnum("comment_issue")]
+    [JsonStringEnumMemberName("comment_issue")]
     Comment_issue = 9,
     /// <summary>merge_pull_request</summary>
-    [MapEnum("merge_pull_request")]
+    [JsonStringEnumMemberName("merge_pull_request")]
     Merge_pull_request = 10,
     /// <summary>close_issue</summary>
-    [MapEnum("close_issue")]
+    [JsonStringEnumMemberName("close_issue")]
     Close_issue = 11,
     /// <summary>reopen_issue</summary>
-    [MapEnum("reopen_issue")]
+    [JsonStringEnumMemberName("reopen_issue")]
     Reopen_issue = 12,
     /// <summary>close_pull_request</summary>
-    [MapEnum("close_pull_request")]
+    [JsonStringEnumMemberName("close_pull_request")]
     Close_pull_request = 13,
     /// <summary>reopen_pull_request</summary>
-    [MapEnum("reopen_pull_request")]
+    [JsonStringEnumMemberName("reopen_pull_request")]
     Reopen_pull_request = 14,
     /// <summary>delete_tag</summary>
-    [MapEnum("delete_tag")]
+    [JsonStringEnumMemberName("delete_tag")]
     Delete_tag = 15,
     /// <summary>delete_branch</summary>
-    [MapEnum("delete_branch")]
+    [JsonStringEnumMemberName("delete_branch")]
     Delete_branch = 16,
     /// <summary>mirror_sync_push</summary>
-    [MapEnum("mirror_sync_push")]
+    [JsonStringEnumMemberName("mirror_sync_push")]
     Mirror_sync_push = 17,
     /// <summary>mirror_sync_create</summary>
-    [MapEnum("mirror_sync_create")]
+    [JsonStringEnumMemberName("mirror_sync_create")]
     Mirror_sync_create = 18,
     /// <summary>mirror_sync_delete</summary>
-    [MapEnum("mirror_sync_delete")]
+    [JsonStringEnumMemberName("mirror_sync_delete")]
     Mirror_sync_delete = 19,
     /// <summary>approve_pull_request</summary>
-    [MapEnum("approve_pull_request")]
+    [JsonStringEnumMemberName("approve_pull_request")]
     Approve_pull_request = 20,
     /// <summary>reject_pull_request</summary>
-    [MapEnum("reject_pull_request")]
+    [JsonStringEnumMemberName("reject_pull_request")]
     Reject_pull_request = 21,
     /// <summary>comment_pull</summary>
-    [MapEnum("comment_pull")]
+    [JsonStringEnumMemberName("comment_pull")]
     Comment_pull = 22,
     /// <summary>publish_release</summary>
-    [MapEnum("publish_release")]
+    [JsonStringEnumMemberName("publish_release")]
     Publish_release = 23,
     /// <summary>pull_review_dismissed</summary>
-    [MapEnum("pull_review_dismissed")]
+    [JsonStringEnumMemberName("pull_review_dismissed")]
     Pull_review_dismissed = 24,
     /// <summary>pull_request_ready_for_review</summary>
-    [MapEnum("pull_request_ready_for_review")]
+    [JsonStringEnumMemberName("pull_request_ready_for_review")]
     Pull_request_ready_for_review = 25,
     /// <summary>auto_merge_pull_request</summary>
-    [MapEnum("auto_merge_pull_request")]
+    [JsonStringEnumMemberName("auto_merge_pull_request")]
     Auto_merge_pull_request = 26,
 };
 
@@ -3822,13 +3819,13 @@ public enum ActivityOp_type
 public enum AddCollaboratorOptionPermission
 {
     /// <summary>read</summary>
-    [MapEnum("read")]
+    [JsonStringEnumMemberName("read")]
     Read = 0,
     /// <summary>write</summary>
-    [MapEnum("write")]
+    [JsonStringEnumMemberName("write")]
     Write = 1,
     /// <summary>admin</summary>
-    [MapEnum("admin")]
+    [JsonStringEnumMemberName("admin")]
     Admin = 2,
 };
 
@@ -3836,10 +3833,10 @@ public enum AddCollaboratorOptionPermission
 public enum AttachmentType
 {
     /// <summary>attachment</summary>
-    [MapEnum("attachment")]
+    [JsonStringEnumMemberName("attachment")]
     Attachment = 0,
     /// <summary>external</summary>
-    [MapEnum("external")]
+    [JsonStringEnumMemberName("external")]
     External = 1,
 };
 
@@ -3847,13 +3844,13 @@ public enum AttachmentType
 public enum ChangeFileOperationOperation
 {
     /// <summary>create</summary>
-    [MapEnum("create")]
+    [JsonStringEnumMemberName("create")]
     Create = 0,
     /// <summary>update</summary>
-    [MapEnum("update")]
+    [JsonStringEnumMemberName("update")]
     Update = 1,
     /// <summary>delete</summary>
-    [MapEnum("delete")]
+    [JsonStringEnumMemberName("delete")]
     Delete = 2,
 };
 
@@ -3861,37 +3858,37 @@ public enum ChangeFileOperationOperation
 public enum CreateHookOptionType
 {
     /// <summary>forgejo</summary>
-    [MapEnum("forgejo")]
+    [JsonStringEnumMemberName("forgejo")]
     Forgejo = 0,
     /// <summary>dingtalk</summary>
-    [MapEnum("dingtalk")]
+    [JsonStringEnumMemberName("dingtalk")]
     Dingtalk = 1,
     /// <summary>discord</summary>
-    [MapEnum("discord")]
+    [JsonStringEnumMemberName("discord")]
     Discord = 2,
     /// <summary>gitea</summary>
-    [MapEnum("gitea")]
+    [JsonStringEnumMemberName("gitea")]
     Gitea = 3,
     /// <summary>gogs</summary>
-    [MapEnum("gogs")]
+    [JsonStringEnumMemberName("gogs")]
     Gogs = 4,
     /// <summary>msteams</summary>
-    [MapEnum("msteams")]
+    [JsonStringEnumMemberName("msteams")]
     Msteams = 5,
     /// <summary>slack</summary>
-    [MapEnum("slack")]
+    [JsonStringEnumMemberName("slack")]
     Slack = 6,
     /// <summary>telegram</summary>
-    [MapEnum("telegram")]
+    [JsonStringEnumMemberName("telegram")]
     Telegram = 7,
     /// <summary>feishu</summary>
-    [MapEnum("feishu")]
+    [JsonStringEnumMemberName("feishu")]
     Feishu = 8,
     /// <summary>wechatwork</summary>
-    [MapEnum("wechatwork")]
+    [JsonStringEnumMemberName("wechatwork")]
     Wechatwork = 9,
     /// <summary>packagist</summary>
-    [MapEnum("packagist")]
+    [JsonStringEnumMemberName("packagist")]
     Packagist = 10,
 };
 
@@ -3899,10 +3896,10 @@ public enum CreateHookOptionType
 public enum CreateMilestoneOptionState
 {
     /// <summary>open</summary>
-    [MapEnum("open")]
+    [JsonStringEnumMemberName("open")]
     Open = 0,
     /// <summary>closed</summary>
-    [MapEnum("closed")]
+    [JsonStringEnumMemberName("closed")]
     Closed = 1,
 };
 
@@ -3910,13 +3907,13 @@ public enum CreateMilestoneOptionState
 public enum CreateOrgOptionVisibility
 {
     /// <summary>public</summary>
-    [MapEnum("public")]
+    [JsonStringEnumMemberName("public")]
     Public = 0,
     /// <summary>limited</summary>
-    [MapEnum("limited")]
+    [JsonStringEnumMemberName("limited")]
     Limited = 1,
     /// <summary>private</summary>
-    [MapEnum("private")]
+    [JsonStringEnumMemberName("private")]
     Private = 2,
 };
 
@@ -3924,10 +3921,10 @@ public enum CreateOrgOptionVisibility
 public enum CreateRepoOptionObject_format_name
 {
     /// <summary>sha1</summary>
-    [MapEnum("sha1")]
+    [JsonStringEnumMemberName("sha1")]
     Sha1 = 0,
     /// <summary>sha256</summary>
-    [MapEnum("sha256")]
+    [JsonStringEnumMemberName("sha256")]
     Sha256 = 1,
 };
 
@@ -3935,16 +3932,16 @@ public enum CreateRepoOptionObject_format_name
 public enum CreateRepoOptionTrust_model
 {
     /// <summary>default</summary>
-    [MapEnum("default")]
+    [JsonStringEnumMemberName("default")]
     Default = 0,
     /// <summary>collaborator</summary>
-    [MapEnum("collaborator")]
+    [JsonStringEnumMemberName("collaborator")]
     Collaborator = 1,
     /// <summary>committer</summary>
-    [MapEnum("committer")]
+    [JsonStringEnumMemberName("committer")]
     Committer = 2,
     /// <summary>collaboratorcommitter</summary>
-    [MapEnum("collaboratorcommitter")]
+    [JsonStringEnumMemberName("collaboratorcommitter")]
     Collaboratorcommitter = 3,
 };
 
@@ -3952,13 +3949,13 @@ public enum CreateRepoOptionTrust_model
 public enum CreateTeamOptionPermission
 {
     /// <summary>read</summary>
-    [MapEnum("read")]
+    [JsonStringEnumMemberName("read")]
     Read = 0,
     /// <summary>write</summary>
-    [MapEnum("write")]
+    [JsonStringEnumMemberName("write")]
     Write = 1,
     /// <summary>admin</summary>
-    [MapEnum("admin")]
+    [JsonStringEnumMemberName("admin")]
     Admin = 2,
 };
 
@@ -3966,13 +3963,13 @@ public enum CreateTeamOptionPermission
 public enum EditOrgOptionVisibility
 {
     /// <summary>public</summary>
-    [MapEnum("public")]
+    [JsonStringEnumMemberName("public")]
     Public = 0,
     /// <summary>limited</summary>
-    [MapEnum("limited")]
+    [JsonStringEnumMemberName("limited")]
     Limited = 1,
     /// <summary>private</summary>
-    [MapEnum("private")]
+    [JsonStringEnumMemberName("private")]
     Private = 2,
 };
 
@@ -3980,13 +3977,13 @@ public enum EditOrgOptionVisibility
 public enum EditTeamOptionPermission
 {
     /// <summary>read</summary>
-    [MapEnum("read")]
+    [JsonStringEnumMemberName("read")]
     Read = 0,
     /// <summary>write</summary>
-    [MapEnum("write")]
+    [JsonStringEnumMemberName("write")]
     Write = 1,
     /// <summary>admin</summary>
-    [MapEnum("admin")]
+    [JsonStringEnumMemberName("admin")]
     Admin = 2,
 };
 
@@ -3994,22 +3991,22 @@ public enum EditTeamOptionPermission
 public enum MergePullRequestOptionDo
 {
     /// <summary>merge</summary>
-    [MapEnum("merge")]
+    [JsonStringEnumMemberName("merge")]
     Merge = 0,
     /// <summary>rebase</summary>
-    [MapEnum("rebase")]
+    [JsonStringEnumMemberName("rebase")]
     Rebase = 1,
     /// <summary>rebase-merge</summary>
-    [MapEnum("rebase-merge")]
+    [JsonStringEnumMemberName("rebase-merge")]
     RebaseMerge = 2,
     /// <summary>squash</summary>
-    [MapEnum("squash")]
+    [JsonStringEnumMemberName("squash")]
     Squash = 3,
     /// <summary>fast-forward-only</summary>
-    [MapEnum("fast-forward-only")]
+    [JsonStringEnumMemberName("fast-forward-only")]
     FastForwardOnly = 4,
     /// <summary>manually-merged</summary>
-    [MapEnum("manually-merged")]
+    [JsonStringEnumMemberName("manually-merged")]
     ManuallyMerged = 5,
 };
 
@@ -4017,28 +4014,28 @@ public enum MergePullRequestOptionDo
 public enum MigrateRepoOptionsService
 {
     /// <summary>git</summary>
-    [MapEnum("git")]
+    [JsonStringEnumMemberName("git")]
     Git = 0,
     /// <summary>github</summary>
-    [MapEnum("github")]
+    [JsonStringEnumMemberName("github")]
     Github = 1,
     /// <summary>gitea</summary>
-    [MapEnum("gitea")]
+    [JsonStringEnumMemberName("gitea")]
     Gitea = 2,
     /// <summary>gitlab</summary>
-    [MapEnum("gitlab")]
+    [JsonStringEnumMemberName("gitlab")]
     Gitlab = 3,
     /// <summary>gogs</summary>
-    [MapEnum("gogs")]
+    [JsonStringEnumMemberName("gogs")]
     Gogs = 4,
     /// <summary>onedev</summary>
-    [MapEnum("onedev")]
+    [JsonStringEnumMemberName("onedev")]
     Onedev = 5,
     /// <summary>gitbucket</summary>
-    [MapEnum("gitbucket")]
+    [JsonStringEnumMemberName("gitbucket")]
     Gitbucket = 6,
     /// <summary>codebase</summary>
-    [MapEnum("codebase")]
+    [JsonStringEnumMemberName("codebase")]
     Codebase = 7,
 };
 
@@ -4054,10 +4051,10 @@ public record Contained_in(
 public enum RepositoryObject_format_name
 {
     /// <summary>sha1</summary>
-    [MapEnum("sha1")]
+    [JsonStringEnumMemberName("sha1")]
     Sha1 = 0,
     /// <summary>sha256</summary>
-    [MapEnum("sha256")]
+    [JsonStringEnumMemberName("sha256")]
     Sha256 = 1,
 };
 
@@ -4065,19 +4062,19 @@ public enum RepositoryObject_format_name
 public enum TeamPermission
 {
     /// <summary>none</summary>
-    [MapEnum("none")]
+    [JsonStringEnumMemberName("none")]
     None = 0,
     /// <summary>read</summary>
-    [MapEnum("read")]
+    [JsonStringEnumMemberName("read")]
     Read = 1,
     /// <summary>write</summary>
-    [MapEnum("write")]
+    [JsonStringEnumMemberName("write")]
     Write = 2,
     /// <summary>admin</summary>
-    [MapEnum("admin")]
+    [JsonStringEnumMemberName("admin")]
     Admin = 3,
     /// <summary>owner</summary>
-    [MapEnum("owner")]
+    [JsonStringEnumMemberName("owner")]
     Owner = 4,
 };
 

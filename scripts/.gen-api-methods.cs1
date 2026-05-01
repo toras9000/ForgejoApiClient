@@ -6,6 +6,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Humanizer;
 using Kokuban;
@@ -43,7 +44,7 @@ public class GenerateApiMethods
     /// <summary>コードの保存エンコーディング</summary>
     public Encoding CodeEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
-    public async ValueTask GenerateAsync(FileInfo swaggerFile, DirectoryInfo apiMethodsDir, CancellationToken breaker)
+    public async ValueTask GenerateAsync(FileInfo swaggerFile, DirectoryInfo apiMethodsDir, FileInfo? apiSerContextFile, CancellationToken breaker)
     {
         // Swaggerファイルの読み込み
         Console.WriteLine("Get swagger");
@@ -101,6 +102,7 @@ public class GenerateApiMethods
 
         // スコープ毎のコード生成
         Console.WriteLine("Generate operation code:");
+        var typeNameUsed = new HashSet<string>();
         foreach (var map in this.ScopeMapping)
         {
             Console.WriteLine(Chalk.Cyan[$".. Scope '{map.Scope}'"]);
@@ -123,11 +125,11 @@ public class GenerateApiMethods
                 var codeFile = apiMethodsDir.RelativeFile($"I{map.Name}Api.cs");
                 if (codeFile.Exists)
                 {
-                    updateApiCode(map.Name, codeFile, this.CodeEncoding, scopeApis);
+                    updateApiCode(map.Name, codeFile, this.CodeEncoding, scopeApis, typeNameUsed);
                 }
                 else
                 {
-                    createApiCode(map.Name, codeFile, this.CodeEncoding, scopeApis);
+                    createApiCode(map.Name, codeFile, this.CodeEncoding, scopeApis, typeNameUsed);
                 }
             }
             catch (Exception ex)
@@ -145,6 +147,39 @@ public class GenerateApiMethods
                 Console.WriteLine(Chalk.Yellow[$".. Scope '{scope}'"]);
             }
         }
+
+        // シリアライザコンテキストのコード生成を行うか
+        if (apiSerContextFile != null)
+        {
+            // 生成コードファイルを書き込み用に開く
+            Console.WriteLine("Generate serialization-context code");
+
+            // シリアライズコンテキスト型定義
+            using var serContextWriter = apiSerContextFile.WithDirectoryCreate().CreateTextWriter(encoding: this.CodeEncoding);
+
+            // ヘッダコードを出力
+            serContextWriter.WriteLine("""
+            using System.Text.Json.Serialization;
+
+            namespace ForgejoApiClient.Api;
+
+            [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+            """);
+
+            // 型のメ汰データ生成
+            foreach (var typeName in typeNameUsed.OrderBy(n => n))
+            {
+                serContextWriter.WriteLine($"""
+                [JsonSerializable(typeof({typeName}))]
+                """);
+            }
+
+            serContextWriter.WriteLine("""
+            internal partial class ApiDataSerializerContext : JsonSerializerContext;
+
+            """);
+        }
+
     }
 
     /// <summary>APIメソッドアノテーションコードを生成する</summary>
@@ -216,8 +251,9 @@ public class GenerateApiMethods
     /// <summary>APIメソッドコードを生成する</summary>
     /// <param name="name">メソッド名。nullの場合はAPIエンドポイントから生成する。</param>
     /// <param name="ep">コード生成用APIパラメータ情報</param>
+    /// <param name="typeNameUsed">型名コンテナ</param>
     /// <returns>メソッドコード</returns>
-    private IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep)
+    private IEnumerable<string> makeApiMethodDefine(string? name, ApiEndpoint ep, HashSet<string> typeNameUsed)
     {
         // メソッドの名前が指定されていない場合は Path から作る。
         var methodName = name ?? ep.Path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
@@ -234,16 +270,13 @@ public class GenerateApiMethods
             paramsBuilder.Append($"{param.Type} {param.Variable}, ");
         }
 
-        // Body/FormData パラメータチェック
-        var hasBody = ep.Parameters.Any(p => p.Kind == OpenApiParameterKind.Body);
-        var hasForm = ep.Parameters.Any(p => p.Kind == OpenApiParameterKind.FormData);
-        if (hasBody && hasForm) throw new Exception("どう扱うべきかわからないもの");
-
         // Body パラメータは固定の名称で並べる。基本的には1つしかないはず。
+        var bodyType = default(string);
         foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Body))
         {
             // 型情報が nullable であっても、引数としては null 不可とする。
-            paramsBuilder.Append($"{param.Type.TrimEnd('?')} {GenerationConstants.BodyParamVariable}, ");
+            bodyType = param.Type.TrimEnd('?');
+            paramsBuilder.Append($"{bodyType} {GenerationConstants.BodyParamVariable}, ");
         }
 
         // FormData パラメータ
@@ -258,6 +291,10 @@ public class GenerateApiMethods
             if (!param.Required) paramsBuilder.Append(" = default");
             paramsBuilder.Append($", ");
         }
+
+        // Body/FormData パラメータチェック
+        var hasForm = ep.Parameters.Any(p => p.Kind == OpenApiParameterKind.FormData);
+        if (bodyType != null && hasForm) throw new Exception("どう扱うべきかわからないもの");
 
         // Query パラメータにページングパラメータが含まれる場合は特別扱いする。個別のパラメータからは取り除く。
         var queryParams = ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Query).ToList();
@@ -316,9 +353,10 @@ public class GenerateApiMethods
 
         // Body/FormDataパラメータ引数
         var bodyArg = "";
-        if (hasBody)
+        if (bodyType != null)
         {
-            bodyArg = $", {GenerationConstants.BodyParamVariable}";
+            bodyArg = $", {GenerationConstants.BodyParamVariable}, ApiDataSerializerContext.Default.{this.makeSerializerTypeName(bodyType)}";
+            typeNameUsed.Add(bodyType);
         }
         else if (hasForm)
         {
@@ -332,19 +370,89 @@ public class GenerateApiMethods
                 };
             }
             bodyArg += $".AsContent()";
+            // こちらは HttpContent なのでシリアライザコンテキスト不要
         }
 
         // 結果取得コード
-        var resultTaker = ep.Result.Download ? ".DownloadResponseAsync(cancelToken)"
-                        : ep.Result.Type switch
-                        {
-                            GenerationConstants.NothingResult => ep.IsGET() ? ".StatusResponseAsync(cancelToken)" : ".JsonResponseAsync<EmptyResult>(cancelToken)",
-                            GenerationConstants.StringResult => ".TextResponseAsync(cancelToken)",
-                            _ => $".JsonResponseAsync<{ep.Result.Type}>(cancelToken)",
-                        };
+        var resultTaker = "";
+        if (ep.Result.Download)
+        {
+            resultTaker = ".DownloadResponseAsync(cancelToken)";
+        }
+        else if (ep.Result.Type == GenerationConstants.NothingResult)
+        {
+            if (ep.IsGET())
+            {
+                resultTaker = ".StatusResponseAsync(cancelToken)";
+            }
+            else
+            {
+                resultTaker = ".JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken)";
+                typeNameUsed.Add("EmptyResult");
+            }
+        }
+        else if (ep.Result.Type == GenerationConstants.StringResult)
+        {
+            resultTaker = ".TextResponseAsync(cancelToken)";
+        }
+        else
+        {
+            var coreTypeName = ep.Result.Type.AsSpan().TrimEnd('?').ToString();
+            var serializerTypeName = this.makeSerializerTypeName(coreTypeName);
+            resultTaker = $".JsonResponseAsync(ApiDataSerializerContext.Default.{serializerTypeName}, cancelToken)";
+            typeNameUsed.Add(coreTypeName);
+        }
 
         // API呼び出し処理コードを生成
         yield return $"""    => {ep.Method.Pascalize()}Request({apiPath}{bodyArg}, cancelToken){resultTaker};""";
+    }
+
+    /// <summary>型名をシリアライザ型情報プロパティ型に変換する</summary>
+    /// <param name="typeName"></param>
+    /// <returns></returns>
+    private string makeSerializerTypeName(string typeName)
+    {
+        static string contextName(string name) => name switch
+        {
+            "string" => "String",
+            "bool" => "Boolean",
+            "byte" => "Byte",
+            "sbyte" => "SByte",
+            "short" => "Int16",
+            "ushort" => "UInt16",
+            "int" => "Int32",
+            "uint" => "UInt32",
+            "long" => "Int64",
+            "ulong" => "UInt64",
+            "float" => "Single",
+            "double" => "Double",
+            "decimal" => "Decimal",
+            _ => name,
+        };
+
+        var coreTypeName = typeName.TrimEnd('?');
+        var typeSuffix = "";
+        if (coreTypeName.EndsWith("[]"))
+        {
+            coreTypeName = coreTypeName.TrimEndString("[]").ToString();
+            typeSuffix = "Array";
+        }
+
+        if (coreTypeName.Match(@"ICollection<(.+)>") is Match listMatch && listMatch.Success)
+        {
+            var genType = listMatch.Groups[1].Value;
+            return $"ICollection{contextName(genType)}{typeSuffix}";
+        }
+        else if (coreTypeName.Match(@"IDictionary<\s*([^,]+)\s*,\s*(.+)\s*>") is Match dictMatch && dictMatch.Success)
+        {
+            var genType1 = dictMatch.Groups[1].Value;
+            var genType2 = dictMatch.Groups[2].Value;
+            return $"IDictionary{contextName(genType1)}{contextName(genType2)}{typeSuffix}";
+        }
+        else
+        {
+            return $"{contextName(coreTypeName)}{typeSuffix}";
+        }
     }
 
     /// <summary>新しくAPIクライアントコード生成する</summary>
@@ -352,7 +460,7 @@ public class GenerateApiMethods
     /// <param name="codeFile">保存ファイル</param>
     /// <param name="codeEnc">保存エンコーディング</param>
     /// <param name="scopeApis">生成するAPIエンドポイント情報</param>
-    private void createApiCode(string name, FileInfo codeFile, Encoding codeEnc, IEnumerable<ApiEndpoint> scopeApis)
+    private void createApiCode(string name, FileInfo codeFile, Encoding codeEnc, IEnumerable<ApiEndpoint> scopeApis, HashSet<string> typeNameUsed)
     {
         using var codeWriter = codeFile.WithDirectoryCreate().CreateTextWriter(encoding: codeEnc);
 
@@ -372,7 +480,7 @@ public class GenerateApiMethods
                 codeWriter.WriteLine($"""    {comment}""");
             }
             codeWriter.WriteLine($"""    {makeApiMethodAnnotation(ep)}""");
-            foreach (var method in makeApiMethodDefine(default, ep))
+            foreach (var method in makeApiMethodDefine(default, ep, typeNameUsed))
             {
                 codeWriter.WriteLine($"""    {method}""");
             }
@@ -388,7 +496,7 @@ public class GenerateApiMethods
     /// <param name="codeFile"></param>
     /// <param name="codeEnc"></param>
     /// <param name="scopeApis"></param>
-    void updateApiCode(string name, FileInfo codeFile, Encoding codeEnc, IEnumerable<ApiEndpoint> scopeApis)
+    private void updateApiCode(string name, FileInfo codeFile, Encoding codeEnc, IEnumerable<ApiEndpoint> scopeApis, HashSet<string> typeNameUsed)
     {
         // API定義コードを更新して列挙する
         IEnumerable<string> updateCodeLines(TextItemsScanner scanner)
@@ -462,7 +570,7 @@ public class GenerateApiMethods
                     yield return $"""    {comment}""";
                 }
                 yield return $"""    {makeApiMethodAnnotation(newEp)}""";
-                foreach (var method in makeApiMethodDefine(orgFunc, newEp))
+                foreach (var method in makeApiMethodDefine(orgFunc, newEp, typeNameUsed))
                 {
                     yield return $"""    {method}""";
                 }
@@ -476,7 +584,7 @@ public class GenerateApiMethods
                     yield return $"""    {comment}""";
                 }
                 yield return $"""    {makeApiMethodAnnotation(ep)}""";
-                foreach (var method in makeApiMethodDefine(default, ep))
+                foreach (var method in makeApiMethodDefine(default, ep, typeNameUsed))
                 {
                     yield return $"""    {method}""";
                 }

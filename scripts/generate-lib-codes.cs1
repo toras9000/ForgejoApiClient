@@ -29,14 +29,16 @@ return await Paved.ProceedAsync(async () =>
     using var http = new HttpClient();
     var swaggerFile = await http.GetFileAsync(config.ForgejoSwaggerUrl, tempDir.Info, cancelToken: signal.Token);
 
+    var apiSerContextFile = config.CodeDirectory.RelativeFile("ApiDataSerializerContect.cs");
+
     Console.WriteLine("Generate data-type code");
     var dataTypeGenerator = new GenerateApiDataType();
     var apiDataTypeFile = config.CodeDirectory.RelativeFile("ApiData.cs");
-    await dataTypeGenerator.GenerateAsync(swaggerFile, apiDataTypeFile, signal.Token);
+    await dataTypeGenerator.GenerateAsync(swaggerFile, apiDataTypeFile, default, signal.Token);
 
     Console.WriteLine("Generate api-methods code");
     var apiMethodsGenerator = new GenerateApiMethods();
     var apiMethodsDir = config.CodeDirectory.RelativeDirectory("Scopes");
-    await apiMethodsGenerator.GenerateAsync(swaggerFile, apiMethodsDir, signal.Token);
+    await apiMethodsGenerator.GenerateAsync(swaggerFile, apiMethodsDir, apiSerContextFile, signal.Token);
 
 });

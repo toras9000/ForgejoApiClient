@@ -10,7 +10,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationList</returns>
     [ForgejoEndpoint("GET", "/orgs", "List all organizations")]
     public Task<Organization[]> ListAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OrganizationArray, cancelToken);
 
     /// <summary>Get an organization</summary>
     /// <param name="org">name of the organization to get</param>
@@ -18,7 +18,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Organization</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}", "Get an organization")]
     public Task<Organization> GetAsync(string org, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}", cancelToken).JsonResponseAsync<Organization>(cancelToken);
+        => GetRequest($"orgs/{org}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Organization, cancelToken);
 
     /// <summary>Create an organization</summary>
     /// <param name="options"></param>
@@ -26,7 +26,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Organization</returns>
     [ForgejoEndpoint("POST", "/orgs", "Create an organization")]
     public Task<Organization> CreateAsync(CreateOrgOption options, CancellationToken cancelToken = default)
-        => PostRequest("orgs", options, cancelToken).JsonResponseAsync<Organization>(cancelToken);
+        => PostRequest("orgs", options, ApiDataSerializerContext.Default.CreateOrgOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Organization, cancelToken);
 
     /// <summary>Edit an organization</summary>
     /// <param name="org">name of the organization to edit</param>
@@ -35,14 +35,14 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Organization</returns>
     [ForgejoEndpoint("PATCH", "/orgs/{org}", "Edit an organization")]
     public Task<Organization> UpdateAsync(string org, EditOrgOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"orgs/{org}", options, cancelToken).JsonResponseAsync<Organization>(cancelToken);
+        => PatchRequest($"orgs/{org}", options, ApiDataSerializerContext.Default.EditOrgOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Organization, cancelToken);
 
     /// <summary>Delete an organization</summary>
     /// <param name="org">organization that is to be deleted</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}", "Delete an organization")]
     public Task DeleteAsync(string org, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Rename an organization</summary>
     /// <param name="org">existing org name</param>
@@ -50,7 +50,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/orgs/{org}/rename", "Rename an organization")]
     public Task RenameAsync(string org, RenameOrgOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/rename", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"orgs/{org}/rename", options, ApiDataSerializerContext.Default.RenameOrgOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List the current user&apos;s organizations</summary>
     /// <param name="paging">ページングオプション</param>
@@ -58,7 +58,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationListWithoutPagination - Organizations without pagination headers</returns>
     [ForgejoEndpoint("GET", "/user/orgs", "List the current user's organizations")]
     public Task<Organization[]> ListMyOrgsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("user/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest("user/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OrganizationArray, cancelToken);
 
     /// <summary>List a user&apos;s organizations</summary>
     /// <param name="username">username of user</param>
@@ -67,7 +67,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationListWithoutPagination - Organizations without pagination headers</returns>
     [ForgejoEndpoint("GET", "/users/{username}/orgs", "List a user's organizations")]
     public Task<Organization[]> ListUserOrgsAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Organization[]>(cancelToken);
+        => GetRequest($"users/{username}/orgs".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OrganizationArray, cancelToken);
     #endregion
 
     #region Org Member
@@ -78,7 +78,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/members", "List an organization's members")]
     public Task<User[]> ListMembersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"orgs/{org}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Check if a user is a member of an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -94,7 +94,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/members/{username}", "Remove a member from an organization")]
     public Task RemoveMemberAsync(string org, string username, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/members/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List an organization&apos;s public members</summary>
     /// <param name="org">name of the organization</param>
@@ -103,7 +103,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/public_members", "List an organization's public members")]
     public Task<User[]> ListPublicMembersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/public_members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"orgs/{org}/public_members".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Check if a user is a public member of an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -119,7 +119,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/orgs/{org}/public_members/{username}", "Publicize a user's membership")]
     public Task PublicizeMemberAsync(string org, string username, CancellationToken cancelToken = default)
-        => PutRequest($"orgs/{org}/public_members/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"orgs/{org}/public_members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Conceal a user&apos;s membership</summary>
     /// <param name="org">name of the organization</param>
@@ -127,7 +127,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/public_members/{username}", "Conceal a user's membership")]
     public Task ConcealMemberAsync(string org, string username, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/public_members/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/public_members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Org Repository
@@ -138,7 +138,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/repos", "List an organization's repos")]
     public Task<Repository[]> ListRepositoriesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"orgs/{org}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RepositoryArray, cancelToken);
 
     /// <summary>Create a repository in an organization</summary>
     /// <param name="org">name of organization</param>
@@ -147,7 +147,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("POST", "/orgs/{org}/repos", "Create a repository in an organization")]
     public Task<Repository> CreateRepositoryAsync(string org, CreateRepoOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/repos", options, cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => PostRequest($"orgs/{org}/repos", options, ApiDataSerializerContext.Default.CreateRepoOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
     #endregion
 
     #region Org Misc
@@ -159,7 +159,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/activities/feeds", "List an organization's activity feeds")]
     public Task<Activity[]> ListActivitiesAsync(string org, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"orgs/{org}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActivityArray, cancelToken);
 
     /// <summary>Update an organization&apos;s avatar</summary>
     /// <param name="org">name of the organization</param>
@@ -167,14 +167,14 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/orgs/{org}/avatar", "Update an organization's avatar")]
     public Task UpdateAvatarAsync(string org, UpdateUserAvatarOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/avatar", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"orgs/{org}/avatar", options, ApiDataSerializerContext.Default.UpdateUserAvatarOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete an organization&apos;s avatar. It will be replaced by a default one</summary>
     /// <param name="org">name of the organization</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/avatar", "Delete an organization's avatar. It will be replaced by a default one")]
     public Task DeleteAvatarAsync(string org, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/avatar", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Runners
@@ -186,7 +186,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActionRunnerList is a list of Forgejo Action runners</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners", "Get the organization's runners")]
     public Task<ActionRunner[]> ListActionsRunnersAsync(string org, bool? visible = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync<ActionRunner[]>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/runners".WithQuery().Param(visible).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunnerArray, cancelToken);
 
     /// <summary>Get a particular runner that belongs to the organization</summary>
     /// <param name="org">name of the organization</param>
@@ -196,7 +196,7 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/{runner_id}", "Get a particular runner that belongs to the organization")]
     [ManualEdit("runner_id の型を変更")]
     public Task<ActionRunner> GetActionsRunnerAsync(string org, long runner_id, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<ActionRunner>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunner, cancelToken);
 
     /// <summary>Register a new organization-level runner</summary>
     /// <param name="org">name of the organization</param>
@@ -205,7 +205,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>RegisterRunnerResponse contains the details of the just registered runner.</returns>
     [ForgejoEndpoint("POST", "/orgs/{org}/actions/runners", "Register a new organization-level runner")]
     public Task<RegisterRunnerResponse> CreateActionsRunnerAsync(string org, RegisterRunnerOptions options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/actions/runners", options, cancelToken).JsonResponseAsync<RegisterRunnerResponse>(cancelToken);
+        => PostRequest($"orgs/{org}/actions/runners", options, ApiDataSerializerContext.Default.RegisterRunnerOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RegisterRunnerResponse, cancelToken);
 
     /// <summary>Delete a particular runner that belongs to the organization</summary>
     /// <param name="org">name of the organization</param>
@@ -214,7 +214,7 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/runners/{runner_id}", "Delete a particular runner that belongs to the organization")]
     [ManualEdit("runner_id の型を変更")]
     public Task DeleteActionsRunnerAsync(string org, long runner_id, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/actions/runners/{runner_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Tasks
@@ -227,7 +227,7 @@ public interface IOrganizationApi : IApiScope
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/runners/jobs", "Search for organization's action jobs according filter conditions")]
     [ManualEdit("戻り値を nullable に変更")]
     public Task<ActionRunJob[]?> ListActionsJobsAsync(string org, string? labels = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync<ActionRunJob[]?>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJobArray, cancelToken);
     #endregion
 
     #region Actions Secrets
@@ -238,7 +238,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>SecretList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/secrets", "List actions secrets of an organization")]
     public Task<Secret[]> ListActionsSecretsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Secret[]>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SecretArray, cancelToken);
 
     /// <summary>Create or Update a secret value in an organization</summary>
     /// <param name="org">name of organization</param>
@@ -247,7 +247,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/orgs/{org}/actions/secrets/{secretname}", "Create or Update a secret value in an organization")]
     public Task SetActionsSecretAsync(string org, string secretname, CreateOrUpdateSecretOption options, CancellationToken cancelToken = default)
-        => PutRequest($"orgs/{org}/actions/secrets/{secretname}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"orgs/{org}/actions/secrets/{secretname}", options, ApiDataSerializerContext.Default.CreateOrUpdateSecretOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete a secret in an organization</summary>
     /// <param name="org">name of organization</param>
@@ -255,7 +255,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/secrets/{secretname}", "Delete a secret in an organization")]
     public Task DeleteActionsSecretAsync(string org, string secretname, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/actions/secrets/{secretname}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Variables
@@ -266,7 +266,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>VariableList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables", "List variables of an organization")]
     public Task<ActionVariable[]> ListActionsVariablesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync<ActionVariable[]>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/variables".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionVariableArray, cancelToken);
 
     /// <summary>Get organization&apos;s variable by name</summary>
     /// <param name="org">name of the organization</param>
@@ -275,7 +275,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActionVariable</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/actions/variables/{variablename}", "Get organization's variable by name")]
     public Task<ActionVariable> GetActionsVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<ActionVariable>(cancelToken);
+        => GetRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionVariable, cancelToken);
 
     /// <summary>Create a new variable in organization</summary>
     /// <param name="org">name of the organization</param>
@@ -284,7 +284,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("POST", "/orgs/{org}/actions/variables/{variablename}", "Create a new variable in organization")]
     public Task CreateActionsVariableAsync(string org, string variablename, CreateVariableOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PostRequest($"orgs/{org}/actions/variables/{variablename}", options, ApiDataSerializerContext.Default.CreateVariableOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Update variable in organization</summary>
     /// <param name="org">name of the organization</param>
@@ -293,7 +293,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/orgs/{org}/actions/variables/{variablename}", "Update variable in organization")]
     public Task UpdateActionsVariableAsync(string org, string variablename, UpdateVariableOption options, CancellationToken cancelToken = default)
-        => PutRequest($"orgs/{org}/actions/variables/{variablename}", options, cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"orgs/{org}/actions/variables/{variablename}", options, ApiDataSerializerContext.Default.UpdateVariableOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Delete organization&apos;s variable by name</summary>
     /// <param name="org">name of the organization</param>
@@ -301,7 +301,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/actions/variables/{variablename}", "Delete organization's variable by name")]
     public Task DeleteActionsVariableAsync(string org, string variablename, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/actions/variables/{variablename}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Social
@@ -312,7 +312,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>BlockedUserList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/list_blocked", "List the organization's blocked users")]
     public Task<BlockedUser[]> ListBlockedUsersAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/list_blocked".WithQuery().Param(paging), cancelToken).JsonResponseAsync<BlockedUser[]>(cancelToken);
+        => GetRequest($"orgs/{org}/list_blocked".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.BlockedUserArray, cancelToken);
 
     /// <summary>Blocks a user from the organization</summary>
     /// <param name="org">name of the org</param>
@@ -320,7 +320,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/orgs/{org}/block/{username}", "Blocks a user from the organization")]
     public Task BlockUserFromAsync(string org, string username, CancellationToken cancelToken = default)
-        => PutRequest($"orgs/{org}/block/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"orgs/{org}/block/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Unblock a user from the organization</summary>
     /// <param name="org">name of the org</param>
@@ -328,7 +328,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/orgs/{org}/unblock/{username}", "Unblock a user from the organization")]
     public Task UnblockUserFromAsync(string org, string username, CancellationToken cancelToken = default)
-        => PutRequest($"orgs/{org}/unblock/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"orgs/{org}/unblock/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Webhook
@@ -339,7 +339,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>HookListWithoutPagination - Hooks without pagination headers</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/hooks", "List an organization's webhooks")]
     public Task<Hook[]> ListWebhooksAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Hook[]>(cancelToken);
+        => GetRequest($"orgs/{org}/hooks".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.HookArray, cancelToken);
 
     /// <summary>Get a hook</summary>
     /// <param name="org">name of the organization</param>
@@ -348,7 +348,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/hooks/{id}", "Get a hook")]
     public Task<Hook> GetWebhookAsync(string org, long id, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/hooks/{id}", cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => GetRequest($"orgs/{org}/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Create a hook</summary>
     /// <param name="org">name of the organization</param>
@@ -357,7 +357,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("POST", "/orgs/{org}/hooks", "Create a hook")]
     public Task<Hook> CreateWebhookAsync(string org, CreateHookOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/hooks", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PostRequest($"orgs/{org}/hooks", options, ApiDataSerializerContext.Default.CreateHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Update a hook</summary>
     /// <param name="org">name of the organization</param>
@@ -367,7 +367,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Hook</returns>
     [ForgejoEndpoint("PATCH", "/orgs/{org}/hooks/{id}", "Update a hook")]
     public Task<Hook> UpdateWebhookAsync(string org, long id, EditHookOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"orgs/{org}/hooks/{id}", options, cancelToken).JsonResponseAsync<Hook>(cancelToken);
+        => PatchRequest($"orgs/{org}/hooks/{id}", options, ApiDataSerializerContext.Default.EditHookOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Hook, cancelToken);
 
     /// <summary>Delete a hook</summary>
     /// <param name="org">name of the organization</param>
@@ -375,7 +375,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/hooks/{id}", "Delete a hook")]
     public Task DeleteWebhookAsync(string org, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/hooks/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/hooks/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Lable
@@ -387,7 +387,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>LabelList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/labels", "List an organization's labels")]
     public Task<Label[]> ListLabelsAsync(string org, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/labels".WithQuery().Param(sort).Param(paging), cancelToken).JsonResponseAsync<Label[]>(cancelToken);
+        => GetRequest($"orgs/{org}/labels".WithQuery().Param(sort).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.LabelArray, cancelToken);
 
     /// <summary>Get a single label</summary>
     /// <param name="org">name of the organization</param>
@@ -396,7 +396,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Label</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/labels/{id}", "Get a single label")]
     public Task<Label> GetLabelAsync(string org, long id, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/labels/{id}", cancelToken).JsonResponseAsync<Label>(cancelToken);
+        => GetRequest($"orgs/{org}/labels/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Label, cancelToken);
 
     /// <summary>Create a label for an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -405,7 +405,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Label</returns>
     [ForgejoEndpoint("POST", "/orgs/{org}/labels", "Create a label for an organization")]
     public Task<Label> CreateLabelAsync(string org, CreateLabelOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/labels", options, cancelToken).JsonResponseAsync<Label>(cancelToken);
+        => PostRequest($"orgs/{org}/labels", options, ApiDataSerializerContext.Default.CreateLabelOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Label, cancelToken);
 
     /// <summary>Update a label</summary>
     /// <param name="org">name of the organization</param>
@@ -415,7 +415,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Label</returns>
     [ForgejoEndpoint("PATCH", "/orgs/{org}/labels/{id}", "Update a label")]
     public Task<Label> UpdateLabelAsync(string org, long id, EditLabelOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"orgs/{org}/labels/{id}", options, cancelToken).JsonResponseAsync<Label>(cancelToken);
+        => PatchRequest($"orgs/{org}/labels/{id}", options, ApiDataSerializerContext.Default.EditLabelOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Label, cancelToken);
 
     /// <summary>Delete a label</summary>
     /// <param name="org">name of the organization</param>
@@ -423,7 +423,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/orgs/{org}/labels/{id}", "Delete a label")]
     public Task DeleteLabelAsync(string org, long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"orgs/{org}/labels/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"orgs/{org}/labels/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Team
@@ -434,7 +434,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>TeamList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/teams", "List an organization's teams")]
     public Task<Team[]> ListTeamsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/teams".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Team[]>(cancelToken);
+        => GetRequest($"orgs/{org}/teams".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TeamArray, cancelToken);
 
     /// <summary>Search for teams within an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -445,7 +445,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>SearchResults of a successful search</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/teams/search", "Search for teams within an organization")]
     public Task<TeamSearchResults> SearchTeamsAsync(string org, string? q = default, bool? include_desc = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/teams/search".WithQuery().Param(q).Param(include_desc).Param(paging), cancelToken).JsonResponseAsync<TeamSearchResults>(cancelToken);
+        => GetRequest($"orgs/{org}/teams/search".WithQuery().Param(q).Param(include_desc).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.TeamSearchResults, cancelToken);
 
     /// <summary>Get a team</summary>
     /// <param name="id">id of the team to get</param>
@@ -453,7 +453,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Team</returns>
     [ForgejoEndpoint("GET", "/teams/{id}", "Get a team")]
     public Task<Team> GetTeamAsync(long id, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}", cancelToken).JsonResponseAsync<Team>(cancelToken);
+        => GetRequest($"teams/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Team, cancelToken);
 
     /// <summary>Create a team</summary>
     /// <param name="org">name of the organization</param>
@@ -462,7 +462,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Team</returns>
     [ForgejoEndpoint("POST", "/orgs/{org}/teams", "Create a team")]
     public Task<Team> CreateTeamAsync(string org, CreateTeamOption options, CancellationToken cancelToken = default)
-        => PostRequest($"orgs/{org}/teams", options, cancelToken).JsonResponseAsync<Team>(cancelToken);
+        => PostRequest($"orgs/{org}/teams", options, ApiDataSerializerContext.Default.CreateTeamOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Team, cancelToken);
 
     /// <summary>Edit a team</summary>
     /// <param name="id">id of the team to edit</param>
@@ -471,14 +471,14 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Team</returns>
     [ForgejoEndpoint("PATCH", "/teams/{id}", "Edit a team")]
     public Task<Team> UpdateTeamAsync(long id, EditTeamOption options, CancellationToken cancelToken = default)
-        => PatchRequest($"teams/{id}", options, cancelToken).JsonResponseAsync<Team>(cancelToken);
+        => PatchRequest($"teams/{id}", options, ApiDataSerializerContext.Default.EditTeamOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Team, cancelToken);
 
     /// <summary>Delete a team</summary>
     /// <param name="id">id of the team to delete</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/teams/{id}", "Delete a team")]
     public Task DeleteTeamAsync(long id, CancellationToken cancelToken = default)
-        => DeleteRequest($"teams/{id}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"teams/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Team Member
@@ -489,7 +489,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/members", "List a team's members")]
     public Task<User[]> ListTeamMembersAsync(long id, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync<User[]>(cancelToken);
+        => GetRequest($"teams/{id}/members".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>List a particular member of team</summary>
     /// <param name="id">id of the team</param>
@@ -498,7 +498,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>User</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/members/{username}", "List a particular member of team")]
     public Task<User> GetTeamMemberAsync(long id, string username, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync<User>(cancelToken);
+        => GetRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.User, cancelToken);
 
     /// <summary>Add a team member</summary>
     /// <param name="id">id of the team</param>
@@ -506,7 +506,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/teams/{id}/members/{username}", "Add a team member")]
     public Task AddTeamMemberAsync(long id, string username, CancellationToken cancelToken = default)
-        => PutRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Remove a team member</summary>
     /// <param name="id">id of the team</param>
@@ -514,7 +514,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/teams/{id}/members/{username}", "Remove a team member")]
     public Task RemoveTeamMemberAsync(long id, string username, CancellationToken cancelToken = default)
-        => DeleteRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"teams/{id}/members/{username}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Team Repository
@@ -525,7 +525,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>RepositoryList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/repos", "List a team's repos")]
     public Task<Repository[]> ListTeamRepositoriesAsync(long id, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync<Repository[]>(cancelToken);
+        => GetRequest($"teams/{id}/repos".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RepositoryArray, cancelToken);
 
     /// <summary>List a particular repo of team</summary>
     /// <param name="id">id of the team</param>
@@ -535,7 +535,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Repository</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/repos/{org}/{repo}", "List a particular repo of team")]
     public Task<Repository> GetTeamRepositoryAsync(long id, string org, string repo, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync<Repository>(cancelToken);
+        => GetRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Repository, cancelToken);
 
     /// <summary>Add a repository to a team</summary>
     /// <param name="id">id of the team</param>
@@ -544,7 +544,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("PUT", "/teams/{id}/repos/{org}/{repo}", "Add a repository to a team")]
     public Task AddTeamRepositoryAsync(long id, string org, string repo, CancellationToken cancelToken = default)
-        => PutRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => PutRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>Remove a repository from a team</summary>
     /// <param name="id">id of the team</param>
@@ -553,7 +553,7 @@ public interface IOrganizationApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     [ForgejoEndpoint("DELETE", "/teams/{id}/repos/{org}/{repo}", "Remove a repository from a team")]
     public Task RemoveTeamRepositoryAsync(long id, string org, string repo, CancellationToken cancelToken = default)
-        => DeleteRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync<EmptyResult>(cancelToken);
+        => DeleteRequest($"teams/{id}/repos/{org}/{repo}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Team Misc
@@ -565,7 +565,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>ActivityFeedsList</returns>
     [ForgejoEndpoint("GET", "/teams/{id}/activities/feeds", "List a team's activity feeds")]
     public Task<Activity[]> ListTeamActivitiesAsync(long id, DateTimeOffset? date = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"teams/{id}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync<Activity[]>(cancelToken);
+        => GetRequest($"teams/{id}/activities/feeds".WithQuery().Param(date).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActivityArray, cancelToken);
 
     /// <summary>Get user permissions in organization</summary>
     /// <param name="username">username of user</param>
@@ -574,7 +574,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>OrganizationPermissions</returns>
     [ForgejoEndpoint("GET", "/users/{username}/orgs/{org}/permissions", "Get user permissions in organization")]
     public Task<OrganizationPermissions> GetUserPermissionsAsync(string username, string org, CancellationToken cancelToken = default)
-        => GetRequest($"users/{username}/orgs/{org}/permissions", cancelToken).JsonResponseAsync<OrganizationPermissions>(cancelToken);
+        => GetRequest($"users/{username}/orgs/{org}/permissions", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OrganizationPermissions, cancelToken);
     #endregion
 
     #region Quota
@@ -585,7 +585,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedArtifactList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/artifacts", "List the artifacts affecting the organization's quota")]
     public Task<QuotaUsedArtifact[]> ListQuotaArtifactsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/artifacts".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedArtifact[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/artifacts".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaUsedArtifactArray, cancelToken);
 
     /// <summary>List the attachments affecting the organization&apos;s quota</summary>
     /// <param name="org">name of the organization</param>
@@ -594,7 +594,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedAttachmentList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/attachments", "List the attachments affecting the organization's quota")]
     public Task<QuotaUsedAttachment[]> ListQuotaAttachmentsAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/attachments".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedAttachment[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/attachments".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaUsedAttachmentArray, cancelToken);
 
     /// <summary>List the packages affecting the organization&apos;s quota</summary>
     /// <param name="org">name of the organization</param>
@@ -603,7 +603,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaUsedPackageList</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/packages", "List the packages affecting the organization's quota")]
     public Task<QuotaUsedPackage[]> ListQuotaPackagesAsync(string org, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/packages".WithQuery().Param(paging), cancelToken).JsonResponseAsync<QuotaUsedPackage[]>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/packages".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaUsedPackageArray, cancelToken);
 
     /// <summary>Get quota information for an organization</summary>
     /// <param name="org">name of the organization</param>
@@ -611,7 +611,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>QuotaInfo</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota", "Get quota information for an organization")]
     public Task<QuotaInfo> GetQuotaAsync(string org, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota", cancelToken).JsonResponseAsync<QuotaInfo>(cancelToken);
+        => GetRequest($"orgs/{org}/quota", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.QuotaInfo, cancelToken);
 
     /// <summary>Check if the organization is over quota for a given subject</summary>
     /// <param name="org">name of the organization</param>
@@ -620,7 +620,7 @@ public interface IOrganizationApi : IApiScope
     /// <returns>Returns true if the action is accepted.</returns>
     [ForgejoEndpoint("GET", "/orgs/{org}/quota/check", "Check if the organization is over quota for a given subject")]
     public Task<bool> CheckQuotaOverAsync(string org, string subject, CancellationToken cancelToken = default)
-        => GetRequest($"orgs/{org}/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync<bool>(cancelToken);
+        => GetRequest($"orgs/{org}/quota/check".WithQuery().Param(subject), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Boolean, cancelToken);
     #endregion
 
 }

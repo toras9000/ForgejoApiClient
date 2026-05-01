@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using ForgejoApiClient.Api;
-using ForgejoApiClient.Converters;
 
 namespace ForgejoApiClient;
 
@@ -16,15 +16,16 @@ internal record EmptyResult;
 /// </remarks>
 /// <remarks>API要求応答を指定するコンストラクタ</remarks>
 /// <param name="requester">API要求デリゲート</param>
-internal struct RequestContext(Task<HttpResponseMessage> requester)
+internal partial struct RequestContext(Task<HttpResponseMessage> requester)
 {
     // 公開メソッド
     #region 応答処理
     /// <summary>API要求を行い応答をJSONとして解釈して型にマッピングする</summary>
     /// <typeparam name="TResult">応答結果データ型</typeparam>
+    /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>API応答データ</returns>
-    public readonly Task<TResult> JsonResponseAsync<TResult>(CancellationToken cancelToken)
+    public readonly Task<TResult> JsonResponseAsync<TResult>(JsonTypeInfo<TResult> typeInfo, CancellationToken cancelToken)
         => interpretResponseAsync(async (rsp) =>
         {
             // 空の応答の場合もある。空応答を期待する場合はデコードせずに。
@@ -34,7 +35,7 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
             if (rsp.StatusCode == System.Net.HttpStatusCode.NoContent) return default!;
 
             // JSON応答を取得
-            var json = await rsp.Content.ReadFromJsonAsync<TResult>(options: JsonResponseOptions, cancelToken).ConfigureAwait(false);
+            var json = await rsp.Content.ReadFromJsonAsync(typeInfo, cancelToken).ConfigureAwait(false);
             return json!;
         }, cancelToken);
 
@@ -71,20 +72,11 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
         => interpretResponseStatusAsync(cancelToken);
     #endregion
 
-    // 内部フィールド
-    #region 定数：シリアル化
-    /// <summary>API要求時のJSONシリアライズオプション</summary>
-    internal static readonly JsonSerializerOptions JsonRequestOptions = new JsonSerializerOptions
-    {
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters = { new EnumJsonConverterFactory(), },
-    };
-
-    /// <summary>API応答解釈時のJSONシリアライズオプション</summary>
-    internal static readonly JsonSerializerOptions JsonResponseOptions = new JsonSerializerOptions
-    {
-        Converters = { new EnumJsonConverterFactory(), },
-    };
+    // 非公開型
+    #region シリアライズ
+    /// <summary>シリアライズ型コンテキスト</summary>
+    [JsonSerializable(typeof(JsonElement))]
+    private partial class InternalSerializerContext : JsonSerializerContext;
     #endregion
 
     // 非公開メソッド
@@ -104,7 +96,7 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
             try
             {
                 // JSONパースしてmessageプロパティ値の取得を試みる
-                var json = await response.Content.ReadFromJsonAsync<JsonElement>(cancelToken).ConfigureAwait(false);
+                var json = await response.Content.ReadFromJsonAsync(InternalSerializerContext.Default.JsonElement, cancelToken).ConfigureAwait(false);
                 if (json.TryGetProperty("message", out var msgProp) && msgProp.GetString() is string msgText)
                 {
                     rspMsg = msgText;
@@ -198,7 +190,7 @@ internal struct RequestContext(Task<HttpResponseMessage> requester)
             try
             {
                 // JSONパースしてmessageプロパティ値の取得を試みる
-                var json = await response.Content.ReadFromJsonAsync<JsonElement>(cancelToken).ConfigureAwait(false);
+                var json = await response.Content.ReadFromJsonAsync(InternalSerializerContext.Default.JsonElement, cancelToken).ConfigureAwait(false);
                 if (json.TryGetProperty("message", out var msgProp) && msgProp.GetString() is string msgText)
                 {
                     error = new ErrorResponseException(response.StatusCode, msgText);

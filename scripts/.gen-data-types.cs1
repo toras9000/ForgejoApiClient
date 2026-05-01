@@ -35,7 +35,7 @@ public class GenerateApiDataType
     /// <summary>コードの保存エンコーディング</summary>
     public Encoding CodeEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
-    public async ValueTask GenerateAsync(FileInfo swaggerFile, FileInfo apiDataTypeFile, CancellationToken breaker)
+    public async ValueTask GenerateAsync(FileInfo swaggerFile, FileInfo apiDataTypeFile, FileInfo? apiSerContextFile, CancellationToken breaker)
     {
         // Swaggerファイルの読み込み
         Console.WriteLine("Get swagger");
@@ -74,31 +74,66 @@ public class GenerateApiDataType
         Console.WriteLine("Generate data-type code");
 
         // データ型定義
-        using var writer = apiDataTypeFile.WithDirectoryCreate().CreateTextWriter(encoding: this.CodeEncoding);
+        using var dataTypeWriter = apiDataTypeFile.WithDirectoryCreate().CreateTextWriter(encoding: this.CodeEncoding);
 
         // ヘッダコードを出力
-        writer.WriteLine("using System;");
-        writer.WriteLine("using System.Collections.Generic;");
-        writer.WriteLine("using System.Text.Json.Serialization;");
-        writer.WriteLine("using ForgejoApiClient.Converters;");
-        writer.WriteLine("");
-        writer.WriteLine("#pragma warning disable IDE1006 // 命名スタイル");
-        writer.WriteLine("");
-        writer.WriteLine($"namespace {this.GenerateNamespace};");
-        writer.WriteLine("");
+        dataTypeWriter.WriteLine($"""
+        using System.Text.Json.Serialization;
+
+        #pragma warning disable IDE1006 // 命名スタイル
+
+        namespace {this.GenerateNamespace};
+
+        """);
 
         // 型のコードを出力
         var defTypes = resolver.Types.ToDictionary();
         foreach (var code in generateTypeDefines(resolver, defTypes))
         {
-            writer.WriteLine(code);
+            dataTypeWriter.WriteLine(code);
         }
 
         // 型モデルを生成した際に追加される型もある。それを追加で出力する。
-        var addedTypes = resolver.Types.Where(t => !defTypes.ContainsKey(t.Key));  // 上で出力していないものを対象とする
+        var addedTypes = resolver.Types.Where(t => !defTypes.ContainsKey(t.Key)).ToArray();  // 上で出力していないものを対象とする
         foreach (var code in generateTypeDefines(resolver, addedTypes))
         {
-            writer.WriteLine(code);
+            dataTypeWriter.WriteLine(code);
+        }
+
+        // シリアライザコンテキストのコード生成を行うか
+        if (apiSerContextFile != null)
+        {
+            // 生成コードファイルを書き込み用に開く
+            Console.WriteLine("Generate serialization-context code");
+
+            // シリアライズコンテキスト型定義
+            using var serContextWriter = apiSerContextFile.WithDirectoryCreate().CreateTextWriter(encoding: this.CodeEncoding);
+
+            // ヘッダコードを出力
+            serContextWriter.WriteLine("""
+            using System.Text.Json.Serialization;
+
+            namespace ForgejoApiClient.Api;
+
+            [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+            """);
+
+            // 型のメ汰データ生成
+            foreach (var define in defTypes.Concat(addedTypes).OrderBy(e => e.Value))
+            {
+                var typeSchema = define.Key;
+                var typeName = define.Value;
+                if (!typeSchema.IsEnumeration && typeSchema.Properties.Count <= 0) continue;
+
+                serContextWriter.WriteLine($"""
+                [JsonSerializable(typeof({typeName}))]
+                """);
+            }
+
+            serContextWriter.WriteLine("""
+            internal partial class ApiDataSerializerContext : JsonSerializerContext;
+
+            """);
         }
     }
 
@@ -151,7 +186,7 @@ public class GenerateApiDataType
                     {
                         yield return $"    {desc}";
                     }
-                    yield return $"    [MapEnum(\"{entryModel.Value}\")]";
+                    yield return $"    [JsonStringEnumMemberName(\"{entryModel.Value}\")]";
                     yield return $"    {entryName} = {entryModel.InternalValue},";
                 }
                 yield return "};";

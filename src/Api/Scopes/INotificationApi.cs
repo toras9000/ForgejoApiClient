@@ -14,14 +14,14 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThreadList</returns>
     [ForgejoEndpoint("GET", "/notifications", "List users's notification threads")]
     public Task<NotificationThread[]> ListAsync(bool? all = default, ICollection<string>? status_types = default, string[]? subject_type = default, DateTimeOffset? since = default, DateTimeOffset? before = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("notifications".WithQuery().Param(all).Param(status_types).Param(subject_type).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
+        => GetRequest("notifications".WithQuery().Param(all).Param(status_types).Param(subject_type).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThreadArray, cancelToken);
 
     /// <summary>Check if unread notifications exist</summary>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Number of unread notifications</returns>
     [ForgejoEndpoint("GET", "/notifications/new", "Check if unread notifications exist")]
     public Task<NotificationCount> CheckNewAsync(CancellationToken cancelToken = default)
-        => GetRequest("notifications/new", cancelToken).JsonResponseAsync<NotificationCount>(cancelToken);
+        => GetRequest("notifications/new", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationCount, cancelToken);
 
     /// <summary>Mark notification threads as read, pinned or unread</summary>
     /// <param name="last_read_at">Describes the last point that notifications were checked. Anything updated since this time will not be updated.</param>
@@ -32,7 +32,7 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThreadListWithoutPagination - Notification threads without pagination headers</returns>
     [ForgejoEndpoint("PUT", "/notifications", "Mark notification threads as read, pinned or unread")]
     public Task<NotificationThread[]> MarkAsync(DateTimeOffset? last_read_at = default, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, CancellationToken cancelToken = default)
-        => PutRequest("notifications".WithQuery().Param(last_read_at).Param(all).Param(status_types).Param(to_status), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
+        => PutRequest("notifications".WithQuery().Param(last_read_at).Param(all).Param(status_types).Param(to_status), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThreadArray, cancelToken);
 
     /// <summary>Get notification thread by ID</summary>
     /// <param name="id">id of notification thread</param>
@@ -40,7 +40,7 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThread</returns>
     [ForgejoEndpoint("GET", "/notifications/threads/{id}", "Get notification thread by ID")]
     public Task<NotificationThread> GetThreadAsync(long id, CancellationToken cancelToken = default)
-        => GetRequest($"notifications/threads/{id}", cancelToken).JsonResponseAsync<NotificationThread>(cancelToken);
+        => GetRequest($"notifications/threads/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThread, cancelToken);
 
     /// <summary>Mark notification thread as read by ID</summary>
     /// <param name="id">id of notification thread</param>
@@ -49,7 +49,7 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThread</returns>
     [ForgejoEndpoint("PATCH", "/notifications/threads/{id}", "Mark notification thread as read by ID")]
     public Task<NotificationThread> MarkThreadAsync(long id, string? to_status = default, CancellationToken cancelToken = default)
-        => PatchRequest($"notifications/threads/{id}".WithQuery().Param(to_status), cancelToken).JsonResponseAsync<NotificationThread>(cancelToken);
+        => PatchRequest($"notifications/threads/{id}".WithQuery().Param(to_status), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThread, cancelToken);
 
     /// <summary>List users&apos;s notification threads on a specific repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -64,7 +64,7 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThreadList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/notifications", "List users's notification threads on a specific repo")]
     public Task<NotificationThread[]> ListRepositoryThreadsAsync(string owner, string repo, bool? all = default, ICollection<string>? status_types = default, string[]? subject_type = default, DateTimeOffset? since = default, DateTimeOffset? before = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(subject_type).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
+        => GetRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(subject_type).Param(since).Param(before).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThreadArray, cancelToken);
 
     /// <summary>Mark notification threads as read, pinned or unread on a specific repo</summary>
     /// <param name="owner">owner of the repo</param>
@@ -77,6 +77,6 @@ public interface INotificationApi : IApiScope
     /// <returns>NotificationThreadListWithoutPagination - Notification threads without pagination headers</returns>
     [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/notifications", "Mark notification threads as read, pinned or unread on a specific repo")]
     public Task<NotificationThread[]> MarkRepositoryThreadsAsync(string owner, string repo, bool? all = default, ICollection<string>? status_types = default, string? to_status = default, DateTimeOffset? last_read_at = default, CancellationToken cancelToken = default)
-        => PutRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(to_status).Param(last_read_at), cancelToken).JsonResponseAsync<NotificationThread[]>(cancelToken);
+        => PutRequest($"repos/{owner}/{repo}/notifications".WithQuery().Param(all).Param(status_types).Param(to_status).Param(last_read_at), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.NotificationThreadArray, cancelToken);
 
 }

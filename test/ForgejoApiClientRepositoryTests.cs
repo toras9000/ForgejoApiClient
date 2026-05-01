@@ -2278,6 +2278,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             caller: breaker => client.Repository.ListCodeLanguagesAsync(this.TestTokenUser, repoName, cancelToken: breaker),
             condition: languages => 0 < languages.Count
         );
+        languages.Should().ContainKey("C#");
     }
 
     [TestMethod]
