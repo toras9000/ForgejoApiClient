@@ -18,14 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageReference Include="AwesomeAssertions" Version="9.5.0" />
     <PackageReference Include="BouncyCastle.OpenPGP" Version="2.0.0.1" />
-    <PackageReference Include="Lestaly" Version="0.123.0" />
-    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
-    <PackageReference Include="MSTest" Version="4.2.1" />
-    <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
-    <PackageReference Include="SkiaSharp" Version="3.119.2" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.6" />
+    <PackageReference Include="Lestaly" Version="0.141.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.32.0" />
+    <PackageReference Include="MSTest" Version="4.3.3" />
+    <PackageReference Include="NuGet.Protocol" Version="7.6.0" />
+    <PackageReference Include="SkiaSharp" Version="4.151.0" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
