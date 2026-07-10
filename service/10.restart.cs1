@@ -1,7 +1,7 @@
 #!/usr/bin/env -S dotnet run --file
-#:package ForgejoApiClient@15.0.0-rev.1
-#:package Lestaly.General@0.123.0
-#:package AngleSharp@1.4.0
+#:package ForgejoApiClient@15.0.0-rev.3
+#:package Lestaly.General@0.141.0
+#:package AngleSharp@1.6.0
 #:property PublishAot=false
 using System.Net;
 using System.Text;
@@ -15,7 +15,7 @@ using Lestaly.Cx;
 var settings = new
 {
     // サービスのURL
-    ServiceURL = "http://localhost:9970",
+    ServiceURL = "http://testserver.home:9970",
 
     // 初回起動セットアップの設定
     Setup = new

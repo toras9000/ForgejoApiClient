@@ -1,5 +1,5 @@
 #!/usr/bin/env -S dotnet run --file
-#:package Lestaly.General@0.123.0
+#:package Lestaly.General@0.141.0
 using Lestaly;
 using Lestaly.Cx;
 
@@ -7,7 +7,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
 {
     var composeFile = ThisSource.RelativeFile("./docker/compose.yml");
     var port = (await "docker".args("compose", "--file", composeFile, "port", "app", "3000").silent().result().success().output(trim: true)).SkipToken(':');
-    var service = $"http://localhost:{port}";
+    var service = $"http://testserver.home:{port}";
     Console.WriteLine();
     Console.WriteLine($" {Poster.Link[$"{service}", $"Forgejo - {service}"]}");
     Console.WriteLine();

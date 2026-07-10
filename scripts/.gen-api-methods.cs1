@@ -1,7 +1,7 @@
 #!/usr/bin/env -S dotnet run --file
 #:package NSwag.CodeGeneration.CSharp@14.7.1
 #:package Humanizer.Core@3.0.10
-#:package Lestaly.General@0.123.0
+#:package Lestaly.General@0.141.0
 #:package Kokuban@0.2.0
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
@@ -699,7 +699,7 @@ public class GenerateApiMethods
 
             // ダウンロードレスポンスであるか判定
             var rspDownload = description.Operation.Responses.Where(r => r.Key == "200").Any(r => r.Value.Schema?.Type == NJsonSchema.JsonObjectType.File)
-                || description.Operation.Produces?.Any(p => p == "application/octet-stream") == true;
+                || description.Operation.Produces?.Any(p => p is "application/octet-stream" or "application/zip") == true;
 
             // 戻り値の配列型を具体型に置き換え
             var resultType = opModel.SyncResultType;
