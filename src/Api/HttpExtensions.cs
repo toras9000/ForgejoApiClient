@@ -7,14 +7,13 @@ namespace ForgejoApiClient.Api;
 public static class HttpExtensions
 {
     #region HTTP要求
-    /// <summary>HTTP要求にBASIC認証ヘッダを設定する</summary>
+    /// <summary>HTTP要求に認証ヘッダを設定する</summary>
     /// <param name="request">HTTP要求</param>
-    /// <param name="auth">BASIC認証情報</param>
+    /// <param name="auth">HTTP認証情報</param>
     /// <returns>HTTP要求自身</returns>
-    internal static HttpRequestMessage WithBasicAuth(this HttpRequestMessage request, BasicAuthCredential auth)
+    internal static HttpRequestMessage WithAuthentication(this HttpRequestMessage request, IHttpAuthentication auth)
     {
-        var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{auth.Username}:{auth.Password}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
+        request.Headers.Authorization = new AuthenticationHeaderValue(auth.Scheme, auth.Parameters);
         return request;
     }
     #endregion

@@ -143,7 +143,7 @@ public class ForgejoClient : IApiClient, IDisposable
             // 現在では、DelegatingHandlerを利用するよりもHttpRequestMessageを生成する箇所に自前の処理レイヤーを入れた方が良さそうな感じがしている。
             // ただ、まだそのあたりを精査できていない。内部的な話であり公開I/Fとは切り離して考えられる部分なのであと回す。
 
-            if (request.Headers.Authorization == null) request.Headers.Authorization = new AuthenticationHeaderValue("token", $"{outer.apiToken}");
+            if (request.Headers.Authorization == null) request.Headers.Authorization = new AuthenticationHeaderValue("token", outer.apiToken);
             if (user != null) request.Headers.Add("Sudo", user);
             return base.SendAsync(request, cancellationToken);
         }

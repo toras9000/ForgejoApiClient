@@ -41,7 +41,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="starredBy">search only for repos that the user with the given id has starred</param>
     /// <param name="private">include private repositories this user has access to (defaults to true)</param>
     /// <param name="is_private">show only public, private or all repositories (defaults to all)</param>
-    /// <param name="template">include template repositories this user has access to (defaults to true)</param>
+    /// <param name="template">show only template, non-template or all repositories (defaults to all)</param>
     /// <param name="archived">show only archived, non-archived or all repositories (defaults to all)</param>
     /// <param name="mode">type of repository to search for. Supported values are &quot;fork&quot;, &quot;source&quot;, &quot;mirror&quot; and &quot;collaborative&quot;</param>
     /// <param name="exclusive">if `uid` is given, search only for repos that the user owns</param>
@@ -785,6 +785,37 @@ public interface IRepositoryApi : IApiScope
     public Task<ActionRunJob[]?> ListActionsJobsAsync(string owner, string repo, string? labels = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runners/jobs".WithQuery().Param(labels), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJobArray, cancelToken);
 
+    /// <summary>List jobs of a workflow run</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">ID of the workflow run</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunJobList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs/{run_id}/jobs", "List jobs of a workflow run")]
+    public Task<ActionRunJob[]> ListActionsRunJobsAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}/jobs", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJobArray, cancelToken);
+
+    /// <summary>Download the plaintext logs of an action job</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="job_id">ID of the workflow job</param>
+    /// <param name="attempt">1-based attempt number matching the value of `attempt` in the job listing; omit to fetch the latest attempt of the job</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>Plaintext log content</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/jobs/{job_id}/logs", "Download the plaintext logs of an action job")]
+    public Task<string> GetActionsJobLogsAsync(string owner, string repo, long job_id, long? attempt = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/jobs/{job_id}/logs".WithQuery().Param(attempt), cancelToken).TextResponseAsync(cancelToken);
+
+    /// <summary>Download a ZIP of plaintext logs for every job in an action run</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">ID of the workflow run. The ZIP contains the latest attempt of each job in the run, with each entry named `{job-name}-{job-id}-attempt-{N}.log` (the job ID prevents collisions when two jobs share a name; the attempt number records which run the log came from). The run itself has no attempt number — jobs are re-run independently, so use the per-job logs endpoint with `?attempt` to fetch a specific historical attempt of one job.</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ZIP archive of per-job log files</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs/{run_id}/logs", "Download a ZIP of plaintext logs for every job in an action run")]
+    public Task<ResponseResult<DownloadResult>> DownloadActionsRunLogsAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}/logs", cancelToken).DownloadResponseAsync(cancelToken);
+
     /// <summary>List a repository&apos;s action runs</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -810,6 +841,76 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs/{run_id}", "Get an action run")]
     public Task<ActionRun> GetActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRun, cancelToken);
+
+    /// <summary>Cancel a pending or running workflow run.</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">ID of the workflow run</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/runs/{run_id}/cancel", "Cancel a pending or running workflow run.")]
+    public Task CancelActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/runs/{run_id}/cancel", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>Delete a completed workflow run.</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">id of the action run</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/runs/{run_id}", "Delete a completed workflow run.")]
+    public Task DeleteActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>List artifacts of a workflow run</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">ID of the workflow run</param>
+    /// <param name="name">filter by artifact name</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionArtifactList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts", "List artifacts of a workflow run")]
+    public Task<ActionArtifact[]> ListActionsRunArtifactsAsync(string owner, string repo, long run_id, string? name = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}/artifacts".WithQuery().Param(name).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionArtifactArray, cancelToken);
+
+    /// <summary>List a repository&apos;s artifacts</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="name">filter by artifact name</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionArtifactList</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/artifacts", "List a repository's artifacts")]
+    public Task<ActionArtifact[]> ListActionsArtifactsAsync(string owner, string repo, string? name = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/artifacts".WithQuery().Param(name).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionArtifactArray, cancelToken);
+
+    /// <summary>Get an artifact by ID</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="artifact_id">ID of the artifact</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionArtifact</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/artifacts/{artifact_id}", "Get an artifact by ID")]
+    public Task<ActionArtifact> GetActionsArtifactAsync(string owner, string repo, long artifact_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/artifacts/{artifact_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionArtifact, cancelToken);
+
+    /// <summary>Download an artifact</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="artifact_id">ID of the artifact</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>the artifact archive</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip", "Download an artifact")]
+    public Task<ResponseResult<DownloadResult>> DownloadActionsArtifactAsync(string owner, string repo, long artifact_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip", cancelToken).DownloadResponseAsync(cancelToken);
+
+    /// <summary>Mark an artifact for deletion</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="artifact_id">ID of the artifact</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/artifacts/{artifact_id}", "Mark an artifact for deletion")]
+    public Task DeleteActionsArtifactAsync(string owner, string repo, long artifact_id, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/actions/artifacts/{artifact_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Actions Secrets
@@ -1049,12 +1150,14 @@ public interface IRepositoryApi : IApiScope
     /// <param name="milestone">ID of the milestone</param>
     /// <param name="labels">Label IDs</param>
     /// <param name="poster">Filter by pull request author</param>
+    /// <param name="base">Filter by base branch name</param>
+    /// <param name="head">Filter by head branch name</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>PullRequestList</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/pulls", "List a repo's pull requests. If a pull request is selected but fails to be retrieved for any reason, it will be a null value in the list of results.")]
-    public Task<PullRequest[]> ListPullRequestsAsync(string owner, string repo, string? state = default, string? sort = default, long? milestone = default, ICollection<long>? labels = default, string? poster = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery().Param(state).Param(sort).Param(milestone).Param(labels).Param(poster).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequestArray, cancelToken);
+    public Task<PullRequest[]> ListPullRequestsAsync(string owner, string repo, string? state = default, string? sort = default, long? milestone = default, ICollection<long>? labels = default, string? poster = default, string? @base = default, string? head = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/pulls".WithQuery().Param(state).Param(sort).Param(milestone).Param(labels).Param(poster).Param(@base).Param(head).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.PullRequestArray, cancelToken);
 
     /// <summary>Create a pull request</summary>
     /// <param name="owner">owner of the repo</param>

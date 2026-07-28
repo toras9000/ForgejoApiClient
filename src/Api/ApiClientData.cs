@@ -1,14 +1,53 @@
 ﻿using System.Net;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace ForgejoApiClient.Api;
 
 #pragma warning disable IDE1006 // 命名スタイル
 
+/// <summary>HTTP認証用情報</summary>
+public interface IHttpAuthentication
+{
+    /// <summary>認証スキーマ</summary>
+    public string Scheme { get; }
+
+    /// <summary>認証パラメータ</summary>
+    public string Parameters { get; }
+}
+
 /// <summary>BASIC認証情報</summary>
 /// <param name="Username">ユーザ名</param>
 /// <param name="Password">パスワード</param>
-public record BasicAuthCredential(string Username, string Password);
+public record BasicAuthCredential(string Username, string Password) : IHttpAuthentication
+{
+    /// <inheritdoc />
+    public string Scheme => "Basic";
+
+    /// <inheritdoc />
+    public string Parameters
+    {
+        get
+        {
+            this.parameters ??= Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.Username}:{this.Password}"));
+            return this.parameters;
+        }
+    }
+
+    /// <summary>認証パラメータキャッシュ</summary>
+    private string? parameters;
+}
+
+/// <summary>アクショントークン認証情報</summary>
+/// <param name="Token">ワークフローの自動生成トークン。ワークフロー内の forgejo.token に相当する。</param>
+public record ActionTokenCredential(string Token) : IHttpAuthentication
+{
+    /// <inheritdoc />
+    public string Scheme => "Bearer";
+
+    /// <inheritdoc />
+    public string Parameters => this.Token;
+}
 
 /// <summary>ページングオプション</summary>
 /// <param name="page">ページ番号</param>

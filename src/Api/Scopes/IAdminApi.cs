@@ -186,13 +186,14 @@ public interface IAdminApi : IApiScope
     /// <summary>Search users according filter conditions</summary>
     /// <param name="source_id">ID of the user&apos;s login source to search for</param>
     /// <param name="login_name">user&apos;s login name to search for</param>
+    /// <param name="is_2fa_enabled">whether or not to filter users with the 2fa enabled</param>
     /// <param name="sort">sort order of results</param>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>UserList</returns>
     [ForgejoEndpoint("GET", "/admin/users", "Search users according filter conditions")]
-    public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
-        => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(sort).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
+    public Task<User[]> ListUsersAsync(long? source_id = default, string? login_name = default, bool? is_2fa_enabled = default, string? sort = default, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("admin/users".WithQuery().Param(source_id).Param(login_name).Param(is_2fa_enabled).Param(sort).Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.UserArray, cancelToken);
 
     /// <summary>Create a user account</summary>
     /// <param name="options"></param>
@@ -242,6 +243,32 @@ public interface IAdminApi : IApiScope
     [ForgejoEndpoint("DELETE", "/admin/users/{username}/emails", "Delete email addresses from a user's account")]
     public Task DeleteUserEmailsAsync(string username, DeleteEmailOption options, CancellationToken cancelToken = default)
         => DeleteRequest($"admin/users/{username}/emails", options, ApiDataSerializerContext.Default.DeleteEmailOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>List the specified user&apos;s access tokens</summary>
+    /// <param name="username">username of user</param>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>AccessTokenList</returns>
+    [ForgejoEndpoint("GET", "/admin/users/{username}/tokens", "List the specified user's access tokens")]
+    public Task<AccessToken[]> ListUserTokensAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest($"admin/users/{username}/tokens".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.AccessTokenArray, cancelToken);
+
+    /// <summary>Create an access token for the specified user</summary>
+    /// <param name="username">username of user</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>AccessToken represents an API access token.</returns>
+    [ForgejoEndpoint("POST", "/admin/users/{username}/tokens", "Create an access token for the specified user")]
+    public Task<AccessToken> CreateUsersTokenAsync(string username, CreateAccessTokenOption options, CancellationToken cancelToken = default)
+        => PostRequest($"admin/users/{username}/tokens", options, ApiDataSerializerContext.Default.CreateAccessTokenOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.AccessToken, cancelToken);
+
+    /// <summary>Delete an access token for the specified user</summary>
+    /// <param name="username">username of user</param>
+    /// <param name="token">token to be deleted, identified by ID and if not available by name</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/admin/users/{username}/tokens/{token}", "Delete an access token for the specified user")]
+    public Task DeleteUserTokenAsync(string username, string token, CancellationToken cancelToken = default)
+        => DeleteRequest($"admin/users/{username}/tokens/{token}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region Key

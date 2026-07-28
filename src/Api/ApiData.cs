@@ -71,6 +71,13 @@ public record APIValidationError(
 );
 
 /// <summary></summary>
+/// <param name="target"></param>
+public record APRemoteFollowOption(
+    string? target = default
+);
+
+/// <summary></summary>
+/// <param name="created_at"></param>
 /// <param name="id"></param>
 /// <param name="name"></param>
 /// <param name="repositories">
@@ -81,12 +88,35 @@ public record APIValidationError(
 /// <param name="sha1"></param>
 /// <param name="token_last_eight"></param>
 public record AccessToken(
+    DateTimeOffset? created_at = default,
     long? id = default,
     string? name = default,
     ICollection<RepositoryMeta>? repositories = default,
     ICollection<string>? scopes = default,
     string? sha1 = default,
     string? token_last_eight = default
+);
+
+/// <summary>ActionArtifact represents an artifact of a workflow run</summary>
+/// <param name="archive_download_url">the URL to download the artifact zip archive</param>
+/// <param name="created_at"></param>
+/// <param name="expired">whether the artifact has expired</param>
+/// <param name="expires_at"></param>
+/// <param name="id">the artifact&apos;s ID</param>
+/// <param name="name">the artifact&apos;s name</param>
+/// <param name="run_id">the ID of the workflow run that produced this artifact</param>
+/// <param name="size_in_bytes">the total size of the artifact in bytes</param>
+/// <param name="updated_at"></param>
+public record ActionArtifact(
+    string? archive_download_url = default,
+    DateTimeOffset? created_at = default,
+    bool? expired = default,
+    DateTimeOffset? expires_at = default,
+    long? id = default,
+    string? name = default,
+    long? run_id = default,
+    long? size_in_bytes = default,
+    DateTimeOffset? updated_at = default
 );
 
 /// <summary>ActionRun represents an action run</summary>
@@ -147,6 +177,7 @@ public record ActionRun(
 /// <param name="needs">the action run job needed ids</param>
 /// <param name="owner_id">the owner id</param>
 /// <param name="repo_id">the repository id</param>
+/// <param name="run_id">Identifier of the workflow run this job belongs to.</param>
 /// <param name="runs_on">the action run job labels to run on</param>
 /// <param name="status">the action run job status</param>
 /// <param name="task_id">the action run job latest task id</param>
@@ -158,6 +189,7 @@ public record ActionRunJob(
     ICollection<string>? needs = default,
     long? owner_id = default,
     long? repo_id = default,
+    long? run_id = default,
     ICollection<string>? runs_on = default,
     string? status = default,
     long? task_id = default
@@ -456,6 +488,7 @@ public record ChangeFileOperation(
 /// <param name="branch">branch (optional) to base this file from. if not given, the default branch is used</param>
 /// <param name="committer"></param>
 /// <param name="dates"></param>
+/// <param name="force_overwrite_new_branch">(optional) will do a force-push if the new branch already exists</param>
 /// <param name="message">message (optional) for the commit of this file. if not supplied, a default message will be used</param>
 /// <param name="new_branch">new_branch (optional) will make a new branch from `branch` before creating the file</param>
 /// <param name="signoff">Add a Signed-off-by trailer by the committer at the end of the commit log message.</param>
@@ -465,6 +498,7 @@ public record ChangeFilesOptions(
     string? branch = default,
     Identity? committer = default,
     CommitDateOptions? dates = default,
+    bool? force_overwrite_new_branch = default,
     string? message = default,
     string? new_branch = default,
     bool? signoff = default
@@ -766,6 +800,7 @@ public record CreateEmailOption(
 /// <param name="branch">branch (optional) to base this file from. if not given, the default branch is used</param>
 /// <param name="committer"></param>
 /// <param name="dates"></param>
+/// <param name="force_overwrite_new_branch">(optional) will do a force-push if the new branch already exists</param>
 /// <param name="message">message (optional) for the commit of this file. if not supplied, a default message will be used</param>
 /// <param name="new_branch">new_branch (optional) will make a new branch from `branch` before creating the file</param>
 /// <param name="signoff">Add a Signed-off-by trailer by the committer at the end of the commit log message.</param>
@@ -775,6 +810,7 @@ public record CreateFileOptions(
     string? branch = default,
     Identity? committer = default,
     CommitDateOptions? dates = default,
+    bool? force_overwrite_new_branch = default,
     string? message = default,
     string? new_branch = default,
     bool? signoff = default
@@ -941,11 +977,13 @@ public record CreatePullRequestOption(
 
 /// <summary>CreatePullReviewComment represent a review comment for creation api</summary>
 /// <param name="body"></param>
+/// <param name="extra_lines_count">number of additional lines after the commented line (0 = single line comment)</param>
 /// <param name="new_position">if comment to new file line or 0</param>
 /// <param name="old_position">if comment to old file line or 0</param>
 /// <param name="path">the tree path</param>
 public record CreatePullReviewComment(
     string? body = default,
+    long? extra_lines_count = default,
     long? new_position = default,
     long? old_position = default,
     string? path = default
@@ -1025,7 +1063,7 @@ public record CreateReleaseOption(
 /// <param name="auto_init">Whether the repository should be auto-initialized?</param>
 /// <param name="default_branch">DefaultBranch of the repository (used when initializes and in template)</param>
 /// <param name="description">Description of the repository to create</param>
-/// <param name="gitignores">Gitignores to use</param>
+/// <param name="gitignores">Gitignores to use, separated by commas</param>
 /// <param name="issue_labels">Label-Set to use</param>
 /// <param name="license">License to use</param>
 /// <param name="object_format_name">ObjectFormatName of the underlying git repository</param>
@@ -1176,6 +1214,7 @@ public record DeleteEmailOption(
 /// <param name="branch">branch (optional) to base this file from. if not given, the default branch is used</param>
 /// <param name="committer"></param>
 /// <param name="dates"></param>
+/// <param name="force_overwrite_new_branch">(optional) will do a force-push if the new branch already exists</param>
 /// <param name="message">message (optional) for the commit of this file. if not supplied, a default message will be used</param>
 /// <param name="new_branch">new_branch (optional) will make a new branch from `branch` before creating the file</param>
 /// <param name="signoff">Add a Signed-off-by trailer by the committer at the end of the commit log message.</param>
@@ -1185,6 +1224,7 @@ public record DeleteFileOptions(
     string? branch = default,
     Identity? committer = default,
     CommitDateOptions? dates = default,
+    bool? force_overwrite_new_branch = default,
     string? message = default,
     string? new_branch = default,
     bool? signoff = default
@@ -2148,26 +2188,10 @@ public record ListActionRunResponse(
 );
 
 /// <summary>MarkdownOption markdown options</summary>
-/// <param name="Context">
-/// Context to render
-/// 
-/// in: body
-/// </param>
-/// <param name="Mode">
-/// Mode to render (comment, gfm, markdown)
-/// 
-/// in: body
-/// </param>
-/// <param name="Text">
-/// Text markdown to render
-/// 
-/// in: body
-/// </param>
-/// <param name="Wiki">
-/// Is it a wiki page ?
-/// 
-/// in: body
-/// </param>
+/// <param name="Context">Context to render</param>
+/// <param name="Mode">Mode to render (comment, gfm, markdown)</param>
+/// <param name="Text">Text markdown to render</param>
+/// <param name="Wiki">Is it a wiki page ?</param>
 public record MarkdownOption(
     string? Context = default,
     string? Mode = default,
@@ -2176,36 +2200,12 @@ public record MarkdownOption(
 );
 
 /// <summary>MarkupOption markup options</summary>
-/// <param name="BranchPath">
-/// The current branch path where the form gets posted
-/// 
-/// in: body
-/// </param>
-/// <param name="Context">
-/// Context to render
-/// 
-/// in: body
-/// </param>
-/// <param name="FilePath">
-/// File path for detecting extension in file mode
-/// 
-/// in: body
-/// </param>
-/// <param name="Mode">
-/// Mode to render (comment, gfm, markdown, file)
-/// 
-/// in: body
-/// </param>
-/// <param name="Text">
-/// Text markup to render
-/// 
-/// in: body
-/// </param>
-/// <param name="Wiki">
-/// Is it a wiki page ?
-/// 
-/// in: body
-/// </param>
+/// <param name="BranchPath">The current branch path where the form gets posted</param>
+/// <param name="Context">Context to render</param>
+/// <param name="FilePath">File path for detecting extension in file mode</param>
+/// <param name="Mode">Mode to render (comment, gfm, markdown, file)</param>
+/// <param name="Text">Text markup to render</param>
+/// <param name="Wiki">Is it a wiki page ?</param>
 public record MarkupOption(
     string? BranchPath = default,
     string? Context = default,
@@ -2448,6 +2448,7 @@ public record OAuth2Application(
 
 /// <summary>Organization represents an organization</summary>
 /// <param name="avatar_url"></param>
+/// <param name="created"></param>
 /// <param name="description"></param>
 /// <param name="email"></param>
 /// <param name="full_name"></param>
@@ -2460,6 +2461,7 @@ public record OAuth2Application(
 /// <param name="website"></param>
 public record Organization(
     string? avatar_url = default,
+    DateTimeOffset? created = default,
     string? description = default,
     string? email = default,
     string? full_name = default,
@@ -2606,8 +2608,10 @@ public record Permission(
 /// <param name="key_type"></param>
 /// <param name="read_only"></param>
 /// <param name="title"></param>
+/// <param name="updated_at"></param>
 /// <param name="url"></param>
 /// <param name="user"></param>
+/// <param name="verified"></param>
 public record PublicKey(
     DateTimeOffset? created_at = default,
     string? fingerprint = default,
@@ -2616,8 +2620,10 @@ public record PublicKey(
     string? key_type = default,
     bool? read_only = default,
     string? title = default,
+    DateTimeOffset? updated_at = default,
     string? url = default,
-    User? user = default
+    User? user = default,
+    bool? verified = default
 );
 
 /// <summary>PullRequest represents a pull request</summary>
@@ -2749,6 +2755,7 @@ public record PullReview(
 /// <param name="commit_id"></param>
 /// <param name="created_at"></param>
 /// <param name="diff_hunk"></param>
+/// <param name="extra_lines_count">number of additional lines after the commented line (0 = single line comment)</param>
 /// <param name="html_url"></param>
 /// <param name="id"></param>
 /// <param name="original_commit_id"></param>
@@ -2765,6 +2772,7 @@ public record PullReviewComment(
     string? commit_id = default,
     DateTimeOffset? created_at = default,
     string? diff_hunk = default,
+    long? extra_lines_count = default,
     string? html_url = default,
     long? id = default,
     string? original_commit_id = default,
@@ -3482,6 +3490,7 @@ public record UpdateBranchRepoOption(
 /// <param name="branch">branch (optional) to base this file from. if not given, the default branch is used</param>
 /// <param name="committer"></param>
 /// <param name="dates"></param>
+/// <param name="force_overwrite_new_branch">(optional) will do a force-push if the new branch already exists</param>
 /// <param name="from_path">from_path (optional) is the path of the original file which will be moved/renamed to the path in the URL</param>
 /// <param name="message">message (optional) for the commit of this file. if not supplied, a default message will be used</param>
 /// <param name="new_branch">new_branch (optional) will make a new branch from `branch` before creating the file</param>
@@ -3493,6 +3502,7 @@ public record UpdateFileOptions(
     string? branch = default,
     Identity? committer = default,
     CommitDateOptions? dates = default,
+    bool? force_overwrite_new_branch = default,
     string? from_path = default,
     string? message = default,
     string? new_branch = default,

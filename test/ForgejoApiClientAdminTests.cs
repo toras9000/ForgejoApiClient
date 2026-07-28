@@ -335,6 +335,37 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task UserTokensScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+
+        // テスト用エンティティの情報
+        var userName = $"user-{DateTime.Now.Ticks:x16}";
+        var userMail = $"{userName}@example.com";
+
+        // ユーザ作成
+        var user_created = await client.Admin.CreateUserAsync(new(email: userMail, username: userName, password: userName)).WillBeDiscarded(resources);
+
+        // トークン作成
+        var token = await client.Admin.CreateUsersTokenAsync(userName, new("abc", scopes: ["read:repository", "read:user"]));
+
+        // トークンリスト取得
+        var token_list1 = await client.Admin.ListUserTokensAsync(userName);
+        token_list1.Select(r => r.name).Should().Contain(token.name);
+
+        // トークン削除
+        await client.Admin.DeleteUserTokenAsync(userName, token.name!);
+
+        // トークンリスト取得
+        var token_list2 = await client.Admin.ListUserTokensAsync(userName);
+        token_list2.Select(r => r.name).Should().NotContain(token.name);
+
+    }
+
+    [TestMethod]
     public async Task PublicKeyScenario()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -461,7 +492,5 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var userQuota = await client.Admin.GetUserQuotaRuleAsync(userName);
         userQuota.groups.Should().Contain(g => g.name == quotaGroupName);
     }
-
-
 
 }

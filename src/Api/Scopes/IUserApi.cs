@@ -215,6 +215,13 @@ public interface IUserApi : IApiScope
     [ForgejoEndpoint("GET", "/users/{username}/starred", "The repos that the given user has starred")]
     public Task<Repository[]> ListUserStarredAsync(string username, PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest($"users/{username}/starred".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.RepositoryArray, cancelToken);
+
+    /// <summary>Follow a remote activitypub account</summary>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/user/activitypub/follow", "Follow a remote activitypub account")]
+    public Task FollowActivityPubUser(APRemoteFollowOption options, CancellationToken cancelToken = default)
+        => PostRequest("user/activitypub/follow", options, ApiDataSerializerContext.Default.APRemoteFollowOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
     #region User

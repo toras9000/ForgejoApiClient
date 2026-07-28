@@ -110,4 +110,15 @@ public interface IMiscellaneousApi : IApiScope
         => GetRequest("version", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ServerVersion, cancelToken);
     #endregion
 
+    #region Actions Tasks
+    /// <summary>Get a workflow run associated with a token</summary>
+    /// <param name="auth">ワークフローの自動生成トークン</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRun</returns>
+    [ForgejoEndpoint("GET", "/actions/run", "Get a workflow run associated with a token")]
+    [ManualEdit("このAPIはワークフローの自動生成トークンを認証に用いる。")]
+    public Task<ActionRun> GetActionsRun(ActionTokenCredential auth, CancellationToken cancelToken = default)
+        => GetRequest(auth, "actions/run", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRun, cancelToken);
+    #endregion
+
 }

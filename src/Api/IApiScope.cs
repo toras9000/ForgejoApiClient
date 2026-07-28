@@ -28,14 +28,14 @@ public interface IApiScope
         => new RequestContext(this.Http.GetAsync(new Uri(this.BaseUrl, endpoint), cancelToken));
 
     /// <summary>APIにGETメソッドアクセスを行う要求コンテキストを作成する</summary>
-    /// <param name="auth">BASIC認証情報</param>
+    /// <param name="auth">HTTP認証情報</param>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext GetRequest(BasicAuthCredential auth, string endpoint, CancellationToken cancelToken)
+    internal RequestContext GetRequest(IHttpAuthentication auth, string endpoint, CancellationToken cancelToken)
     {
         var uri = new Uri(this.BaseUrl, endpoint);
-        var request = new HttpRequestMessage(HttpMethod.Get, uri).WithBasicAuth(auth);
+        var request = new HttpRequestMessage(HttpMethod.Get, uri).WithAuthentication(auth);
         return new RequestContext(this.Http.SendAsync(request, cancelToken));
     }
 
@@ -66,16 +66,16 @@ public interface IApiScope
 
     /// <summary>APIにJSON-BODYのPOSTメソッドアクセスを行う要求コンテキストを作成する</summary>
     /// <typeparam name="TArg">要求データの型</typeparam>
-    /// <param name="auth">BASIC認証情報</param>
+    /// <param name="auth">HTTP認証情報</param>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="args">要求データ</param>
     /// <param name="typeInfo">JSONシリアライズ型情報</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext PostRequest<TArg>(BasicAuthCredential auth, string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
+    internal RequestContext PostRequest<TArg>(IHttpAuthentication auth, string endpoint, TArg args, JsonTypeInfo<TArg> typeInfo, CancellationToken cancelToken)
     {
         var uri = new Uri(this.BaseUrl, endpoint);
-        var request = new HttpRequestMessage(HttpMethod.Post, uri).WithBasicAuth(auth);
+        var request = new HttpRequestMessage(HttpMethod.Post, uri).WithAuthentication(auth);
         request.Content = JsonContent.Create(args, typeInfo);
         return new RequestContext(this.Http.SendAsync(request, cancelToken));
     }
@@ -122,14 +122,14 @@ public interface IApiScope
         => new RequestContext(this.Http.DeleteAsync(new Uri(this.BaseUrl, endpoint), cancelToken));
 
     /// <summary>APIにDELETEメソッドアクセスを行う要求コンテキストを作成する</summary>
-    /// <param name="auth">BASIC認証情報</param>
+    /// <param name="auth">HTTP認証情報</param>
     /// <param name="endpoint">APIエンドポイント</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>要求コンテキスト</returns>
-    internal RequestContext DeleteRequest(BasicAuthCredential auth, string endpoint, CancellationToken cancelToken)
+    internal RequestContext DeleteRequest(IHttpAuthentication auth, string endpoint, CancellationToken cancelToken)
     {
         var uri = new Uri(this.BaseUrl, endpoint);
-        var request = new HttpRequestMessage(HttpMethod.Delete, uri).WithBasicAuth(auth);
+        var request = new HttpRequestMessage(HttpMethod.Delete, uri).WithAuthentication(auth);
         return new RequestContext(this.Http.SendAsync(request, cancelToken));
     }
 

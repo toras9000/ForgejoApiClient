@@ -834,54 +834,6 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
-    public async Task DispatchActionWorkflowAsync_Taks_Jobs()
-    {
-        using var client = new ForgejoClient(this.TestService, this.TestToken);
-
-        // テスト用エンティティ情報
-        var repoOwner = this.TestTokenUser;
-        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
-
-        // テスト用のエンティティを作成する。
-        await using var resources = new TestForgejoResources(client);
-        var repo = await resources.CreateTestRepoAsync(repoName);
-
-        // コンテンツ作成
-        var content = """
-        on: 
-          workflow_dispatch:
-        jobs:
-          test:
-            runs-on: node
-            steps:
-              - run: echo All Good
-        """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
-
-        // ワークフロー実行 (戻り情報無し)
-        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: false));
-        runInfo.Should().BeNull();
-
-        // タスク取得
-        var tasks = await client.Repository.ListActionsTasksAsync(repoOwner, repoName);
-
-        // ジョブ取得
-        var jobs = await client.Repository.ListActionsJobsAsync(repoOwner, repoName, "node");
-
-        // 実行一覧取得
-        var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName,
-            @event: ["workflow_dispatch"],
-            status: ["unknown", "waiting", "running", "success", "failure", "cancelled", "skipped", "blocked"]
-        );
-        runs.total_count.Should().BeGreaterThanOrEqualTo(1);
-        runs.workflow_runs.Should().NotBeEmpty();
-
-        // 実行単独取得
-        var run = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runs.workflow_runs.First().id!.Value);
-        run.id.Should().Be(runs.workflow_runs.First().id!.Value);
-    }
-
-    [TestMethod]
     public async Task DispatchActionWorkflowAsync_ReturnInfo()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -900,15 +852,243 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
           workflow_dispatch:
         jobs:
           test:
-            runs-on: node
+            runs-on: busybox
             steps:
               - run: echo All Good
         """.ReplaceLineEndings("\n");
         var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
 
-        // ワークフロー実行 (戻り情報無し)
+        // ワークフロー実行
         var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
         Assert.IsNotNull(runInfo);
+    }
+
+    [TestMethod]
+    public async Task ActionsTaskInfos()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: busybox
+            steps:
+              - run: echo All Good
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        runInfo.Should().NotBeNull();
+
+        // ワークフローの開始を待機
+        using var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+        while (true)
+        {
+            var runStatus = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+            if (DateTimeOffset.UnixEpoch < runStatus.stopped) break;
+            await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+        }
+
+        // タスク取得
+        var tasks = await client.Repository.ListActionsTasksAsync(repoOwner, repoName);
+        tasks.workflow_runs.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // ジョブ一覧取得
+        var jobs = await client.Repository.ListActionsRunJobsAsync(repoOwner, repoName, runInfo.id!.Value);
+        jobs.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // ログ取得
+        var logs = await client.Repository.GetActionsJobLogsAsync(repoOwner, repoName, runInfo.id!.Value);
+        logs.Should().NotBeNullOrEmpty();
+
+        // ログダウンロード
+        using var logDownload = await client.Repository.DownloadActionsRunLogsAsync(repoOwner, repoName, runInfo.id!.Value);
+        var dlHead = await logDownload.Result.Stream.ReadBytesAsync(2);
+        dlHead.Should().Equal([(byte)'P', (byte)'K']);
+
+        // 実行一覧取得
+        var runs = await client.Repository.ListActionsRunsAsync(repoOwner, repoName,
+            @event: ["workflow_dispatch"],
+            status: ["unknown", "waiting", "running", "success", "failure", "cancelled", "skipped", "blocked"]
+        );
+        runs.total_count.Should().BeGreaterThanOrEqualTo(1);
+        runs.workflow_runs.Should().NotBeEmpty();
+
+        // 実行単独取得
+        var run = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runs.workflow_runs.First().id!.Value);
+        run.id.Should().Be(runs.workflow_runs.First().id!.Value);
+    }
+
+    [TestMethod]
+    public async Task ActionsTaskCancelDelete()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: busybox
+            steps:
+              - run: echo Begin
+              - run: sleep 60s
+              - run: echo End
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        runInfo.Should().NotBeNull();
+
+        // ワークフローの開始を待機
+        using var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+        while (true)
+        {
+            var runStatus = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+            if (runStatus.status != "waiting") break;
+
+            await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+        }
+
+        // タスクキャンセル
+        await client.Repository.CancelActionsRunAsync(repoOwner, repoName, runInfo.id!.Value);
+
+        // タスク情報取得
+        var cancelledInfo = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+        cancelledInfo.status.Should().Be("cancelled");
+
+        // タスク削除
+        await client.Repository.DeleteActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+
+        // タスク取得
+        var tasks = await client.Repository.ListActionsTasksAsync(repoOwner, repoName);
+        tasks.workflow_runs!.Select(r => r.id).Should().NotContain(runInfo.id!.Value);
+    }
+
+    [TestMethod]
+    public async Task ActionsTaskArtifacts()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: node
+            steps:
+              - run: echo ${{ forgejo.sha }} > test-output.txt
+              - uses: actions/upload-artifact@v3
+                with:
+                  name: test-artifact
+                  path: test-output.txt
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        var dispatched = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        dispatched.Should().NotBeNull();
+
+        // ワークフローの開始を待機
+        using var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(15));
+        while (true)
+        {
+            var run = await client.Repository.GetActionsRunAsync(repoOwner, repoName, dispatched.id!.Value, breaker.Token);
+            if (DateTimeOffset.UnixEpoch < run.stopped) break;
+            await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+        }
+
+        // アーティファクト一覧の取得
+        var repoArtifacts = await client.Repository.ListActionsArtifactsAsync(repoOwner, repoName);
+        repoArtifacts.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // アーティファクト一覧の取得
+        var runArtifacts = await client.Repository.ListActionsRunArtifactsAsync(repoOwner, repoName, dispatched.id!.Value);
+        var artifactId = runArtifacts.First(a => a.name == "test-artifact").id;
+        artifactId.Should().NotBeNull();
+
+        // アーティファクト取得
+        var artifact = await client.Repository.GetActionsArtifactAsync(repoOwner, repoName, artifactId.Value);
+        artifact.id.Should().Be(artifactId.Value);
+
+        // アーティファクトダウンロード
+        var artifactDL = await client.Repository.DownloadActionsArtifactAsync(repoOwner, repoName, artifactId.Value);
+        var dlHead = await artifactDL.Result.Stream.ReadBytesAsync(2);
+        dlHead.Should().Equal([(byte)'P', (byte)'K']);
+
+        // アーティファクト削除
+        await client.Repository.DeleteActionsArtifactAsync(repoOwner, repoName, artifactId.Value);
+
+    }
+
+    [TestMethod]
+    public async Task ListActionsJobsAsync()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: busybox
+            steps:
+              - run: sleep 10s
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        var run = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        run.Should().NotBeNull();
+
+        // ジョブ取得 (待機・実行中)
+        var jobs = await client.Repository.ListActionsJobsAsync(repoOwner, repoName);
+        jobs.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // タスクキャンセル
+        await client.Repository.CancelActionsRunAsync(repoOwner, repoName, run.id!.Value);
+
     }
 
     [TestMethod]
@@ -984,8 +1164,8 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await client.Repository.DeleteActionsVariableAsync(repoOwner, repoName, varName);
 
         // 追加検証
-        Assert.Inconclusive("ListActionVariablesAsync で変数値が得られない。バグ？");
-        variable_list.Should().Contain(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase) && v.data == "BBB");
+        var updatedVariable = variable_list.First(v => string.Equals(v.name, varName, StringComparison.OrdinalIgnoreCase));
+        updatedVariable.data.Should().Be("BBB");
     }
 
     [TestMethod]
@@ -1541,7 +1721,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var review = await client.Repository.CreatePullRequestReviewAsync(repoOwner, repoName, pr.number!.Value, new(body: "AAA"));
 
         // レビューコメント追加
-        var comment = await client.Repository.AddPullRequestReviewCommentAsync(repoOwner, repoName, pr.number!.Value, review.id!.Value, new(body: "XXXX"));
+        var comment = await client.Repository.AddPullRequestReviewCommentAsync(repoOwner, repoName, pr.number!.Value, review.id!.Value, new(body: "XXXX", path: "ccc.cs", new_position: 1));
         comment.body.Should().Be("XXXX");
 
         // レビューコメント追加
