@@ -4047,6 +4047,12 @@ public enum MigrateRepoOptionsService
     /// <summary>codebase</summary>
     [JsonStringEnumMemberName("codebase")]
     Codebase = 7,
+    /// <summary>forgejo</summary>
+    [JsonStringEnumMemberName("forgejo")]
+    Forgejo = 8,
+    /// <summary>pagure</summary>
+    [JsonStringEnumMemberName("pagure")]
+    Pagure = 9,
 };
 
 /// <summary>Context for the attachment: URLs to the containing object</summary>
