@@ -490,11 +490,11 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         blob.content.Should().Be(fileContent.EncodeUtf8().EncodeBase64());
 
         // オブジェクト取得
-        using var downloadObject = await client.Repository.GetObjectAsync(ownerName, repoName, "aaa.cs");
+        using var downloadObject = await client.Repository.DownloadObjectAsync(ownerName, repoName, "aaa.cs");
         new StreamReader(downloadObject.Result.Stream).ReadToEnd().Should().Be(fileContent);
 
         // オブジェクト取得
-        using var downloadFile = await client.Repository.GetFileAsync(ownerName, repoName, "aaa.cs");
+        using var downloadFile = await client.Repository.DownloadFileAsync(ownerName, repoName, "aaa.cs");
         new StreamReader(downloadFile.Result.Stream).ReadToEnd().Should().Be(fileContent);
     }
 
@@ -2371,7 +2371,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // テスト対象呼び出し
         using var tempDir = new TestTempDir();
         var downloadFile = tempDir.Info.RelativeFile("download.zip");
-        using (var archive = await client.Repository.GetArchiveAsync(this.TestTokenUser, repoName, "main.zip"))
+        using (var archive = await client.Repository.DownloadArchiveAsync(this.TestTokenUser, repoName, "main.zip"))
         using (var downloadStream = downloadFile.CreateWrite())
         {
             await archive.Result.Stream.CopyToAsync(downloadStream);

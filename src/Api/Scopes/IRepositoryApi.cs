@@ -521,7 +521,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/media/{filepath}", "Get a file or it's LFS object from a repository")]
-    public Task<ResponseResult<DownloadResult>> GetObjectAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
+    public Task<ResponseResult<DownloadResult>> DownloadObjectAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/media/{filepath}".WithQuery().Param(@ref), cancelToken).DownloadResponseAsync(cancelToken);
 
     /// <summary>Get a file from a repository</summary>
@@ -532,7 +532,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>Returns raw file content.</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/raw/{filepath}", "Get a file from a repository")]
-    public Task<ResponseResult<DownloadResult>> GetFileAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
+    public Task<ResponseResult<DownloadResult>> DownloadFileAsync(string owner, string repo, string filepath, string? @ref = default, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/raw/{filepath}".WithQuery().Param(@ref), cancelToken).DownloadResponseAsync(cancelToken);
 
     /// <summary>Create a file in a repository</summary>
@@ -1990,7 +1990,7 @@ public interface IRepositoryApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>success</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/archive/{archive}", "Get an archive of a repository")]
-    public Task<ResponseResult<DownloadResult>> GetArchiveAsync(string owner, string repo, string archive, CancellationToken cancelToken = default)
+    public Task<ResponseResult<DownloadResult>> DownloadArchiveAsync(string owner, string repo, string archive, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/archive/{archive}", cancelToken).DownloadResponseAsync(cancelToken);
 
     /// <summary>Return all users that have write access and can be assigned to issues</summary>
