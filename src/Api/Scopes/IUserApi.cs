@@ -501,6 +501,14 @@ public interface IUserApi : IApiScope
     #endregion
 
     #region Actions Secrets
+    /// <summary>List actions secrets of the current user</summary>
+    /// <param name="paging">ページングオプション</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>SecretList</returns>
+    [ForgejoEndpoint("GET", "/user/actions/secrets", "List actions secrets of the current user")]
+    public Task<Secret[]> ListActionsSecretsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
+        => GetRequest("user/actions/secrets".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.SecretArray, cancelToken);
+
     /// <summary>Create or Update a secret value in a user scope</summary>
     /// <param name="secretname">name of the secret</param>
     /// <param name="options"></param>
@@ -562,7 +570,7 @@ public interface IUserApi : IApiScope
     /// <summary>List the authenticated user&apos;s oauth2 applications</summary>
     /// <param name="paging">ページングオプション</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>OAuth2ApplicationList</returns>
+    /// <returns>OAuth2ApplicationList represents a list of OAuth2 applications.</returns>
     [ForgejoEndpoint("GET", "/user/applications/oauth2", "List the authenticated user's oauth2 applications")]
     public Task<OAuth2Application[]> ListOAuth2ApplicationsAsync(PagingOptions paging = default, CancellationToken cancelToken = default)
         => GetRequest("user/applications/oauth2".WithQuery().Param(paging), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OAuth2ApplicationArray, cancelToken);
@@ -572,6 +580,7 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
     [ForgejoEndpoint("POST", "/user/applications/oauth2", "Creates a new OAuth2 application")]
+    [ManualEdit("戻り値を OAuth2Application に変更")]
     public Task<OAuth2Application> CreateOAuth2ApplicationAsync(CreateOAuth2ApplicationOptions options, CancellationToken cancelToken = default)
         => PostRequest("user/applications/oauth2", options, ApiDataSerializerContext.Default.CreateOAuth2ApplicationOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OAuth2Application, cancelToken);
 
@@ -580,6 +589,7 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
     [ForgejoEndpoint("GET", "/user/applications/oauth2/{id}", "Get an OAuth2 application")]
+    [ManualEdit("戻り値を OAuth2Application に変更")]
     public Task<OAuth2Application> GetOAuth2ApplicationAsync(long id, CancellationToken cancelToken = default)
         => GetRequest($"user/applications/oauth2/{id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OAuth2Application, cancelToken);
 
@@ -589,6 +599,7 @@ public interface IUserApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>OAuth2Application</returns>
     [ForgejoEndpoint("PATCH", "/user/applications/oauth2/{id}", "Update an OAuth2 application, this includes regenerating the client secret")]
+    [ManualEdit("戻り値を OAuth2Application に変更")]
     public Task<OAuth2Application> UpdateOAuth2ApplicationAsync(long id, CreateOAuth2ApplicationOptions options, CancellationToken cancelToken = default)
         => PatchRequest($"user/applications/oauth2/{id}", options, ApiDataSerializerContext.Default.CreateOAuth2ApplicationOptions, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.OAuth2Application, cancelToken);
 

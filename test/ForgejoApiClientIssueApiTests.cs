@@ -403,6 +403,35 @@ public class ForgejoApiClientIssueApiTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task IssueLockScenario()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestUserRepoAsync(repoOwner, repoName);
+        var issue = await resources.CreateTestIssueAsync(repoOwner, repoName, "issue");
+
+        // ロック
+        await client.Issue.LockAsync(repoOwner, repoName, issue.number!.Value, new(reason: "test-lock"));
+
+        // イシュー情報取得1
+        var issue_info1 = await client.Issue.GetAsync(repoOwner, repoName, issue.number!.Value);
+        issue_info1.is_locked.Should().Be(true);
+
+        // アンロック
+        await client.Issue.UnlockAsync(repoOwner, repoName, issue.number!.Value);
+
+        // イシュー情報取得2
+        var issue_info2 = await client.Issue.GetAsync(repoOwner, repoName, issue.number!.Value);
+        issue_info2.is_locked.Should().Be(false);
+    }
+
+    [TestMethod]
     public async Task SetDeadlineAsync()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);

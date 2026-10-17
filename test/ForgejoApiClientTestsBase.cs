@@ -3,7 +3,7 @@ using ForgejoApiClient.Api;
 
 namespace ForgejoApiClient.Tests;
 
-record TestServiceInfo(string Url, BasicAuthCredential Admin, string Token);
+record TestServiceInfo(string Url, int InternalPort, BasicAuthCredential Admin, string Token);
 
 public abstract class ForgejoApiClientTestsBase
 {
@@ -18,12 +18,14 @@ public abstract class ForgejoApiClientTestsBase
         if (svcInfo.Admin?.Password == null) throw new Exception("Cannot load test token");
         if (svcInfo.Token == null) throw new Exception("Cannot load test token");
         this.TestService = new Uri(svcInfo.Url);
+        this.TestInternalPort = (ushort)svcInfo.InternalPort;
         this.TestToken = svcInfo.Token;
         this.TestTokenUser = svcInfo.Admin.Username;
         this.TestAdminUser = svcInfo.Admin;
     }
 
     public Uri TestService { get; }
+    public ushort TestInternalPort { get; }
     public string TestToken { get; }
     public string TestTokenUser { get; }
     public BasicAuthCredential TestAdminUser { get; }

@@ -149,6 +149,7 @@ public class ForgejoApiClientMiscellaneousTests : ForgejoApiClientTestsBase
 
         // コンテンツ作成
         // テスト実行ホストに対してアクショントークンを送信する。受信待機タイムアウトを 10 秒とし、少しだけ待ち状態になるようにしている。
+        var workflowFile = "demo.yaml";
         var content = $$$"""
         on: 
           workflow_dispatch:
@@ -158,10 +159,10 @@ public class ForgejoApiClientMiscellaneousTests : ForgejoApiClientTestsBase
             steps:
               - run: echo ${{ forgejo.token }} | nc -w 10 -u "{{{selfIp}}}" {{{port}}}
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var dispatched = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var dispatched = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
 
         // 受信を完了する
         var recvLen = await recvTask.WaitAsync(TimeSpan.FromMinutes(2));

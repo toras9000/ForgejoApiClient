@@ -109,7 +109,10 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync($"repo-{DateTime.Now.Ticks:X16}");
 
         // テスト対象メソッドを実行
-        var activities = await client.User.ListUserActivitiesAsync(repo.owner!.login!);
+        var activities = await TestCallHelper.Satisfy(
+            caller: breaker => client.User.ListUserActivitiesAsync(repo.owner!.login!, cancelToken: breaker),
+            condition: activities => 0 < activities.Length
+        );
         activities.Should().Contain(a => a.op_type == ActivityOp_type.Create_repo);
     }
 
@@ -610,6 +613,8 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         var secretname = $"secret_{DateTime.Now.Ticks:X16}";
         await client.User.SetActionsSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data"));
         await client.User.SetActionsSecretAsync(secretname, new CreateOrUpdateSecretOption("test-data-updated"));
+        var secrets = await client.User.ListActionsSecretsAsync();
+        secrets.Should().NotBeEmpty();
         await client.User.DeleteActionsSecretAsync(secretname);
     }
 

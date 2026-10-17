@@ -347,11 +347,13 @@ public interface IRepositoryApi : IApiScope
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
     /// <param name="basehead">compare two branches or commits</param>
+    /// <param name="verification">include verification status for each commit</param>
+    /// <param name="files">include which files changed by a commit</param>
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns></returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/compare/{basehead}", "Get commit comparison information")]
-    public Task<Compare> GetCommitCompareAsync(string owner, string repo, string basehead, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/compare/{basehead}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Compare, cancelToken);
+    public Task<Compare> GetCommitCompareAsync(string owner, string repo, string basehead, bool? verification = default, bool? files = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/compare/{basehead}".WithQuery().Param(verification).Param(files), cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.Compare, cancelToken);
 
     /// <summary>Get the pull request of the commit</summary>
     /// <param name="owner">owner of the repo</param>
@@ -800,11 +802,15 @@ public interface IRepositoryApi : IApiScope
     /// <param name="repo">name of the repo</param>
     /// <param name="job_id">ID of the workflow job</param>
     /// <param name="attempt">1-based attempt number matching the value of `attempt` in the job listing; omit to fetch the latest attempt of the job</param>
+    /// <param name="step">Step number to filter to. Use the `number` field from `GET /repos/{owner}/{repo}/actions/jobs/{job_id}` — 0 is the &quot;Set up job&quot; entry, the last index is the &quot;Complete job&quot; entry, real steps are in between. Returns only that step&apos;s slice of the log. Range requests still work over the slice.</param>
+    /// <param name="q">Substring filter applied to each line&apos;s content (the part after the timestamp prefix). Plain string match — regex is not supported. Setting `q` drops `Accept-Ranges` and disables `Range:` support; the full filtered body is always returned.</param>
+    /// <param name="qi">Case-insensitive substring match (only meaningful when `q` is set).</param>
+    /// <param name="format">Response shape. `text` (default) returns log content as plaintext lines. `ndjson` returns one `{&quot;time&quot;:&quot;...&quot;,&quot;content&quot;:&quot;...&quot;}` object per emitted line, separated by `\n` (content-type `application/x-ndjson`). `format=ndjson` drops `Accept-Ranges` and disables `Range:` support.</param>
     /// <param name="cancelToken">キャンセルトークン</param>
-    /// <returns>Plaintext log content</returns>
+    /// <returns>Plaintext log content (or NDJSON when `format=ndjson`)</returns>
     [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/jobs/{job_id}/logs", "Download the plaintext logs of an action job")]
-    public Task<string> GetActionsJobLogsAsync(string owner, string repo, long job_id, long? attempt = default, CancellationToken cancelToken = default)
-        => GetRequest($"repos/{owner}/{repo}/actions/jobs/{job_id}/logs".WithQuery().Param(attempt), cancelToken).TextResponseAsync(cancelToken);
+    public Task<string> GetActionsJobLogsAsync(string owner, string repo, long job_id, long? attempt = default, int? step = default, string? q = default, bool? qi = default, string? format = default, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/jobs/{job_id}/logs".WithQuery().Param(attempt).Param(step).Param(q).Param(qi).Param(format), cancelToken).TextResponseAsync(cancelToken);
 
     /// <summary>Download a ZIP of plaintext logs for every job in an action run</summary>
     /// <param name="owner">owner of the repo</param>
@@ -842,6 +848,16 @@ public interface IRepositoryApi : IApiScope
     public Task<ActionRun> GetActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
         => GetRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRun, cancelToken);
 
+    /// <summary>Get a single workflow run job, including its step list</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="job_id">ID of the workflow job</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    /// <returns>ActionRunJob is a single workflow run job</returns>
+    [ForgejoEndpoint("GET", "/repos/{owner}/{repo}/actions/jobs/{job_id}", "Get a single workflow run job, including its step list")]
+    public Task<ActionRunJob> GetActionsJobAsync(string owner, string repo, long job_id, CancellationToken cancelToken = default)
+        => GetRequest($"repos/{owner}/{repo}/actions/jobs/{job_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.ActionRunJob, cancelToken);
+
     /// <summary>Cancel a pending or running workflow run.</summary>
     /// <param name="owner">owner of the repo</param>
     /// <param name="repo">name of the repo</param>
@@ -859,6 +875,24 @@ public interface IRepositoryApi : IApiScope
     [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/actions/runs/{run_id}", "Delete a completed workflow run.")]
     public Task DeleteActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
         => DeleteRequest($"repos/{owner}/{repo}/actions/runs/{run_id}", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>Rerun a finished (succeeded, failed, cancelled or skipped) workflow run.</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="run_id">ID of the workflow run</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/runs/{run_id}/rerun", "Rerun a finished (succeeded, failed, cancelled or skipped) workflow run.")]
+    public Task RerunActionsRunAsync(string owner, string repo, long run_id, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/runs/{run_id}/rerun", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>Rerun a completed workflow job and its dependent jobs</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="job_id">ID of the workflow job</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("POST", "/repos/{owner}/{repo}/actions/jobs/{job_id}/rerun", "Rerun a completed workflow job and its dependent jobs")]
+    public Task RerunActionsJobAsync(string owner, string repo, long job_id, CancellationToken cancelToken = default)
+        => PostRequest($"repos/{owner}/{repo}/actions/jobs/{job_id}/rerun", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
 
     /// <summary>List artifacts of a workflow run</summary>
     /// <param name="owner">owner of the repo</param>

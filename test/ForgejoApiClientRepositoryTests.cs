@@ -26,7 +26,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // リポジトリのマイグレーション
-        var migrate_addr = $"http://localhost:3000/{repoOwner}/{repoName}";
+        var migrate_addr = $"http://localhost:{this.TestInternalPort}/{repoOwner}/{repoName}";
         var migrate_name = $"repo2-{DateTime.Now.Ticks:X16}";
         var migrate_options = new MigrateRepoOptions(
             clone_addr: migrate_addr,
@@ -61,7 +61,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // リポジトリのマイグレーション
-        var migrate_addr = $"http://localhost:3000/{repoOwner}/{repoName}";
+        var migrate_addr = $"http://localhost:{this.TestInternalPort}/{repoOwner}/{repoName}";
         var migrate_name = $"repo2-{DateTime.Now.Ticks:X16}";
         var migrate_options = new MigrateRepoOptions(
             clone_addr: migrate_addr,
@@ -226,10 +226,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         await client.Repository.DeleteBranchProtectionAsync(ownerName, repoName, repoDir.Repo.Head.FriendlyName);
 
         // 検証
-        protection.branch_name.Should().Be(repoDir.Repo.Head.FriendlyName);
-        protection_get.branch_name.Should().Be(repoDir.Repo.Head.FriendlyName);
-        protection_updated.branch_name.Should().Be(repoDir.Repo.Head.FriendlyName);
-        protection_list.Select(p => p.branch_name).Should().Contain(repoDir.Repo.Head.FriendlyName);
+        protection.rule_name.Should().Be(repoDir.Repo.Head.FriendlyName);
+        protection_get.rule_name.Should().Be(repoDir.Repo.Head.FriendlyName);
+        protection_updated.rule_name.Should().Be(repoDir.Repo.Head.FriendlyName);
+        protection_list.Select(p => p.rule_name).Should().Contain(repoDir.Repo.Head.FriendlyName);
     }
 
     [TestMethod]
@@ -847,6 +847,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
+        var workflowFile = "demo.yaml";
         var content = """
         on: 
           workflow_dispatch:
@@ -856,10 +857,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             steps:
               - run: echo All Good
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
         Assert.IsNotNull(runInfo);
     }
 
@@ -877,6 +878,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
+        var workflowFile = "demo.yaml";
         var content = """
         on: 
           workflow_dispatch:
@@ -886,10 +888,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             steps:
               - run: echo All Good
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
         runInfo.Should().NotBeNull();
 
         // ワークフローの開始を待機
@@ -908,6 +910,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         // ジョブ一覧取得
         var jobs = await client.Repository.ListActionsRunJobsAsync(repoOwner, repoName, runInfo.id!.Value);
         jobs.Should().HaveCountGreaterThanOrEqualTo(1);
+
+        // ジョブ情報取得
+        var jobInfo = await client.Repository.GetActionsJobAsync(repoOwner, repoName, jobs[0].id!.Value);
+        jobInfo.name.Should().Be(jobs[0].name);
 
         // ログ取得
         var logs = await client.Repository.GetActionsJobLogsAsync(repoOwner, repoName, runInfo.id!.Value);
@@ -932,6 +938,92 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
     }
 
     [TestMethod]
+    public async Task ActionsRerun()
+    {
+        using var client = new ForgejoClient(this.TestService, this.TestToken);
+
+        // テスト用エンティティ情報
+        var repoOwner = this.TestTokenUser;
+        var repoName = $"repo-{DateTime.Now.Ticks:X16}";
+
+        // テスト用のエンティティを作成する。
+        await using var resources = new TestForgejoResources(client);
+        var repo = await resources.CreateTestRepoAsync(repoName);
+
+        // コンテンツ作成
+        var workflowFile = "demo.yaml";
+        var content = """
+        on: 
+          workflow_dispatch:
+        jobs:
+          test:
+            runs-on: busybox
+            steps:
+              - run: echo All Good
+        """.ReplaceLineEndings("\n");
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
+
+        // ワークフロー実行
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
+        runInfo.Should().NotBeNull();
+
+        // ワークフローの完了を待機
+        var firstRun = default(ActionRun);
+        using (var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(3)))
+        {
+            while (true)
+            {
+                firstRun = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+                if (DateTimeOffset.UnixEpoch < firstRun.stopped) break;
+                await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+            }
+        }
+
+        // ジョブ情報を取得
+        var firstJobs = await client.Repository.ListActionsRunJobsAsync(repoOwner, repoName, firstRun.id!.Value);
+
+        // ワークフロー再実行
+        await client.Repository.RerunActionsRunAsync(repoOwner, repoName, firstRun.id!.Value);
+
+        // ワークフローの完了を待機
+        var secondRun = default(ActionRun);
+        using (var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(3)))
+        {
+            while (true)
+            {
+                secondRun = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+                if (DateTimeOffset.UnixEpoch < secondRun.stopped) break;
+                await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+            }
+        }
+
+        // 実行の開始時間が変わっていることを確認
+        secondRun.started.Should().NotBe(firstRun.started);
+
+        // ジョブ情報を取得
+        var secondJobs = await client.Repository.ListActionsRunJobsAsync(repoOwner, repoName, secondRun.id!.Value);
+        var secondJob = secondJobs.MaxBy(j => j.attempt) ?? throw new Exception();
+
+        // ジョブ再実行
+        await client.Repository.RerunActionsJobAsync(repoOwner, repoName, secondJob.id!.Value);
+
+        // ワークフローの完了を待機
+        var thirdRun = default(ActionRun);
+        using (var breaker = new CancellationTokenSource(TimeSpan.FromMinutes(3)))
+        {
+            while (true)
+            {
+                thirdRun = await client.Repository.GetActionsRunAsync(repoOwner, repoName, runInfo.id!.Value, breaker.Token);
+                if (DateTimeOffset.UnixEpoch < thirdRun.stopped) break;
+                await Task.Delay(TimeSpan.FromSeconds(5), breaker.Token);
+            }
+        }
+
+        // 実行の開始時間が変わっていることを確認
+        thirdRun.started.Should().NotBe(secondRun.started);
+    }
+
+    [TestMethod]
     public async Task ActionsTaskCancelDelete()
     {
         using var client = new ForgejoClient(this.TestService, this.TestToken);
@@ -945,6 +1037,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
+        var workflowFile = "demo.yaml";
         var content = """
         on: 
           workflow_dispatch:
@@ -956,10 +1049,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
               - run: sleep 60s
               - run: echo End
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var runInfo = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
         runInfo.Should().NotBeNull();
 
         // ワークフローの開始を待機
@@ -1001,6 +1094,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
+        var workflowFile = "demo.yaml";
         var content = """
         on: 
           workflow_dispatch:
@@ -1014,10 +1108,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
                   name: test-artifact
                   path: test-output.txt
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var dispatched = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var dispatched = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
         dispatched.Should().NotBeNull();
 
         // ワークフローの開始を待機
@@ -1067,6 +1161,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // コンテンツ作成
+        var workflowFile = "demo.yaml";
         var content = """
         on: 
           workflow_dispatch:
@@ -1076,10 +1171,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
             steps:
               - run: sleep 10s
         """.ReplaceLineEndings("\n");
-        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: ".forgejo/workflows/demo.yaml", new(content: content.EncodeUtf8Base64()));
+        var main1 = await client.Repository.CreateFileAsync(repoOwner, repoName, filepath: $".forgejo/workflows/{workflowFile}", new(content: content.EncodeUtf8Base64()));
 
         // ワークフロー実行
-        var run = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, "demo.yaml", new(@ref: "main", return_run_info: true));
+        var run = await client.Repository.DispatchActionsWorkflowAsync(repoOwner, repoName, workflowfilename: workflowFile, new(@ref: "main", return_run_info: true));
         run.Should().NotBeNull();
 
         // ジョブ取得 (待機・実行中)
@@ -2020,7 +2115,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(repoOwner, repoName1, filepath: "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // pushミラーを追加
-        var mirror_addr = $"http://localhost:3000/{repoOwner}/{repoName2}";
+        var mirror_addr = $"http://localhost:{this.TestInternalPort}/{repoOwner}/{repoName2}";
         var mirror_options = new CreatePushMirrorOption(
             interval: "8h",
             remote_address: mirror_addr,
@@ -2062,7 +2157,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(repoOwner, repoName1, filepath: "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // pushミラーを追加
-        var mirror_addr = $"http://localhost:3000/{repoOwner}/{repoName2}";
+        var mirror_addr = $"http://localhost:{this.TestInternalPort}/{repoOwner}/{repoName2}";
         var mirror_options = new CreatePushMirrorOption(
             interval: "8h",
             remote_address: mirror_addr,
@@ -2095,7 +2190,7 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var content = await client.Repository.CreateFileAsync(repoOwner, repoName1, filepath: "aaa.cs", new(content: "ABC".EncodeUtf8Base64()));
 
         // pushミラーを追加
-        var mirror_addr = $"http://localhost:3000/{repoOwner}/{repoName2}";
+        var mirror_addr = $"http://localhost:{this.TestInternalPort}/{repoOwner}/{repoName2}";
         var mirror_options = new CreatePushMirrorOption(
             interval: "8h",
             remote_address: mirror_addr,
@@ -2341,7 +2436,10 @@ public class ForgejoApiClientRepositoryTests : ForgejoApiClientTestsBase
         var repo = await resources.CreateTestRepoAsync(repoName);
 
         // テスト対象呼び出し
-        var activities = await client.Repository.ListActivitiesAsync(this.TestTokenUser, repoName);
+        var activities = await TestCallHelper.Satisfy(
+            caller: breaker => client.Repository.ListActivitiesAsync(this.TestTokenUser, repoName, cancelToken: breaker),
+            condition: activities => 0 < activities.Length
+        );
         activities.Should().NotBeEmpty();
     }
 

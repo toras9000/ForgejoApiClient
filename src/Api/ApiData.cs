@@ -172,6 +172,7 @@ public record ActionRun(
 /// <summary>ActionRunJob represents a job of a run</summary>
 /// <param name="attempt">How many times the job has been attempted including the current attempt.</param>
 /// <param name="handle">Opaque identifier that uniquely identifies a single attempt of a job.</param>
+/// <param name="html_url">HTMLURL is the URL where a user can view the job using their browser.</param>
 /// <param name="id">Identifier of this job.</param>
 /// <param name="name">the action run job name</param>
 /// <param name="needs">the action run job needed ids</param>
@@ -180,10 +181,16 @@ public record ActionRun(
 /// <param name="run_id">Identifier of the workflow run this job belongs to.</param>
 /// <param name="runs_on">the action run job labels to run on</param>
 /// <param name="status">the action run job status</param>
+/// <param name="steps">
+/// the steps that make up this workflow job&apos;s execution, including the
+/// &quot;Set up job&quot; entry (number=0) and &quot;Complete job&quot; tail. Only populated by
+/// endpoints that return a single job (e.g. GET /repos/{owner}/{repo}/actions/jobs/{job_id}).
+/// </param>
 /// <param name="task_id">the action run job latest task id</param>
 public record ActionRunJob(
     long? attempt = default,
     string? handle = default,
+    string? html_url = default,
     long? id = default,
     string? name = default,
     ICollection<string>? needs = default,
@@ -192,7 +199,35 @@ public record ActionRunJob(
     long? run_id = default,
     ICollection<string>? runs_on = default,
     string? status = default,
+    ICollection<ActionRunJobStep>? steps = default,
     long? task_id = default
+);
+
+/// <summary>
+/// ActionRunJobStep is a step in a workflow job&apos;s execution. The slice on
+/// ActionRunJob.Steps always includes a &quot;Set up job&quot; entry at number=0 and a
+/// &quot;Complete job&quot; entry as the last element; the entries in between are the
+/// workflow&apos;s real steps in declaration order. The Number field is the value
+/// accepted by the job-logs endpoint&apos;s `?step=` filter.
+/// </summary>
+/// <param name="name">
+/// step name (workflow YAML `name:` for real steps; &quot;Set up job&quot; and
+/// &quot;Complete job&quot; for the head and tail respectively)
+/// </param>
+/// <param name="number">
+/// position in the job&apos;s step list. 0 is the &quot;Set up job&quot; entry; the last
+/// index is the &quot;Complete job&quot; entry; real steps are numbered 1..N in
+/// declaration order.
+/// </param>
+/// <param name="started">when the step started</param>
+/// <param name="status">step status (success, failure, running, waiting, skipped, cancelled, ...)</param>
+/// <param name="stopped">when the step stopped</param>
+public record ActionRunJobStep(
+    string? name = default,
+    long? number = default,
+    DateTimeOffset? started = default,
+    string? status = default,
+    DateTimeOffset? stopped = default
 );
 
 /// <summary>ActionRunner represents a runner</summary>
@@ -414,7 +449,7 @@ public record Branch(
 /// <param name="block_on_official_review_requests"></param>
 /// <param name="block_on_outdated_branch"></param>
 /// <param name="block_on_rejected_reviews"></param>
-/// <param name="branch_name">Deprecated: true</param>
+/// <param name="branch_name"></param>
 /// <param name="created_at"></param>
 /// <param name="dismiss_stale_approvals"></param>
 /// <param name="enable_approvals_whitelist"></param>
@@ -442,6 +477,7 @@ public record BranchProtection(
     bool? block_on_official_review_requests = default,
     bool? block_on_outdated_branch = default,
     bool? block_on_rejected_reviews = default,
+    [property: Obsolete("")]
     string? branch_name = default,
     DateTimeOffset? created_at = default,
     bool? dismiss_stale_approvals = default,
@@ -725,7 +761,7 @@ public record CreateAccessTokenOption(
 /// <param name="block_on_official_review_requests"></param>
 /// <param name="block_on_outdated_branch"></param>
 /// <param name="block_on_rejected_reviews"></param>
-/// <param name="branch_name">Deprecated: true</param>
+/// <param name="branch_name"></param>
 /// <param name="dismiss_stale_approvals"></param>
 /// <param name="enable_approvals_whitelist"></param>
 /// <param name="enable_merge_whitelist"></param>
@@ -751,6 +787,7 @@ public record CreateBranchProtectionOption(
     bool? block_on_official_review_requests = default,
     bool? block_on_outdated_branch = default,
     bool? block_on_rejected_reviews = default,
+    [property: Obsolete("")]
     string? branch_name = default,
     bool? dismiss_stale_approvals = default,
     bool? enable_approvals_whitelist = default,
@@ -774,13 +811,11 @@ public record CreateBranchProtectionOption(
 
 /// <summary>CreateBranchRepoOption options when creating a branch in a repository</summary>
 /// <param name="new_branch_name">Name of the branch to create</param>
-/// <param name="old_branch_name">
-/// Deprecated: true
-/// Name of the old branch to create from
-/// </param>
+/// <param name="old_branch_name">Name of the old branch to create from</param>
 /// <param name="old_ref_name">Name of the old branch/tag/commit to create from</param>
 public record CreateBranchRepoOption(
     string new_branch_name,
+    [property: Obsolete("")]
     string? old_branch_name = default,
     string? old_ref_name = default
 );
@@ -1124,7 +1159,7 @@ public record CreateTagProtectionOption(
 /// <param name="description"></param>
 /// <param name="includes_all_repositories"></param>
 /// <param name="permission"></param>
-/// <param name="units"></param>
+/// <param name="units">Deprecated: This variable should be replaced by UnitsMap and will be dropped in later versions.</param>
 /// <param name="units_map"></param>
 public record CreateTeamOption(
     string name,
@@ -1132,18 +1167,19 @@ public record CreateTeamOption(
     string? description = default,
     bool? includes_all_repositories = default,
     CreateTeamOptionPermission? permission = default,
+    [property: Obsolete("")]
     ICollection<string>? units = default,
     IDictionary<string, string>? units_map = default
 );
 
 /// <summary>CreateUserOption create user options</summary>
-/// <param name="email"></param>
 /// <param name="username"></param>
 /// <param name="created_at">
 /// For explicitly setting the user creation timestamp. Useful when users are
 /// migrated from other systems. When omitted, the user&apos;s creation timestamp
 /// will be set to &quot;now&quot;.
 /// </param>
+/// <param name="email"></param>
 /// <param name="full_name"></param>
 /// <param name="login_name"></param>
 /// <param name="must_change_password"></param>
@@ -1153,9 +1189,9 @@ public record CreateTeamOption(
 /// <param name="source_id"></param>
 /// <param name="visibility"></param>
 public record CreateUserOption(
-    string email,
     string username,
     DateTimeOffset? created_at = default,
+    string? email = default,
     string? full_name = default,
     string? login_name = default,
     bool? must_change_password = default,
@@ -1347,7 +1383,7 @@ public record EditBranchProtectionOption(
 /// <summary>EditDeadlineOption options for creating a deadline</summary>
 /// <param name="due_date"></param>
 public record EditDeadlineOption(
-    DateTimeOffset due_date
+    DateTimeOffset? due_date = default
 );
 
 /// <summary>EditGitHookOption options when modifying one Git hook</summary>
@@ -1596,7 +1632,7 @@ public record EditTagProtectionOption(
 /// <param name="description"></param>
 /// <param name="includes_all_repositories"></param>
 /// <param name="permission"></param>
-/// <param name="units"></param>
+/// <param name="units">Deprecated: This variable should be replaced by UnitsMap and will be dropped in later versions.</param>
 /// <param name="units_map"></param>
 public record EditTeamOption(
     string name,
@@ -1604,6 +1640,7 @@ public record EditTeamOption(
     string? description = default,
     bool? includes_all_repositories = default,
     EditTeamOptionPermission? permission = default,
+    [property: Obsolete("")]
     ICollection<string>? units = default,
     IDictionary<string, string>? units_map = default
 );
@@ -1955,6 +1992,7 @@ public record Hook(
     bool? active = default,
     string? authorization_header = default,
     string? branch_filter = default,
+    [property: Obsolete("")]
     IDictionary<string, string>? config = default,
     string? content_type = default,
     DateTimeOffset? created_at = default,
@@ -2093,6 +2131,12 @@ public record IssueFormField(
 public record IssueLabelsOption(
     ICollection<object>? labels = default,
     DateTimeOffset? updated_at = default
+);
+
+/// <summary></summary>
+/// <param name="reason"></param>
+public record IssueLockOption(
+    string? reason = default
 );
 
 /// <summary>IssueMeta basic issue information</summary>
@@ -2957,7 +3001,7 @@ public record Reference(
 /// <summary></summary>
 /// <param name="name">Name of the runner to register. The name of the runner does not have to be unique.</param>
 /// <param name="description">Description of the runner to register.</param>
-/// <param name="ephemeral">Register as ephemeral runner https://forgejo.org/docs/latest/admin/actions/security/#ephemeral-runner</param>
+/// <param name="ephemeral">Register as ephemeral runner https://forgejo.org/docs/latest/admin/actions/security/#ephemeral-runners</param>
 public record RegisterRunnerOptions(
     string name,
     string? description = default,
@@ -3352,7 +3396,7 @@ public record TagProtection(
 /// <param name="name"></param>
 /// <param name="organization"></param>
 /// <param name="permission"></param>
-/// <param name="units"></param>
+/// <param name="units">Deprecated: This variable should be replaced by UnitsMap and will be dropped in later versions.</param>
 /// <param name="units_map"></param>
 public record Team(
     bool? can_create_org_repo = default,
@@ -3362,6 +3406,7 @@ public record Team(
     string? name = default,
     Organization? organization = default,
     TeamPermission? permission = default,
+    [property: Obsolete("")]
     ICollection<string>? units = default,
     IDictionary<string, string>? units_map = default
 );
@@ -4053,6 +4098,9 @@ public enum MigrateRepoOptionsService
     /// <summary>pagure</summary>
     [JsonStringEnumMemberName("pagure")]
     Pagure = 9,
+    /// <summary>bitbucketdc</summary>
+    [JsonStringEnumMemberName("bitbucketdc")]
+    Bitbucketdc = 10,
 };
 
 /// <summary>Context for the attachment: URLs to the containing object</summary>

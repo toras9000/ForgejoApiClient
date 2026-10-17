@@ -3,11 +3,11 @@
 namespace ForgejoApiClient.Api;
 
 [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
-[JsonSerializable(typeof(AccessToken))]
 [JsonSerializable(typeof(AccessToken[]))]
 [JsonSerializable(typeof(ActionArtifact))]
 [JsonSerializable(typeof(ActionArtifact[]))]
 [JsonSerializable(typeof(ActionRun))]
+[JsonSerializable(typeof(ActionRunJob))]
 [JsonSerializable(typeof(ActionRunJob[]))]
 [JsonSerializable(typeof(ActionRunner))]
 [JsonSerializable(typeof(ActionRunner[]))]
@@ -125,6 +125,7 @@ namespace ForgejoApiClient.Api;
 [JsonSerializable(typeof(IssueConfigValidation))]
 [JsonSerializable(typeof(IssueDeadline))]
 [JsonSerializable(typeof(IssueLabelsOption))]
+[JsonSerializable(typeof(IssueLockOption))]
 [JsonSerializable(typeof(IssueMeta))]
 [JsonSerializable(typeof(IssueTemplate[]))]
 [JsonSerializable(typeof(Label))]
@@ -146,7 +147,6 @@ namespace ForgejoApiClient.Api;
 [JsonSerializable(typeof(NotificationCount))]
 [JsonSerializable(typeof(NotificationThread))]
 [JsonSerializable(typeof(NotificationThread[]))]
-[JsonSerializable(typeof(OAuth2Application))]
 [JsonSerializable(typeof(OAuth2Application[]))]
 [JsonSerializable(typeof(Organization))]
 [JsonSerializable(typeof(Organization[]))]

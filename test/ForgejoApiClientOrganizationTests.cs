@@ -191,8 +191,11 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         var org = await resources.CreateTestOrgAsync(orgName);
         var repo = await resources.CreateTestOrgRepoAsync(orgName, $"repo-{DateTime.Now.Ticks:X16}");
 
-        // テスト対象呼び出し
-        var activities = await client.Organization.ListActivitiesAsync(orgName);
+        // テスト対象呼び出し。少し時間が経たないと情報が得られないようなのでしばらく繰り返して取得する。
+        var activities = await TestCallHelper.Satisfy(
+            caller: breaker => client.Organization.ListActivitiesAsync(orgName, cancelToken: breaker),
+            condition: activities => 0 < activities.Length
+        );
         activities.Should().NotBeEmpty();
     }
 
@@ -551,8 +554,11 @@ public class ForgejoApiClientOrganizationTests : ForgejoApiClientTestsBase
         // リポジトリをチームに追加
         await client.Organization.AddTeamRepositoryAsync(team.id!.Value, orgName, repoName);
 
-        // テスト対象呼び出し
-        var activities = await client.Organization.ListTeamActivitiesAsync(team.id!.Value);
+        // テスト対象呼び出し。少し時間が経たないと情報が得られないようなのでしばらく繰り返して取得する。
+        var activities = await TestCallHelper.Satisfy(
+            caller: breaker => client.Organization.ListTeamActivitiesAsync(team.id!.Value, cancelToken: breaker),
+            condition: activities => 0 < activities.Length
+        );
         activities.Should().NotBeEmpty();
     }
 

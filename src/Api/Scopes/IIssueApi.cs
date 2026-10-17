@@ -182,6 +182,27 @@ public interface IIssueApi : IApiScope
         => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/reactions", options, ApiDataSerializerContext.Default.EditReactionOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
     #endregion
 
+    #region Issue Lock
+    /// <summary>Lock an issue</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="index">index of the issue to lock</param>
+    /// <param name="options"></param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("PUT", "/repos/{owner}/{repo}/issues/{index}/lock", "Lock an issue")]
+    public Task LockAsync(string owner, string repo, long index, IssueLockOption options, CancellationToken cancelToken = default)
+        => PutRequest($"repos/{owner}/{repo}/issues/{index}/lock", options, ApiDataSerializerContext.Default.IssueLockOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+
+    /// <summary>Unlock an issue</summary>
+    /// <param name="owner">owner of the repo</param>
+    /// <param name="repo">name of the repo</param>
+    /// <param name="index">index of the issue to unlock</param>
+    /// <param name="cancelToken">キャンセルトークン</param>
+    [ForgejoEndpoint("DELETE", "/repos/{owner}/{repo}/issues/{index}/lock", "Unlock an issue")]
+    public Task UnlockAsync(string owner, string repo, long index, CancellationToken cancelToken = default)
+        => DeleteRequest($"repos/{owner}/{repo}/issues/{index}/lock", cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.EmptyResult, cancelToken);
+    #endregion
+
     #region Comment
     /// <summary>List all comments in a repository</summary>
     /// <param name="owner">owner of the repo</param>

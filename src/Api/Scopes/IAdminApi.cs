@@ -259,6 +259,7 @@ public interface IAdminApi : IApiScope
     /// <param name="cancelToken">キャンセルトークン</param>
     /// <returns>AccessToken represents an API access token.</returns>
     [ForgejoEndpoint("POST", "/admin/users/{username}/tokens", "Create an access token for the specified user")]
+    [ManualEdit("戻り値を AccessToken に変更")]
     public Task<AccessToken> CreateUsersTokenAsync(string username, CreateAccessTokenOption options, CancellationToken cancelToken = default)
         => PostRequest($"admin/users/{username}/tokens", options, ApiDataSerializerContext.Default.CreateAccessTokenOption, cancelToken).JsonResponseAsync(ApiDataSerializerContext.Default.AccessToken, cancelToken);
 
