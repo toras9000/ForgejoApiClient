@@ -752,7 +752,7 @@ public class ForgejoApiClientUserTests : ForgejoApiClientTestsBase
         quota_packages.Should().NotBeEmpty();
 
         // ユーザにクォータグループを設定
-        await client.Admin.SetUserQuotaGroupAsync(repoOwner, new([quotaGroup.name!]));
+        await client.Admin.SetUserQuotaGroupAsync(repoOwner, new(groups: [quotaGroup.name!]));
 
         // クォータ情報取得
         var quota = await client.User.GetQuotaAsync();

@@ -297,13 +297,13 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         // メールアドレス追加
         using var userClient = client.Sudo(newName);
         var newMail = $"new-{userName}@example.com";
-        var mail_added = await userClient.User.AddEmailAsync(new([newMail]));
+        var mail_added = await userClient.User.AddEmailAsync(new(emails: [newMail]));
 
         // メールアドレス取得
         var mail_list = await client.Admin.ListUserEmailsAsync(newName);
 
         // メールアドレス削除
-        await client.Admin.DeleteUserEmailsAsync(newName, new([newMail]));
+        await client.Admin.DeleteUserEmailsAsync(newName, new(emails: [newMail]));
 
         // メールアドレス取得(削除後)
         var mail_list_deleted = await client.Admin.ListUserEmailsAsync(newName);
@@ -350,7 +350,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var user_created = await client.Admin.CreateUserAsync(new(email: userMail, username: userName, password: userName)).WillBeDiscarded(resources);
 
         // トークン作成
-        var token = await client.Admin.CreateUsersTokenAsync(userName, new("abc", scopes: ["read:repository", "read:user"]));
+        var token = await client.Admin.CreateUsersTokenAsync(userName, new(name: "abc", scopes: ["read:repository", "read:user"]));
 
         // トークンリスト取得
         var token_list1 = await client.Admin.ListUserTokensAsync(userName);
@@ -486,7 +486,7 @@ public class ForgejoApiClientAdminTests : ForgejoApiClientTestsBase
         var user = await resources.CreateTestUserAsync(userName);
 
         // ユーザにクォータグループを設定
-        await client.Admin.SetUserQuotaGroupAsync(userName, new([quotaGroupName]));
+        await client.Admin.SetUserQuotaGroupAsync(userName, new(groups: [quotaGroupName]));
 
         // ユーザのQuota情報を取得
         var userQuota = await client.Admin.GetUserQuotaRuleAsync(userName);

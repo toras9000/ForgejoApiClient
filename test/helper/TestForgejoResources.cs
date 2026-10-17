@@ -15,7 +15,7 @@ public sealed class TestForgejoResources : IAsyncDisposable
 
     /// <summary>テスト用ユーザを作成</summary>
     public Task<User> CreateTestUserAsync(string name, string? mail = default, string? password = default)
-        => CreateTestUserAsync(new CreateUserOption(mail ?? $"{name}@example.com", name, password: password ?? "password", must_change_password: false));
+        => CreateTestUserAsync(new CreateUserOption(username: name, email: mail ?? $"{name}@example.com", password: password ?? "password", must_change_password: false));
 
     /// <summary>テスト用ユーザを作成</summary>
     public Task<User> CreateTestUserAsync(CreateUserOption options)
@@ -23,7 +23,7 @@ public sealed class TestForgejoResources : IAsyncDisposable
 
     /// <summary>テスト用組織を作成</summary>
     public Task<Organization> CreateTestOrgAsync(string name)
-        => CreateTestOrgAsync(new CreateOrgOption(name));
+        => CreateTestOrgAsync(new CreateOrgOption(username: name));
 
     /// <summary>テスト用組織を作成</summary>
     public Task<Organization> CreateTestOrgAsync(CreateOrgOption options)
@@ -31,7 +31,7 @@ public sealed class TestForgejoResources : IAsyncDisposable
 
     /// <summary>テスト用チームを作成</summary>
     public Task<Team> CreateTestTeamAsync(string org, string team)
-        => CreateTestTeamAsync(org, new CreateTeamOption(team, permission: CreateTeamOptionPermission.Read, units: ["activitypub", "admin", "issue", "misc", "notification", "organization", "package", "repository", "user"]));
+        => CreateTestTeamAsync(org, new CreateTeamOption(name: team, permission: CreateTeamOptionPermission.Read, units: ["activitypub", "admin", "issue", "misc", "notification", "organization", "package", "repository", "user"]));
 
     /// <summary>テスト用チームを作成</summary>
     public Task<Team> CreateTestTeamAsync(string org, CreateTeamOption options)
@@ -39,7 +39,7 @@ public sealed class TestForgejoResources : IAsyncDisposable
 
     /// <summary>テスト用リポジトリを作成</summary>
     public Task<Repository> CreateTestRepoAsync(string reponame)
-        => CreateTestRepoAsync(new CreateRepoOption(reponame));
+        => CreateTestRepoAsync(new CreateRepoOption(name: reponame));
 
     /// <summary>テスト用リポジトリを作成</summary>
     public Task<Repository> CreateTestRepoAsync(CreateRepoOption options)

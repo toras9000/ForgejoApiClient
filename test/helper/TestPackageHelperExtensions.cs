@@ -25,7 +25,7 @@ public static class TestPackageHelperExtensions
     {
         var nugetFeed = new Uri(self.TestService, $"/api/packages/{owner}/nuget/index.json");
         var nugetRepo = NuGet.Protocol.Core.Types.Repository.Factory.GetCoreV3(nugetFeed.AbsoluteUri);
-        var nugetUpdater = await nugetRepo.GetResourceAsync<PackageUpdateResource>();
+        var nugetUpdater = await nugetRepo.GetResourceAsync<PackageUpdateResource>() ?? throw new Exception();
         await nugetUpdater.PushAsync(
             packagePaths: [pkgFile.FullName],
             symbolSource: default,
