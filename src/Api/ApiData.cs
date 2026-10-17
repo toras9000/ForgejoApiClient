@@ -2100,9 +2100,9 @@ public record IssueLabelsOption(
 /// <param name="owner"></param>
 /// <param name="repo"></param>
 public record IssueMeta(
-    long? index = default,
-    string? owner = default,
-    string? repo = default
+    long index,
+    string owner,
+    string repo
 );
 
 /// <summary>IssueTemplate represents an issue template for a repository</summary>
