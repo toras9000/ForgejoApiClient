@@ -44,7 +44,7 @@ runner:
   # The timeout for fetching the job from the Forgejo instance.
   fetch_timeout: 30s
   # The interval for fetching the job from the Forgejo instance.
-  fetch_interval: 60s
+  fetch_interval: 10s
   # The interval for reporting the job status and logs to the Forgejo instance.
   report_interval: 2s
   # At the end of a job, retry configuration for sending logs to remote.
@@ -59,19 +59,34 @@ runner:
   # Like: ["macos-arm64:host", "ubuntu-latest:docker://node:20-bookworm", "ubuntu-22.04:docker://node:20-bookworm"]
   # If it's empty when registering, it will ask for inputting labels.
   # If it's empty when executing the `daemon`, it will use labels in the `.runner` file.
+  #
+  # A docker label may carry options as a query string. `platform` sets the OS/architecture
+  # passed to the container runtime when pulling and creating images, which is useful on hosts
+  # (e.g. FreeBSD, macOS) that can run images for several platforms. The value must use the names
+  # Docker uses (the values accepted by `docker --platform`), e.g. linux/amd64, linux/arm64, linux/386:
+  #   labels: ["ubuntu-latest:docker://node:20-bookworm?platform=linux/amd64"]
+  #
+  # The same can be expressed with the more explicit mapping form:
+  #   labels:
+  #     freebsd-15:
+  #       backend: docker
+  #       backend-options:
+  #         image: ghcr.io/freebsd/freebsd-runtime:15.0
+  #         platform: freebsd/amd64
   labels: [
-    "ubuntu:docker://ubuntu:24.04",
+    "ubuntu:docker://ubuntu:26.04",
+    "ubuntu-26.04:docker://ubuntu:26.04",
     "ubuntu-24.04:docker://ubuntu:24.04",
-    "ubuntu-22.04:docker://ubuntu:22.04",
-    "debian:docker://debian:12",
+    "debian:docker://debian:13",
+    "debian-13:docker://debian:13",
     "debian-12:docker://debian:12",
     "debian-11:docker://debian:11",
     "alpine:docker://alpine",
     "busybox:docker://busybox",
-    "node:docker://node:20-bookworm",
-    "node-debian:docker://node:20-bookworm",
+    "node:docker://node:26-trixie",
+    "node-debian:docker://node:26-trixie",
+    "node-26-debian-13:docker://node:26-trixie",
     "node-20-debian-12:docker://node:20-bookworm",
-    "node-20-debian-11:docker://node:20-bullseye",
     "docker-cli:docker://code.forgejo.org/oci/docker:cli",
     "dotnet-sdk:docker://mcr.microsoft.com/dotnet/sdk:10.0",
     "dotnet-sdk-10:docker://mcr.microsoft.com/dotnet/sdk:10.0"

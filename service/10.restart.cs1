@@ -14,8 +14,18 @@ using Lestaly.Cx;
 
 var settings = new
 {
-    // サービスのURL
-    ServiceURL = "http://testserver.home:9970",
+    // Forgejo関連情報
+    Forgejo = new
+    {
+        // サービスのURL
+        ServiceURL = "http://testserver.home:9970",
+
+        // コンテナ内部HTTPポート
+        InternalPort = 3000,
+
+        // 生成したテストインスタンス情報の保存ファイル (セットアップ実行時)
+        InstanceInfoFile = ThisSource.RelativeFile("../test/test-forgejo-instance.json"),
+    },
 
     // 初回起動セットアップの設定
     Setup = new
@@ -29,9 +39,6 @@ var settings = new
         AdminPass = "forgejo-admin-pass",
         // セットアップ時の admin メールアドレス
         AdminMail = "forgejo-admin@example.com",
-
-        // 生成したテストインスタンス情報の保存ファイル
-        InstanceInfoFile = ThisSource.RelativeFile("../test/test-forgejo-instance.json"),
     },
 
     // ランナー関連設定
@@ -78,7 +85,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
     // サービスリンクを表示
     Console.WriteLine();
     Console.WriteLine("Service URL");
-    Console.WriteLine($"  {Poster.Link[settings.ServiceURL]}");
+    Console.WriteLine($"  {Poster.Link[settings.Forgejo.ServiceURL]}");
     Console.WriteLine();
 
     // 初回セットアップを試行しない場合はここで終了
@@ -94,7 +101,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
     {
         while (setupPage == null)
         {
-            var document = await context.OpenAsync(settings.ServiceURL, timeout.Token);
+            var document = await context.OpenAsync(settings.Forgejo.ServiceURL, timeout.Token);
             if (document != null && document.StatusCode == HttpStatusCode.OK && 0 < document.Source.Length)
             {
                 setupPage = document;
@@ -146,7 +153,7 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
         while (true)
         {
             await Task.Delay(TimeSpan.FromSeconds(1), timeout.Token);
-            using var frontpage = await context.OpenAsync(settings.ServiceURL, timeout.Token);
+            using var frontpage = await context.OpenAsync(settings.Forgejo.ServiceURL, timeout.Token);
             if (frontpage == null || frontpage.StatusCode != HttpStatusCode.OK || frontpage.Source.Length <= 0) continue;
             var loading = frontpage.GetElementById("goto-user-login");
             if (loading == null) break; // loading finish
@@ -169,12 +176,12 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
 
     // テスト用サービスインスタンスの情報をファイルに保存
     var credential = new TestUserCredential(settings.Setup.AdminUser, settings.Setup.AdminPass);
-    var instanceInfo = new TestServiceInfo(settings.ServiceURL, credential, apiToken);
-    await settings.Setup.InstanceInfoFile.WriteJsonAsync(instanceInfo, signal.Token);
+    var instanceInfo = new TestServiceInfo(settings.Forgejo.ServiceURL, settings.Forgejo.InternalPort, credential, apiToken);
+    await settings.Forgejo.InstanceInfoFile.WritePrettyJsonAsync(instanceInfo, signal.Token);
 
     // APIクライアント生成
     Console.WriteLine("Create API client");
-    using var forgejo = new ForgejoClient(new Uri(settings.ServiceURL), apiToken);
+    using var forgejo = new ForgejoClient(new Uri(settings.Forgejo.ServiceURL), apiToken);
 
     // ランナーの登録状態確認
     Console.WriteLine("Check runner registration");
@@ -206,4 +213,4 @@ return await Paved.ProceedAsync(noPause: args.RoughContains("--no-pause"), async
 });
 
 record TestUserCredential(string Username, string Password);
-record TestServiceInfo(string Url, TestUserCredential Admin, string Token);
+record TestServiceInfo(string Url, int InternalPort, TestUserCredential Admin, string Token);

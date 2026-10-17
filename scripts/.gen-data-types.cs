@@ -142,6 +142,8 @@ public class GenerateApiDataType
     {
         static string? escape(string? text) => SecurityElement.Escape(text)?.Replace("\r", "&#xD;").Replace("\n", "&#xA;");
 
+        description = description?.Trim();
+
         var descLines = description?.Split(['\r', '\n']) ?? [];
         if (descLines.Length < 2)
         {
@@ -236,7 +238,7 @@ public class GenerateApiDataType
                             var neesSepa = i < (properties.Length - 1);
                             if (prop.Model.IsDeprecated)
                             {
-                                yield return $"[Obsolete(\"{prop.Model.DeprecatedMessage}\")]";
+                                yield return $"    [property: Obsolete(\"{prop.Model.DeprecatedMessage}\")]";
                             }
                             yield return $"    {prop.Model.Type} {prop.PropName}{(prop.Model.IsNullable ? $" = default" : "")}{(neesSepa ? "," : "")}";
                             count++;

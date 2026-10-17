@@ -6,8 +6,8 @@
 #:package RefFile@0.2.0
 #:property PublishAot=false
 using Lestaly;
-[assembly: RefFile(".gen-data-types.cs1")]
-[assembly: RefFile(".gen-api-methods.cs1")]
+[assembly: RefFile(".gen-data-types.cs")]
+[assembly: RefFile(".gen-api-methods.cs")]
 
 var config = new
 {

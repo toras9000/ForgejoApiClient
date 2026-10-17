@@ -6,7 +6,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Humanizer;
 using Kokuban;
@@ -198,12 +197,12 @@ public class GenerateApiMethods
         static string? escape(string? text) => SecurityElement.Escape(text)?.Replace("\r", "&#xD;").Replace("\n", "&#xA;");
 
         // メソッド概要
-        yield return $"/// <summary>{escape(ep.Summary)}</summary>";
+        yield return $"/// <summary>{escape(ep.Summary.Trim())}</summary>";
 
         // Path パラメータ
         foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Path))
         {
-            yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
+            yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description.Trim())}}</param>""";
         }
 
         // Body/FormData パラメータチェック
@@ -214,13 +213,13 @@ public class GenerateApiMethods
         // Body パラメータ
         foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.Body))
         {
-            yield return $$"""/// <param name="{{escape(GenerationConstants.BodyParamVariable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
+            yield return $$"""/// <param name="{{escape(GenerationConstants.BodyParamVariable.TrimStart('@'))}}">{{escape(param.Description.Trim())}}</param>""";
         }
 
         // FormData パラメータ
         foreach (var param in ep.Parameters.Where(p => p.Kind == OpenApiParameterKind.FormData))
         {
-            yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description)}}</param>""";
+            yield return $$"""/// <param name="{{escape(param.Variable.TrimStart('@'))}}">{{escape(param.Description.Trim())}}</param>""";
         }
 
         // Query パラメータ
@@ -229,7 +228,7 @@ public class GenerateApiMethods
         if (hasPaging) queryParams.RemoveAll(p => p.Name is "limit" or "page");
         foreach (var param in queryParams)
         {
-            yield return $"""/// <param name="{escape(param.Variable.TrimStart('@'))}">{escape(param.Description)}</param>""";
+            yield return $"""/// <param name="{escape(param.Variable.TrimStart('@'))}">{escape(param.Description.Trim())}</param>""";
         }
 
         // ページングパラメータ
@@ -244,7 +243,7 @@ public class GenerateApiMethods
         // 戻り値
         if (ep.Result.Type != GenerationConstants.NothingResult)
         {
-            yield return $"""/// <returns>{escape(ep.Result.Description)}</returns>""";
+            yield return $"""/// <returns>{escape(ep.Result.Description.Trim())}</returns>""";
         }
     }
 
