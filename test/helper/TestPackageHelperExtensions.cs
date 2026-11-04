@@ -28,7 +28,7 @@ public static class TestPackageHelperExtensions
         var nugetUpdater = await nugetRepo.GetResourceAsync<PackageUpdateResource>() ?? throw new Exception();
         await nugetUpdater.PushAsync(
             packagePaths: [pkgFile.FullName],
-            symbolSource: default,
+            symbolSource: "",
             timeoutInSecond: 60,
             disableBuffering: false,
             getApiKey: _ => self.TestToken,

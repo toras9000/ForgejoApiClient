@@ -22,10 +22,10 @@
     <PackageReference Include="BouncyCastle.OpenPGP" Version="2.0.0.1" />
     <PackageReference Include="Lestaly" Version="0.147.0" />
     <PackageReference Include="LibGit2Sharp" Version="0.32.0" />
-    <PackageReference Include="MSTest" Version="4.5.1" />
-    <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
-    <PackageReference Include="SkiaSharp" Version="4.153.1" />
-    <PackageReference Include="System.IO.Packaging" Version="10.0.13" />
+    <PackageReference Include="MSTest" Version="4.5.3" />
+    <PackageReference Include="NuGet.Protocol" Version="8.0.0" />
+    <PackageReference Include="SkiaSharp" Version="4.156.0" />
+    <PackageReference Include="System.IO.Packaging" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>
