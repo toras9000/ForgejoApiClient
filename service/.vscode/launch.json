@@ -9,8 +9,8 @@
             "program": "${env:TEMP}/cs-filebased/${fileWorkspaceFolderBasename}/${relativeFileDirname}/${fileBasenameNoExtension}/${fileBasenameNoExtension}.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "stopAtEntry": false
-        }
+            "console": "externalTerminal",
+            "stopAtEntry": false,
+        },
     ]
 }

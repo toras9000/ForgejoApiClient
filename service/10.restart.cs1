@@ -1,7 +1,7 @@
 #!/usr/bin/env -S dotnet run --file
-#:package ForgejoApiClient@16.0.0-rev.2
+#:package ForgejoApiClient@17.0.0-rev.1
 #:package Lestaly.General@0.147.0
-#:package AngleSharp@1.8.5
+#:package AngleSharp@1.10.2
 #:property PublishAot=false
 using System.Net;
 using System.Text;

@@ -1,5 +1,5 @@
 #!/usr/bin/env -S dotnet run --file
-#:package NSwag.CodeGeneration.CSharp@14.7.1
+#:package NSwag.CodeGeneration.CSharp@14.8.0
 #:package Kokuban@0.2.0
 #:package Lestaly.General@0.147.0
 #:property PublishAot=false
